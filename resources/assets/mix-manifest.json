@@ -1,0 +1,19 @@
+{
+    "/hubble.js": "/hubble.js",
+    "/hubble.css": "/hubble.css",
+    "/boolean-edit-boolean-field-vue.js": "/boolean-edit-boolean-field-vue.js",
+    "/boolean-show-boolean-field-vue.js": "/boolean-show-boolean-field-vue.js",
+    "/color-picker-show-color-picker-field-vue.js": "/color-picker-show-color-picker-field-vue.js",
+    "/datetime-edit-datetime-field-vue.js": "/datetime-edit-datetime-field-vue.js",
+    "/hubble-checkbox-filter.js": "/hubble-checkbox-filter.js",
+    "/hubble-create.js": "/hubble-create.js",
+    "/hubble-details.js": "/hubble-details.js",
+    "/hubble-edit.js": "/hubble-edit.js",
+    "/hubble-index.js": "/hubble-index.js",
+    "/select-edit-select-field-vue.js": "/select-edit-select-field-vue.js",
+    "/text-edit-text-field-vue.js": "/text-edit-text-field-vue.js",
+    "/text-index-text-field-vue.js": "/text-index-text-field-vue.js",
+    "/text-show-text-field-vue.js": "/text-show-text-field-vue.js",
+    "/textarea-edit-textarea-field-vue.js": "/textarea-edit-textarea-field-vue.js",
+    "/vendors~datetime-edit-datetime-field-vue.js": "/vendors~datetime-edit-datetime-field-vue.js"
+}

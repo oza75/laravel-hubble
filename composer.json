@@ -1,0 +1,54 @@
+{
+    "name": "oza75/laravel-hubble",
+    "description": "Create a beautiful laravel dashboard in no time",
+    "keywords": [
+        "oza75",
+        "laravel-hubble"
+    ],
+    "homepage": "https://github.com/oza75/laravel-hubble",
+    "license": "MIT",
+    "type": "library",
+    "authors": [
+        {
+            "name": "Zié Aboubacar OUATTARA",
+            "email": "abouba181@gmail.com",
+            "role": "Developer"
+        }
+    ],
+    "require": {
+        "php": "^7.1",
+        "ext-json": "*"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^5.3",
+        "phpunit/phpunit": "^8.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Oza75\\LaravelHubble\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Oza75\\LaravelHubble\\Tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "vendor/bin/phpunit",
+        "test-coverage": "vendor/bin/phpunit --coverage-html coverage"
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Oza75\\LaravelHubble\\HubbleServiceProvider"
+            ],
+            "aliases": {
+                "Hubble": "Oza75\\LaravelHubble\\Facades\\Hubble"
+            }
+        }
+    }
+}
