@@ -38,12 +38,23 @@ interface Hubble
 
     /**
      * @param string $path
+     * @param string $namespace
      * @return mixed
      */
-    public function setResourcePath(string $path);
+    public function setResourcesFolder(string $path, string $namespace);
+
+    /**
+     * @return string
+     */
+    public function getResourcesFolder(): string;
 
     /**
      * @return mixed
      */
     public function disableAutoDiscovering();
+
+    /**
+     * @return mixed
+     */
+    public function autoRegisterResources();
 }

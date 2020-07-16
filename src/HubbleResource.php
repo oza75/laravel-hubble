@@ -4,6 +4,7 @@
 namespace Oza75\LaravelHubble;
 
 
+use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Concerns\HandlesEvents;
 use Oza75\LaravelHubble\Concerns\InteractsWithDatabase;
 use Oza75\LaravelHubble\Contracts\Relations\HandleManyRelationship;
@@ -54,7 +55,12 @@ abstract class HubbleResource
      */
     public function getName()
     {
-        return $this->name;
+        if ($this->name)
+            return $this->name;
+
+        $defaultName = preg_replace('/[rR]esource/', '', class_basename($this));
+
+        return Str::kebab(Str::plural($defaultName));
     }
 
     /**
@@ -88,7 +94,7 @@ abstract class HubbleResource
     {
         $data = [
             'key' => $this->key,
-            'title' => $this->title,
+            'title' => $this->getTitle(),
             'searchable' => $this->searchable(),
             'urls' => $this->getUrls(),
             'fields' => $this->parseFields($section),
@@ -136,7 +142,7 @@ abstract class HubbleResource
     {
         $actions = collect($this->actions())->map(function (Action $action) {
             return array_merge($action->toArray(), [
-                'url' => route('api.hubble.action', ['name' => $this->name, 'action' => $action->getName()])
+                'url' => route('api.hubble.action', ['name' => $this->getName(), 'action' => $action->getName()])
             ]);
         })->toArray();
 
@@ -200,7 +206,7 @@ abstract class HubbleResource
      */
     public function getTitle()
     {
-        return $this->title;
+        return $this->title ?? $this->getName();
     }
 
     /**
@@ -210,10 +216,10 @@ abstract class HubbleResource
     public function resolveItemUrls($resource)
     {
         return [
-            'show' => route('hubble.show', ['name' => $this->name, 'key' => $resource->{$this->key}]),
-            'update' => route('hubble.update', ['name' => $this->name, 'key' => $resource->{$this->key}]),
-            'edit' => route('hubble.edit', ['name' => $this->name, 'key' => $resource->{$this->key}]),
-            'delete' => route('api.hubble.delete', ['name' => $this->name, 'key' => $resource->{$this->key}])
+            'show' => route('hubble.show', ['name' => $this->getName(), 'key' => $resource->{$this->key}]),
+            'update' => route('hubble.update', ['name' => $this->getName(), 'key' => $resource->{$this->key}]),
+            'edit' => route('hubble.edit', ['name' => $this->getName(), 'key' => $resource->{$this->key}]),
+            'delete' => route('api.hubble.delete', ['name' => $this->getName(), 'key' => $resource->{$this->key}])
         ];
     }
 
@@ -227,7 +233,7 @@ abstract class HubbleResource
 
         $item = $this->create($data, $request);
 
-        return route('hubble.show', ['name' => $this->name, 'key' => $item->{$this->key}]);
+        return route('hubble.show', ['name' => $this->getName(), 'key' => $item->{$this->key}]);
     }
 
     /**
@@ -248,11 +254,11 @@ abstract class HubbleResource
     protected function urls()
     {
         return [
-            'create' => route('hubble.create', ['name' => $this->name]),
-            'store' => route('hubble.store', ['name' => $this->name]),
-            'index' => route('hubble.index', ['name' => $this->name]),
+            'create' => route('hubble.create', ['name' => $this->getName()]),
+            'store' => route('hubble.store', ['name' => $this->getName()]),
+            'index' => route('hubble.index', ['name' => $this->getName()]),
             'api' => [
-                'index' => route('api.hubble.index', ['name' => $this->name]),
+                'index' => route('api.hubble.index', ['name' => $this->getName()]),
             ],
         ];
     }

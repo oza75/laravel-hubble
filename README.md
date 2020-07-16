@@ -17,24 +17,35 @@ You can install the package via composer:
 ```bash
 composer require oza75/laravel-hubble
 ```
-Make sure you already have `login` and `logout` routes. You can install [laravel-ui](https://github.com/laravel/ui) package in order to register those routes.
-
-Publish public assets. **`(required)`**
+Then install laravel-hubble
 ```bash
-php artisan vendor:publish --provider="Oza75\LaravelHubble\HubbleServiceProvider" --tag="public"
+php artisan hubble:install
 ```
-or publish all assets, views, config ... if you want more customization
-```bash
-php artisan vendor:publish --provider="Oza75\LaravelHubble\HubbleServiceProvider"
+Now go to : http://yourapp.tld/hubble (or http://localhost:8000/hubble if you use `artisan serve`)
+
+## Authentification
+Hubble uses the default Laravel authorization gate to check if a user can access to the dashboard. 
+By default, everyone can access to hubble dashboard. You are free to modify this gate in your `App\Providers\AppServiceProvider` boot method to restrict access.
+
+```php 
+ Gate::define('viewHubble', function (User $user) {
+      return $user->isAdmin();
+ });
 ```
 
-now go to : yourapp.tld/hubble (or localhost:8000/hubble if you use `artisan serve`)
 ## Usage
 
 ``` php
 // Usage description here
 ```
-
+### Filter
+ - options
+ 
+ An associative array of your filter's options where the key is the label 
+ and the value, the value of the option. You can also return an url where the options
+ should be fetched or a custom array. for those cases you may set the valueKey and the textKey
+ using the setValueKey(string $key), and the setTextKey(string $key) in the constructor of this filter. 
+ 
 ### Testing
 
 ``` bash

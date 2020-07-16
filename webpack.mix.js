@@ -10,6 +10,11 @@ let mix = require('laravel-mix');
  | file for your application, as well as bundling up your JS files.
  |
  */
+mix.webpackConfig({
+    "output": {
+       publicPath: '/vendor/laravel-hubble/'
+    }
+})
 
 mix.js('resources/js/hubble.js', 'resources/assets')
     .sass('resources/sass/hubble.scss', 'resources/assets')

@@ -4,20 +4,22 @@
 namespace Oza75\LaravelHubble;
 
 
+use Illuminate\Support\Str;
+
 abstract class Action
 {
     /**
      * @var string
      */
-    private $name;
+    protected $name;
     /**
      * @var string|null
      */
-    private $confirmationMessage;
+    protected $confirmationMessage;
     /**
      * @var string
      */
-    private $title;
+    protected $title;
 
     /**
      * @var array[]
@@ -29,33 +31,31 @@ abstract class Action
 
     /**
      * Action constructor.
-     * @param string $name
+     * @param string|null $name
      * @param string $title
      * @param string|null $confirmationMessage
      */
-    public function __construct(string $name, string $title, ?string $confirmationMessage = null)
+    public function __construct(?string $name = null, ?string $title = null, ?string $confirmationMessage = null)
     {
-        $this->name = $name;
-        $this->confirmationMessage = $confirmationMessage;
-        $this->title = $title;
+        if ($name) $this->name = $name;
+        if ($title) $this->title = $title;
+        if ($confirmationMessage) $this->confirmationMessage = $confirmationMessage;
     }
 
     /**
-     * @param string $name
-     * @param string $title
-     * @param string|null $confirmationMessage
+     * @param array $arguments
      * @return self
      */
-    public static function make(string $name, string $title, ?string $confirmationMessage = null)
+    public static function make(...$arguments)
     {
-        return new static($name, $title, $confirmationMessage);
+        return new static(...$arguments);
     }
 
     /**
-     * @param $items
-     * @return mixed
+     * @param $ids
+     * @return void
      */
-    public abstract function handle($items);
+    public abstract function handle($ids);
 
     /**
      * @param string $name
@@ -80,8 +80,8 @@ abstract class Action
     public function toArray()
     {
         return [
-            'name' => $this->name,
-            'title' => $this->title,
+            'name' => $this->getName(),
+            'title' => $this->getTitle(),
             'confirm_message' => $this->confirmationMessage,
         ];
     }
@@ -101,7 +101,7 @@ abstract class Action
      */
     public function getName(): string
     {
-        return $this->name;
+        return $this->name ?? Str::kebab(class_basename($this));
     }
 
     /**
@@ -147,5 +147,13 @@ abstract class Action
         foreach ($hooks as $hook) {
             $hook($items);
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title ?? Str::studly(class_basename($this));
     }
 }

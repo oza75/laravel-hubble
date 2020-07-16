@@ -2,7 +2,8 @@
 
 namespace Oza75\LaravelHubble;
 
-use Illuminate\Foundation\Auth\User;
+use Exception;
+use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Contracts\Hubble as Contract;
 
 class Hubble implements Contract
@@ -13,14 +14,20 @@ class Hubble implements Contract
 
     protected $namespace = "Oza75\LaravelHubble\Controller\\";
 
-    protected $resourcePath;
+    protected $resourcesFolder;
+
+    protected $resourcesNamespace;
 
     protected $autoDiscovering = true;
 
+    /**
+     * Hubble constructor.
+     * @param array|null $resources
+     */
     public function __construct(?array $resources = [])
     {
-        $this->resourcePath = app_path('HubbleResources');
         $this->resources = $resources;
+        $this->setDefaultResourcesPaths();
 
         $this->boot();
     }
@@ -101,11 +108,17 @@ class Hubble implements Contract
 
     /**
      * @param string $path
+     * @param string $namespace
      * @return mixed
      */
-    public function setResourcePath(string $path)
+    public function setResourcesFolder(string $path, string $namespace)
     {
-        $this->resourcePath = $path;
+        if (!$this->autoDiscovering) {
+            throw new \LogicException('You have already disable resource auto registration. You can only set resources namespace only if resource auto discovering is activated');
+        }
+
+        $this->resourcesFolder = Str::finish(realpath($path), '/');
+        $this->resourcesNamespace = $namespace;
 
         return $this;
     }
@@ -118,5 +131,123 @@ class Hubble implements Contract
         $this->autoDiscovering = false;
 
         return $this;
+    }
+
+    /**
+     * Register all resources defined in the resource namespace and boot them
+     *
+     * @return bool|mixed
+     * @throws Exception
+     */
+    public function autoRegisterResources()
+    {
+        if (!$this->autoDiscovering) return false;
+
+        $files = glob($this->resourcesFolder . '*.php');
+        if (empty($files)) return false;
+
+        $resources = collect($files)->map(function ($file) {
+            return $this->resourcesNamespace . '\\' . basename($file, '.php');
+        })->filter(function ($class) {
+            if (!class_exists($class)) return false;
+            $reflection = new \ReflectionClass($class);
+            return $reflection->isSubclassOf(HubbleResource::class) && $reflection->isInstantiable();
+        })->toArray();
+
+        $this->resources = $resources;
+
+        $this->boot();
+
+        return true;
+    }
+
+    /**
+     * @return string
+     */
+    public function getResourcesFolder(): string
+    {
+        return $this->resourcesFolder;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getResources(): ?array
+    {
+        return $this->resources;
+    }
+
+    /**
+     * Add manually a new resource to Hubble
+     *
+     * @param string $resource
+     * @return Hubble
+     */
+    public function addResource(string $resource)
+    {
+        $this->resources[] = $resource;
+        $this->booted[$resource] = new $resource;
+
+        return $this;
+    }
+
+    /**
+     * Set hubble resources
+     *
+     * @param array $resources
+     * @return $this
+     */
+    public function setResources(array $resources)
+    {
+        $this->resources = $resources;
+
+        $this->boot();
+
+        return $this;
+    }
+
+    /**
+     * @param array $resources
+     * @return $this
+     */
+    public function addResources(array $resources)
+    {
+        $this->resources = array_merge($this->resources, $resources);
+
+        foreach ($resources as $resource) {
+            $this->booted[$resource] = new $resource;
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getBooted(): array
+    {
+        return $this->booted;
+    }
+
+    private function setDefaultResourcesPaths(): void
+    {
+        $folder = config('laravel-hubble.resources_folder', "app/Hubble");
+        $namespace = config('laravel-hubble.resources_namespace', "App\\Hubble");
+
+        if (!app()->runningUnitTests()) {
+            $folder = base_path($folder);
+        }
+        $folder = Str::finish($folder, '/');
+
+        $this->resourcesFolder = $folder;
+        $this->resourcesNamespace = $namespace;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getResourcesNamespace()
+    {
+        return $this->resourcesNamespace;
     }
 }

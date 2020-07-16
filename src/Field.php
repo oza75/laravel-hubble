@@ -4,6 +4,7 @@
 namespace Oza75\LaravelHubble;
 
 
+use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Concerns\HandlesVisibility;
 use Illuminate\Http\Request;
 
@@ -129,8 +130,8 @@ class Field
     {
         return [
             $this->name => [
-                'name' => $this->name,
-                'title' => $this->title,
+                'name' => $this->getName(),
+                'title' => $this->getTitle(),
                 'sortable' => $this->sortable,
                 'components' => $this->components,
                 'attributes' => $this->attributes,

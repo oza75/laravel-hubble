@@ -3,40 +3,40 @@
 
 namespace Oza75\LaravelHubble\Actions;
 
+
 use Illuminate\Database\Eloquent\Builder;
 use Oza75\LaravelHubble\Action;
 
 class DeleteAction extends Action
 {
-    public function __construct(string $name, string $title, ?string $confirmationMessage = null)
-    {
-        $confirmationMessage = $confirmationMessage ?? 'Voulez vous vraiment supprimer cet enregistrement ?';
-
-        parent::__construct($name, $title, $confirmationMessage);
-    }
-
     /**
      * @var Builder
      */
-    private $query;
+    protected $builder;
 
     /**
-     * @param $items
-     * @return mixed
+     * DeleteAction constructor.
+     *
+     * @param Builder $builder
+     * @param string|null $name
+     * @param string|null $title
+     * @param string|null $confirmationMessage
      */
-    public function handle($items)
+    public function __construct(Builder $builder, ?string $name = null, ?string $title = null, ?string $confirmationMessage = null)
     {
-        $this->query->whereIn('id', $items)->delete();
+        parent::__construct($name, $title, $confirmationMessage);
+
+        $this->builder = $builder;
     }
 
-
     /**
-     * @param Builder $query
-     * @return DeleteAction
+     * Handle your action
+     *
+     * @param $ids
+     * @return mixed
      */
-    public function setQuery(Builder $query)
+    public function handle($ids)
     {
-        $this->query = $query;
-        return $this;
+        $this->builder->newQuery()->where('id', $ids)->delete();
     }
 }

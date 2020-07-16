@@ -44,28 +44,28 @@ Route::prefix($prefix)
 Route::prefix("/api{$prefix}")
     ->middleware(['api', 'hubble.auth'])
     ->group(function () use ($namespace) {
-        Route::get('/resources/{name}', "{$namespace}ApiHubbleController@index")
+        Route::get('/resources/{name}', "{$namespace}ApiController@index")
             ->name('api.hubble.index');
 
-        Route::get('/resources/{name}/{key}/{field}', "{$namespace}ApiHubbleController@relatedIndex")
+        Route::get('/resources/{name}/{key}/{field}', "{$namespace}ApiController@relatedIndex")
             ->name('api.hubble.related.index');
 
-        Route::get('/resources/{name}/{id}/edit', "{$namespace}ApiHubbleController@edit")
+        Route::get('/resources/{name}/{id}/edit', "{$namespace}ApiController@edit")
             ->name('api.hubble.edit');
 
-        Route::post('/resources/{name}/actions/{action}', "{$namespace}ApiHubbleController@action")
+        Route::post('/resources/{name}/actions/{action}', "{$namespace}ApiController@action")
             ->name('api.hubble.action');
 
-        Route::delete('/resources/{name}/{key}', "{$namespace}ApiHubbleController@destroy")
+        Route::delete('/resources/{name}/{key}', "{$namespace}ApiController@destroy")
             ->name('api.hubble.delete');
 
-        Route::delete('/resources/{name}/{key}/{field}/detach/{id}', "{$namespace}ApiHubbleController@detachItem")
+        Route::delete('/resources/{name}/{key}/{field}/detach/{id}', "{$namespace}ApiController@detachItem")
             ->name('api.hubble.related.detach');
 
-        Route::post('/resources/{name}/{key}/{field}/attach', "{$namespace}ApiHubbleController@attachItem")
+        Route::post('/resources/{name}/{key}/{field}/attach', "{$namespace}ApiController@attachItem")
             ->name('api.hubble.related.attach');
 
-        Route::get('/resources/{name}/{key}/fields/{field}/related', "{$namespace}ApiHubbleController@fieldRelatedOptions")
+        Route::get('/resources/{name}/{key}/fields/{field}/related', "{$namespace}ApiController@fieldRelatedOptions")
             ->name('api.hubble.fields.related');
 
     });

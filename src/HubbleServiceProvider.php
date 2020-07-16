@@ -6,6 +6,11 @@ use Illuminate\Foundation\Auth\User;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
+use Oza75\LaravelHubble\Commands\CreateActionCommand;
+use Oza75\LaravelHubble\Commands\CreateFieldCommand;
+use Oza75\LaravelHubble\Commands\CreateFilterCommand;
+use Oza75\LaravelHubble\Commands\CreateResourceCommand;
+use Oza75\LaravelHubble\Commands\InstallationCommand;
 use Oza75\LaravelHubble\Middleware\HubbleAuthMiddleware;
 
 class HubbleServiceProvider extends ServiceProvider
@@ -55,12 +60,20 @@ class HubbleServiceProvider extends ServiceProvider
             ], 'lang');*/
 
             // Registering package commands.
-            // $this->commands([]);
-
-            Gate::define('viewHubble', function (User $user) {
-                return true;
-            });
+            $this->commands([
+                InstallationCommand::class,
+                CreateResourceCommand::class,
+                CreateActionCommand::class,
+                CreateFilterCommand::class,
+                CreateFieldCommand::class
+            ]);
         }
+
+        Gate::define('viewHubble', function (User $user) {
+            return true;
+        });
+
+        \Oza75\LaravelHubble\Facades\Hubble::autoRegisterResources();
     }
 
     /**
