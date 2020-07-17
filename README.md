@@ -425,12 +425,12 @@ You can also tell to `Hubble` to sort your data by default using a certain field
 
 There are a few methods you can use to customize how you want to display the field value in the different sections of the dashboard.
 
-    * displayUsing
-    * displayOnIndexUsing
-    * displayOnDetailsUsing
-    * displayOnFormsUsing
-    * displayWhenEditingUsing
-    * displayWhenCreatingUsing
+* displayUsing
+* displayOnIndexUsing
+* displayOnDetailsUsing
+* displayOnFormsUsing
+* displayWhenEditingUsing
+* displayWhenCreatingUsing
     
 The `displayUsing` method customize the display in all sections of the dashboard.
 All these methods as the same signature.
