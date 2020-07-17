@@ -422,7 +422,9 @@ You can also tell to `Hubble` to sort your data by default using a certain field
 \Oza75\LaravelHubble\Field::make('column', 'title')->sortable(true, 'desc');
 ```
 - custom display
+
 There are a few methods you can use to customize how you want to display the field value in the different sections of the dashboard.
+
     * displayUsing
     * displayOnIndexUsing
     * displayOnDetailsUsing
