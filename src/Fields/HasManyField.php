@@ -5,6 +5,7 @@ namespace Oza75\LaravelHubble\Fields;
 
 use Oza75\LaravelHubble\Concerns\Relations\HasRelationships;
 use Oza75\LaravelHubble\Contracts\Relations\HandleManyRelationship;
+use Oza75\LaravelHubble\HubbleResource;
 use Oza75\LaravelHubble\RelatedResource;
 use Oza75\LaravelHubble\Resource;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -46,7 +47,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
         $this->related = $related;
     }
 
-    public function prepare(Resource $resource)
+    public function prepare(HubbleResource $resource)
     {
         parent::prepare($resource);
 
@@ -158,9 +159,9 @@ class HasManyField extends SelectField implements HandleManyRelationship
     }
 
     /**
-     * @return Resource
+     * @return HubbleResource
      */
-    public function getRelatedResource(): Resource
+    public function getRelatedResource(): HubbleResource
     {
         $resource = $this->newRelatedInstance();
         $resource->boot();

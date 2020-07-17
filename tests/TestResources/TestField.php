@@ -21,7 +21,7 @@ class TestField extends Field
 
     /**
      * This hook is called when the field is ready to work.
-     * Basically it will just set the resource within your field is added.
+     * Basically it will just set the HubbleResourcewithin your field is added.
      * So it your have some attributes to add  or actions that depends on the resource
      * this is where you should do it.
      *
