@@ -156,13 +156,13 @@ You can modify this query builder to add some computed fields.
         return [
             Field::make('id', 'ID'),
 
-            TextField::make('name', 'Name'),
+            TextField::make('name', 'Name')->sortable(),
 
             TextareaField::make('bio', 'Bio')->onlyOnDetails(),
 
             TextField::make('email', 'Email')->displayOnIndexUsing(function ($value) {
                 return "<a href='mailto:$value'>$value</a>";
-            })->type('email')
+            })->type('email')->sortable(),
         ];
     }
 ```
@@ -194,16 +194,221 @@ In your AppServiceProvider :
 
 ### Actions
 
-Action is used to perform custom tasks on one or more Eloquent models. 
+Action is used to perform custom tasks on one or more Eloquent models. You can generate action using :
+```bash
+php artisan hubble:action ActiveUsers
+```
+This command will generate a new `ActiveUsers` class under `app/Hubble/Actions`
+```php
+<?php
 
-### Filter
- - options
+namespace App\Hubble\Actions;
+
+use Oza75\LaravelHubble\Action;
+
+class ActiveUsers extends Action
+{
+    /**
+     * @var string the title of this action
+     */
+    protected $title = 'ActiveUsers';
+
+    /**
+     * @var string the confirmation message to warn user before running this action. Set to null to disable it
+     */
+    protected $confirmationMessage = 'Do you really want to perform this action ?';
+
+    /**
+     * Handle your action
+     *
+     * @param $ids
+     * @return void
+     */
+    public function handle($ids)
+    {
+        // TODO: Implement handle() method.
+    }
+}
+```
+The `title` property contains the name of the action that will be shown on the User Interface
+
+In the `handle` method you can perform your action. For our example, let's assume that our users table has an active column which determine whether the user is active or not. 
+```php
+    /**
+     * Handle your action
+     *
+     * @param $ids
+     * @return void
+     */
+    public function handle($ids)
+    {
+        User::query()->whereIn('id', $ids)->update(['active' => true]);
+    }
+```
+When you created your action you can add it in your resource with the `actions` method.
+```php 
+    /**
+     * Register all actions that the user resource have
+     *
+     * @return Action[] array of actions
+     */
+    public function actions()
+    {
+        return [
+            DeleteAction::make(\App\User::query()),
+            new ActiveUsers(),
+
+        ];
+    }
+```
+
+### Filters
+As the name suggests, filters are used to filter your data and display only data that satisfy certain conditions.
+There are many ways to add filter into your resource : 
+
+- the first way (the easiest way ) :
+
+```php
+    /**
+     * Register all filters that the user resource have
+     *
+     * @return Filter[] array of filters
+     */
+    public function filters()
+    {
+        return [
+            Filter::make('is_active', 'Only Active Users', ['Yes' => 1, 'No' => 0]),
+        ];
+    }
+```
+`Filter::make` take as is first argument, the column in the database. The second argument is the title and then the third array of options.
  
- An associative array of your filter's options where the key is the label 
- and the value, the value of the option. You can also return an url where the options
+The options' argument is an associative array where the key is the label and the value, the value of the option. You can also pass an url where the options
  should be fetched or a custom array. for those cases you may set the valueKey and the textKey
- using the setValueKey(string $key), and the setTextKey(string $key) in the constructor of this filter. 
+ using the `setValueKey(string $key)`, and the `setTextKey(string $key)`. 
  
+ For example:
+ ```php
+    /**
+     * Register all filters that the user resource have
+     *
+     * @return Filter[] array of filters
+     */
+    public function filters()
+    {
+        return [
+            Filter::make('is_active', 'Users Status', [ 
+                ['name' => 'All', 'value' => null], 
+                ['name' => 'Active', 'value' => 1], 
+                ['name' => 'Non active', 'value' => 0]
+            ])->setValueKey('value')->setTextKey('name'),
+        ];
+    }
+```
+Another example:
+```php
+    /**
+     * Register all filters that the user resource have
+     *
+     * @return Filter[] array of filters
+     */
+    public function filters()
+    {
+        return [
+            Filter::make('state', 'Users State', "https://restcountries.eu/rest/v2/all")
+                ->setValueKey('alpha3Code')
+                ->setTextKey('name')
+                ->searchable('Start typing a state...'),
+        ];
+    }
+```
+- the second way to define a filter (more powerful) :
+
+```php
+    /**
+     * Register all filters that the user resource have
+     *
+     * @return Filter[] array of filters
+     */
+    public function filters()
+    {
+        return [
+            Filter::make('state', 'Users State', "https://restcountries.eu/rest/v2/all")
+                ->setValueKey('alpha3Code')
+                ->setTextKey('name')
+                ->setHandler(function (Builder $builder, $value) {
+                    $builder->whereHas('state', function ($query) use ($value) {
+                        $query->where('code', $value);
+                    });
+                }),
+        ];
+    }
+```
+With this way, you can use the `setHandler` method to pass a callable that takes the `query builder` as his first argument and the value of the filter, you can add any `where clause` you want. 
+
+- The last way is to generate a new filter class.
+```bash
+php artisan hubble:filter MyCustomFilter
+```
+This command will generate a new filter class under `app/Hubble/Filters`.
+```php
+<?php
+
+namespace App\Hubble\Filters;
+
+use Illuminate\Database\Eloquent\Builder;
+use Oza75\LaravelHubble\Filter;
+
+class MyCustomFilter extends Filter
+{
+    /**
+     * @var string the title of your filter that will be shown on the ui.
+     */
+    protected $title = 'My custom filter';
+
+    /**
+     * @var string the VueJs component that will be used to display this filter
+     */
+    protected $component = 'hubble-checkbox-filter';
+
+    /**
+     * Apply your filter
+     *
+     * @param Builder $query
+     * @param $value
+     * @return void
+     */
+    public function handle(Builder $query, $value)
+    {
+        // apply your filter here. 
+        return null;
+    }
+
+    /**
+     * Return all options for this filter
+     *
+     * @return array
+     */
+    public function options()
+    {
+        // first way
+        return ['Option 1' => 1, 'Option 2' => 2]; // the key is the label and the value is the option value
+        // second way
+        return [
+                    ['name' => 'Option 1', 'value' => 1],
+                    ['name' => 'Option 2', 'value' => 2],
+               ]; 
+        // third way
+        return "https://restcountries.eu/rest/v2/all";
+        
+        // do not forget to use `setValueKey(string $key)` and `setTextKey(string $key)` in the constructor of this class
+        // or when instantiating this class to set the value key and the text key
+
+    }
+}
+
+```
+
 ### Testing
 
 ``` bash

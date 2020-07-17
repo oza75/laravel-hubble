@@ -654,11 +654,11 @@ body {
 
         .table--list--data {
             .boolean-state--wrapper {
-                justify-content: center;
+                justify-content: flex-start;
             }
 
             .show--number--wrapper {
-                text-align: center;
+                text-align: right;
             }
 
             &.table--list--data--actions {
@@ -747,6 +747,12 @@ body {
                 padding: 10px 12px;
                 white-space: nowrap;
                 background: #f8fafc;
+
+                &.numeric-field {
+                    .table--header--cell--content {
+                        justify-content: flex-end;
+                    }
+                }
 
                 .table--header--cell--content {
                     display: flex;

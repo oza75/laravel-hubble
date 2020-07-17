@@ -7,6 +7,9 @@ namespace Oza75\LaravelHubble;
 use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Concerns\HandlesVisibility;
 use Illuminate\Http\Request;
+use Oza75\LaravelHubble\Fields\BooleanField;
+use Oza75\LaravelHubble\Fields\DateTimeField;
+use Oza75\LaravelHubble\Fields\NumberField;
 
 class Field
 {
@@ -69,6 +72,7 @@ class Field
         $this->sortable = $sortable;
 
         $this->registerComponents();
+        $this->setIsNumeric();
     }
 
     protected function registerComponents()
@@ -330,5 +334,11 @@ class Field
     public function getTitle(): string
     {
         return $this->title;
+    }
+
+    private function setIsNumeric()
+    {
+        if ($this instanceof NumberField || $this instanceof DateTimeField)
+            $this->addAttribute('is_numeric', true);
     }
 }

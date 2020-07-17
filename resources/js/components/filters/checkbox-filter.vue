@@ -61,7 +61,7 @@
     import CheckboxFilterItem from "./checkbox-filter-item.vue";
 
     export default {
-        name: "dashboard-checkbox-filter",
+        name: "hubble-checkbox-filter",
         data: () => ({
             selectedStack: [],
             searchTimer: null,

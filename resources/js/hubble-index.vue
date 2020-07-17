@@ -86,7 +86,7 @@
                         <div class="fake-checkbox" :class="{active: isAllSelected}" @click="selectAll()"></div>
                     </div>
                     <div class="table--list--cell table--header--cell"
-                         :class="{['table--'+ field.name+ '-header']: true}"
+                         :class="{['table--'+ field.name+ '-header']: true, 'numeric-field': field.attributes.is_numeric || false}"
                          v-for="field in fields" :key="field.name">
                         <div class="table--header--cell--content"
                              @click="field.sortable ? sortBy(field.name): null">

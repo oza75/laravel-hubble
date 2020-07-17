@@ -15,6 +15,7 @@
     export default {
         name: "hubble-filter",
         data: () => ({
+            originalsOptions: [],
             filterOptions: []
         }),
         components: {FilterWrapper},
@@ -25,12 +26,14 @@
         methods: {
             fetchData() {
                 if (Array.isArray(this.filter.options)) {
+                    this.originalsOptions = this.filter.options;
                     this.filterOptions = this.filter.options;
                     return;
                 }
 
                 this.$axios.get(this.filter.options).then(res => {
-                    this.filterOptions = res.data.data
+                    this.filterOptions = res.data.data || res.data
+                    this.originalsOptions = this.filterOptions;
                 })
             },
             getCustomFilterText(filter) {
@@ -41,11 +44,11 @@
             },
             search(query) {
                 if (!query) {
-                    this.filterOptions = this.filter.options;
+                    this.filterOptions = this.originalsOptions;
                     return;
                 }
 
-                this.filterOptions = this.filter.options.filter(it => {
+                this.filterOptions = this.originalsOptions.filter(it => {
                     return String(it[this.filter.attributes.textKey]).toLowerCase().includes(String(query).toLowerCase())
                 });
             },

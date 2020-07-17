@@ -183,7 +183,7 @@ class Filter
             return !is_null($value);
         });
 
-        if (is_string($firstOption) || is_numeric($firstOption)) {
+        if (is_string($firstOption) || is_numeric($firstOption) || is_bool($firstOption)) {
             return collect($options)->map(function ($value, $key) {
                 return ['value' => $value, 'text' => $key];
             })->values()->toArray();
