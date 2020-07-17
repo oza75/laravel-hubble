@@ -245,7 +245,7 @@ In the `handle` method you can perform your action. For our example, let's assum
         User::query()->whereIn('id', $ids)->update(['active' => true]);
     }
 ```
-When you created your action you can add it in your resource with the `actions` method.
+When you created your action you can add it in your resource.
 ```php 
     /**
      * Register all actions that the user resource have
