@@ -408,7 +408,155 @@ class MyCustomFilter extends Filter
 }
 
 ```
+### Fields
+Fields are used to display your data. the base `Field` class can be used to create fields. Any types of fields extend this class. 
+```php
+\Oza75\LaravelHubble\Field::make('column', 'title');
+```
+- sortable
+```php
+\Oza75\LaravelHubble\Field::make('column', 'title')->sortable(); // now this field can be used to sort your data
+```
+You can also tell to `Hubble` to sort your data by default using a certain field.
+```php
+\Oza75\LaravelHubble\Field::make('column', 'title')->sortable(true, 'desc');
+```
+- custom display
+There are a few methods you can use to customize how you want to display the field value in the different sections of the dashboard.
+    * displayUsing
+    * displayOnIndexUsing
+    * displayOnDetailsUsing
+    * displayOnFormsUsing
+    * displayWhenEditingUsing
+    * displayWhenCreatingUsing
+    
+The `displayUsing` method customize the display in all sections of the dashboard.
+All these methods as the same signature.
+```php
+\Oza75\LaravelHubble\Field::make('fullname', 'Full Name')->displayUsing(function ($value, $resource) {
+    return $resource->first_name . ' '. $resource->last_name; // in this case resource is a User model
+});
 
+\Oza75\LaravelHubble\Field::make('email', 'Email')->displayOnIndexUsing(function ($value) {
+    return "<a href='mailto:$value'>$value</a>";
+});
+```
+
+`Hubble` ships with many types of fields
+
+- TextField
+- BooleanField
+- NumberField
+- TextareaField
+- DateTimeField
+- SelectField
+- ColorField
+- BelongsToField (relation field)
+- HasManyField  (relation field)
+
+#### TextField
+Used to display a text Field.
+
+```php
+\Oza75\LaravelHubble\Fields\TextField::make('email', 'Email');
+```
+- text type
+```php
+\Oza75\LaravelHubble\Fields\TextField::make('email', 'Email')->type('email');
+```
+this type will be used to display correct input type in forms.
+- limit
+```php
+\Oza75\LaravelHubble\Fields\TextField::make('bio', 'Bio')->limit(100);
+```
+limit the number of character that should be displayed in tables.
+
+#### BooleanField
+
+```php
+    \Oza75\LaravelHubble\Fields\BooleanField::make('active', 'Active ?')->text('Yes', 'No');
+```
+the `text` method set the text to display when this field has `true` or `false` value.
+#### NumberField
+Used to display number values
+
+```php
+\Oza75\LaravelHubble\Fields\NumberField::make('articles_count', 'Articles');
+```
+#### TextareaField
+Used to display long text values
+
+```php
+\Oza75\LaravelHubble\Fields\TextareaField::make('bio', 'Bio');
+```
+
+#### DateTimeField
+Used to display dates values
+
+```php
+\Oza75\LaravelHubble\Fields\DateTimeField::make('created_at', 'Created at');
+```
+- date format
+
+```php
+\Oza75\LaravelHubble\Fields\DateTimeField::make('created_at', 'Created at')->format('Y-m-d at h:i');
+```
+
+- date locale
+```php
+\Oza75\LaravelHubble\Fields\DateTimeField::make('created_at', 'Created at')->setLocale('fr')->format('Y-m-d at h:i');
+```
+#### SelectField
+
+```php
+\Oza75\LaravelHubble\Fields\SelectField::make('user_type', 'Type')->options(['Pro' => 'pro', 'Normal' => 'normal']);
+```
+- display using label
+```php
+\Oza75\LaravelHubble\Fields\SelectField::make('user_type', 'Type')
+->options(['Pro' => 'pro', 'Normal' => 'normal'])
+->displayUsingLabel();
+```
+#### ColorField
+Used to display colors
+
+```php
+\Oza75\LaravelHubble\Fields\ColorField::make('primary_color', 'Color');
+```
+- display using hex value
+```php
+\Oza75\LaravelHubble\Fields\ColorField::make('primary_color', 'Color')->displayUsingHex();
+```
+#### BelongsToField
+Used to display a related resource
+- signature
+```php
+\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'Title', 'related_class');
+```
+The first argument is the name relationship method. Let's assume we have in our `User` model a `belongsTo` method to `City` Model.
+```php 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
+    public function city() {
+        return $this->belongsTo(City::class);
+    }
+```
+Then to add this relationship in our resource
+```php
+\Oza75\LaravelHubble\Fields\BelongsToField::make('city', 'User City', CityResource::class);
+```
+#### HasManyField
+Used to display related resources
+
+- signature
+```php
+\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'Title', 'related_class');
+```
+As the `BelongsToField`, the `HasManyField` takes the relationship method name as his first argument.
+```php
+\Oza75\LaravelHubble\Fields\HasManyField::make('roles', 'User Roles', RoleResource::class);
+```
 ### Testing
 
 ``` bash

@@ -21,13 +21,13 @@
 - [\Oza75\LaravelHubble\Facades\Hubble](#class-oza75laravelhubblefacadeshubble)
 - [\Oza75\LaravelHubble\Fields\TextareaField](#class-oza75laravelhubblefieldstextareafield)
 - [\Oza75\LaravelHubble\Fields\HasManyField](#class-oza75laravelhubblefieldshasmanyfield)
-- [\Oza75\LaravelHubble\Fields\ColorPicker](#class-oza75laravelhubblefieldscolorpicker)
 - [\Oza75\LaravelHubble\Fields\NumberField](#class-oza75laravelhubblefieldsnumberfield)
 - [\Oza75\LaravelHubble\Fields\DateTimeField](#class-oza75laravelhubblefieldsdatetimefield)
 - [\Oza75\LaravelHubble\Fields\TextField](#class-oza75laravelhubblefieldstextfield)
 - [\Oza75\LaravelHubble\Fields\SelectField](#class-oza75laravelhubblefieldsselectfield)
 - [\Oza75\LaravelHubble\Fields\BelongsToField](#class-oza75laravelhubblefieldsbelongstofield)
 - [\Oza75\LaravelHubble\Fields\BooleanField](#class-oza75laravelhubblefieldsbooleanfield)
+- [\Oza75\LaravelHubble\Fields\ColorField](#class-oza75laravelhubblefieldscolorfield)
 - [\Oza75\LaravelHubble\Middleware\HubbleAuthMiddleware](#class-oza75laravelhubblemiddlewarehubbleauthmiddleware)
 - [\Oza75\LaravelHubble\Resources\IndexResource](#class-oza75laravelhubbleresourcesindexresource)
 - [\Oza75\LaravelHubble\Resources\DetailResource](#class-oza75laravelhubbleresourcesdetailresource)
@@ -422,18 +422,6 @@
 
 <hr />
 
-### Class: \Oza75\LaravelHubble\Fields\ColorPicker
-
-| Visibility | Function |
-|:-----------|:---------|
-| public | <strong>__construct(</strong><em>\string</em> <strong>$name</strong>, <em>\string</em> <strong>$title</strong>, <em>\bool</em> <strong>$sortable=false</strong>)</strong> : <em>void</em> |
-| public | <strong>displayUsingHex()</strong> : <em>void</em> |
-| protected | <strong>registerComponents()</strong> : <em>void</em> |
-
-*This class extends [\Oza75\LaravelHubble\Fields\TextField](#class-oza75laravelhubblefieldstextfield)*
-
-<hr />
-
 ### Class: \Oza75\LaravelHubble\Fields\NumberField
 
 | Visibility | Function |
@@ -513,6 +501,18 @@
 | protected | <strong>registerComponents()</strong> : <em>void</em> |
 
 *This class extends [\Oza75\LaravelHubble\Field](#class-oza75laravelhubblefield)*
+
+<hr />
+
+### Class: \Oza75\LaravelHubble\Fields\ColorField
+
+| Visibility | Function |
+|:-----------|:---------|
+| public | <strong>__construct(</strong><em>\string</em> <strong>$name</strong>, <em>\string</em> <strong>$title</strong>, <em>\bool</em> <strong>$sortable=false</strong>)</strong> : <em>void</em> |
+| public | <strong>displayUsingHex()</strong> : <em>void</em> |
+| protected | <strong>registerComponents()</strong> : <em>void</em> |
+
+*This class extends [\Oza75\LaravelHubble\Fields\TextField](#class-oza75laravelhubblefieldstextfield)*
 
 <hr />
 

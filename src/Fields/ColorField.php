@@ -4,7 +4,7 @@
 namespace Oza75\LaravelHubble\Fields;
 
 
-class ColorPicker extends TextField
+class ColorField extends TextField
 {
     public function __construct(string $name, string $title, bool $sortable = false)
     {
