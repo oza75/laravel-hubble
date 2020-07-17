@@ -421,7 +421,7 @@ You can also tell to `Hubble` to sort your data by default using a certain field
 ```php
 \Oza75\LaravelHubble\Field::make('column', 'title')->sortable(true, 'desc');
 ```
-- custom display
+#### Custom Display
 
 There are a few methods you can use to customize how you want to display the field value in the different sections of the dashboard.
 
@@ -433,7 +433,9 @@ There are a few methods you can use to customize how you want to display the fie
 * displayWhenCreatingUsing
     
 The `displayUsing` method customize the display in all sections of the dashboard.
+
 All these methods as the same signature.
+
 ```php
 \Oza75\LaravelHubble\Field::make('fullname', 'Full Name')->displayUsing(function ($value, $resource) {
     return $resource->first_name . ' '. $resource->last_name; // in this case resource is a User model
