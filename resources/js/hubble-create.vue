@@ -4,7 +4,7 @@
             <h2 class="title">Création - {{resource.title}}</h2>
         </header>
         <section class="content--list">
-            <form method="post" :action="resource.urls.store.url">
+            <form method="post" :action="resource.urls.store.url" enctype="multipart/form-data">
                 <input type="hidden" name="_token" :value="resource.token">
                 <hubble-form :resource="resource" :form-data="formData" @input="input" type="creating"/>
                 <div class="form--actions">

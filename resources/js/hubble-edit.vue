@@ -4,7 +4,7 @@
             <h2 class="title">Modification - {{resource.title}}</h2>
         </header>
         <section class="content--list">
-            <form :action="item['@urls']['update']['url']" method="post">
+            <form :action="item['@urls']['update']['url']" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="_method" value="PUT">
                 <input type="hidden" name="_token" :value="resource.token">
                 <hubble-form :resource="resource" :form-data="formData" @input="input" type="editing"/>
@@ -42,7 +42,11 @@
         },
         created() {
             this.fields.forEach(field => {
-                this.input(field.name, this.item[field.name])
+                if (field.attributes.isFile) {
+                    this.input(field.name + '_files', this.item[field.name])
+                } else {
+                    this.input(field.name, this.item[field.name])
+                }
             })
         }
     }

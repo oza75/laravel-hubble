@@ -52,6 +52,8 @@ Vue.component('hubble-checkbox-filter', () => import(/* webpackChunkName: "hubbl
 
 const mods = {
     text: ['edit', 'show','index'],
+    file: ['edit', 'show','index'],
+    image: ['edit', 'show','index'],
     'select': ['edit'],
     'datetime': ['edit'],
     'boolean': ['show', 'edit'],

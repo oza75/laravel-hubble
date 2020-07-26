@@ -7,6 +7,8 @@
 
 Build a beautiful dashboard with laravel in no time.
 
+![Details screen](./docs/images/show-screen.png)
+
 ## Requirements
 - php : ^7.1
 - Laravel : ^6.0
@@ -460,6 +462,8 @@ All these methods as the same signature.
 - DateTimeField
 - SelectField
 - ColorField
+- FileField
+- ImageField
 - BelongsToField (relation field)
 - HasManyField  (relation field)
 
@@ -536,6 +540,39 @@ Used to display colors
 ```php
 \Oza75\LaravelHubble\Fields\ColorField::make('primary_color', 'Color')->displayUsingHex();
 ```
+#### FileField
+Used to display and upload files
+```php 
+\Oza75\LaravelHubble\Fields\FileField::make('avatar', 'Avatar'),
+```
+- multiple
+
+```php 
+\Oza75\LaravelHubble\Fields\FileField::make('avatar', 'Avatar')->multiple(),
+```
+
+- max 
+
+Limit number of files
+
+```php 
+\Oza75\LaravelHubble\Fields\FileField::make('avatar', 'Avatar')->multiple()->max(5),
+```
+#### ImageField
+Used to display image and upload images.
+
+`ImageField` extends to `FileField` so it has all methods that `FileField` has, such as `multiple` or `max`.
+
+```php 
+\Oza75\LaravelHubble\Fields\ImageField::make('avatar', 'Avatar'),
+```
+
+or
+
+```php 
+\Oza75\LaravelHubble\Fields\ImageField::make('avatar', 'Avatar')->multiple()->max(5),
+```
+
 #### BelongsToField
 Used to display a related resource
 - signature

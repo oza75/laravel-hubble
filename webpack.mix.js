@@ -15,7 +15,7 @@ mix.webpackConfig({
        publicPath: '/vendor/laravel-hubble/'
     }
 })
-
+mix.options({processCssUrls: false});
 mix.js('resources/js/hubble.js', 'resources/assets')
     .sass('resources/sass/hubble.scss', 'resources/assets')
     .setPublicPath('resources/assets');

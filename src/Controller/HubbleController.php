@@ -102,7 +102,7 @@ class HubbleController
 
         $resource->updateItem($request, $key);
 
-        return redirect()->route('laravel-hubble::create', ['name' => $resource->getName(), 'key' => $key]);
+        return redirect()->route('hubble.edit', ['name' => $resource->getName(), 'key' => $key]);
     }
 
     /***
@@ -117,6 +117,6 @@ class HubbleController
 
         $resource->delete($key);
 
-        return redirect()->route('laravel-hubble::create', ['name' => $resource->getName()]);
+        return redirect()->route('hubble.index', ['name' => $resource->getName()]);
     }
 }

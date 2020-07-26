@@ -36,7 +36,7 @@ class %class_name%Resource extends Resource
     public function fields()
     {
         return [
-           Field::make('id', 'ID'),
+           Field::make('id', 'ID')->hideOnForms(),
 
         ];
     }

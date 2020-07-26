@@ -68,3 +68,36 @@ export const encodeUrl = function (params, prefix = null) {
 
     return queries.filter(val => !!val).join("&");
 }
+
+export function arrayToFileList(files) {
+    const data = new ClipboardEvent('').clipboardData || new DataTransfer();
+    files.forEach(file => data.items.add(file));
+    return data.files;
+}
+
+export function mergeFiles(files1, files2) {
+    const files = [...files1];
+    files2.forEach(file => {
+        if (files.find(f => f.size === file.size && f.name === file.name) === undefined) {
+            files.push(file);
+        }
+    });
+    return files;
+}
+
+export function mergeFileLists(files1, files2) {
+    return arrayToFileList(mergeFiles(Array.from(files1), Array.from(files2)));
+}
+
+export function diffFiles(oldFiles, newFiles) {
+    if (oldFiles === null) {
+        return [Array.from(newFiles), []];
+    }
+    const added = Array.from(newFiles).filter(f => !Array.from(oldFiles).includes(f));
+    const removed = Array.from(oldFiles).filter(f => !Array.from(newFiles).includes(f));
+    return [added, removed];
+}
+
+export function removeFile(fileList, file) {
+    return arrayToFileList(Array.from(fileList).filter(f => f !== file));
+}
