@@ -408,6 +408,11 @@ class MyCustomFilter extends Filter
 }
 
 ```
+You can also generate a filter with a custom `VueJs` components.
+```bash
+php artisan hubble:filter MyCustomFilter --custom
+```
+This will generate a `VueJs` component under `resources/hubble/components/filters/my-custom-filter.vue`
 ### Fields
 Fields are used to display your data. the base `Field` class can be used to create fields. Any types of fields extend this class. 
 ```php

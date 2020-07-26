@@ -15,7 +15,7 @@ class %class_name% extends Filter
     /**
      * @var string the VueJs component that will be used to display this filter
      */
-    protected $component = 'hubble-checkbox-filter';
+    protected $component = '%component%';
 
     /**
      * Apply your filter

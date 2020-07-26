@@ -58,9 +58,9 @@ class CreateFieldCommand extends Command
         if (!File::exists($path))
             File::makeDirectory($path, 0755, true);
 
-        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'edit.stub', $data, $path . DIRECTORY_SEPARATOR . 'edit-' . $field . '-field.vue');
-        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'index.stub', $data, $path . DIRECTORY_SEPARATOR . 'index-' . $field . '-field.vue');
-        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'show.stub', $data, $path . DIRECTORY_SEPARATOR . 'show-' . $field . '-field.vue');
+//        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'edit.stub', $data, $path . DIRECTORY_SEPARATOR . 'edit-' . $field . '-field.vue');
+//        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'index.stub', $data, $path . DIRECTORY_SEPARATOR . 'index-' . $field . '-field.vue');
+//        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'show.stub', $data, $path . DIRECTORY_SEPARATOR . 'show-' . $field . '-field.vue');
 
         $components = ['edit', 'index', 'show'];
 
