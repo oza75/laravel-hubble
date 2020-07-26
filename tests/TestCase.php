@@ -6,6 +6,7 @@ namespace Oza75\LaravelHubble\Tests;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Orchestra\Testbench\TestCase as BaseTestCase;
+use Oza75\LaravelHubble\Facades\Hubble;
 use Oza75\LaravelHubble\HubbleServiceProvider;
 use Oza75\LaravelHubble\Tests\Models\TestUser;
 
@@ -15,6 +16,11 @@ class TestCase extends BaseTestCase
     protected function getPackageProviders($app)
     {
         return [HubbleServiceProvider::class];
+    }
+
+    protected function getPackageAliases($app)
+    {
+        return ['Hubble' => Hubble::class];
     }
 
     protected function setUp(): void

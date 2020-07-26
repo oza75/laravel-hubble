@@ -654,11 +654,11 @@ body {
 
         .table--list--data {
             .boolean-state--wrapper {
-                justify-content: center;
+                justify-content: flex-start;
             }
 
             .show--number--wrapper {
-                text-align: center;
+                text-align: right;
             }
 
             &.table--list--data--actions {
@@ -747,6 +747,12 @@ body {
                 padding: 10px 12px;
                 white-space: nowrap;
                 background: #f8fafc;
+
+                &.numeric-field {
+                    .table--header--cell--content {
+                        justify-content: flex-end;
+                    }
+                }
 
                 .table--header--cell--content {
                     display: flex;
@@ -1309,5 +1315,159 @@ pre {
                 border-color: $primary-color;
             }
         }
+    }
+}
+
+.edit-file-field, .edit-image-field {
+    .current-files {
+        margin-bottom: 8px;
+
+        .file {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            svg {
+                cursor: pointer;
+                width: 24px;
+                height: 24px;
+                color: $gray-text-color;
+
+                &:hover {
+                    color: $red;
+                }
+            }
+        }
+    }
+}
+
+.edit-image-field {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+
+    .current-files {
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .remove-btn {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 6px 8px;
+        border-radius: 4px;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .3s;
+
+        &:hover {
+            background-color: $red;
+
+            svg {
+                color: white !important;
+            }
+        }
+    }
+
+    .add-card {
+        position: relative;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        background-size: cover;
+        background-position: center center;
+        cursor: pointer;
+        line-height: inherit;
+        color: $gray-text-color;
+        box-sizing: border-box;
+        border: 1px solid $light-border-color;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 160px;
+        height: 160px;
+        transition: .3s;
+        border-radius: 8px;
+
+        &:hover {
+            background-color: $primary-color;
+            color: white;
+        }
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+.show--image--component {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-start;
+
+    .image-card {
+        position: relative;
+        margin-right: 10px;
+        margin-bottom: 10px;
+        background-size: cover;
+        background-position: center center;
+        cursor: pointer;
+        line-height: inherit;
+        color: $gray-text-color;
+        box-sizing: border-box;
+        border: 1px solid $light-border-color;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 160px;
+        height: 160px;
+        transition: .3s;
+        border-radius: 8px;
+
+        &:hover {
+            //background-color: $primary-color;
+            //color: white;
+        }
+
+        svg {
+            width: 24px;
+            height: 24px;
+        }
+    }
+
+    .download {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        padding: 6px 8px;
+        border-radius: 4px;
+        background-color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: .3s;
+
+        &:hover {
+            background-color: $primary-color;
+
+            svg {
+                color: white !important;
+            }
+        }
+    }
+}
+.index--image--component {
+    img {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: 2px solid $primary-color;
+        object-fit: cover;
     }
 }

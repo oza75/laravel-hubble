@@ -4,7 +4,7 @@
 namespace Oza75\LaravelHubble\Fields;
 
 
-use Oza75\LaravelHubble\Resource;
+use Oza75\LaravelHubble\HubbleResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -52,9 +52,9 @@ class BelongsToField extends SelectField
     }
 
     /**
-     * @param Resource $resource
+     * @param HubbleResource $resource
      */
-    public function prepare(Resource $resource)
+    public function prepare(HubbleResource $resource)
     {
         parent::prepare($resource);
 
@@ -98,9 +98,9 @@ class BelongsToField extends SelectField
     }
 
     /**
-     * @param Resource $resource
+     * @param HubbleResource $resource
      */
-    protected function registerDisplayResolver(Resource $resource)
+    protected function registerDisplayResolver(HubbleResource $resource)
     {
         $related = $this->newRelatedInstance();
 

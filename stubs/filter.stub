@@ -1,0 +1,41 @@
+<?php
+
+namespace %namespace%;
+
+use Illuminate\Database\Eloquent\Builder;
+use Oza75\LaravelHubble\Filter;
+
+class %class_name% extends Filter
+{
+    /**
+     * @var string the title of your filter that will be shown on the ui.
+     */
+    protected $title = '%name%';
+
+    /**
+     * @var string the VueJs component that will be used to display this filter
+     */
+    protected $component = '%component%';
+
+    /**
+     * Apply your filter
+     *
+     * @param Builder $query
+     * @param $value
+     * @return void
+     */
+    public function handle(Builder $query, $value)
+    {
+        return null;
+    }
+
+    /**
+     * Return all options for this filter
+     *
+     * @return array
+     */
+    public function options()
+    {
+        return [];
+    }
+}

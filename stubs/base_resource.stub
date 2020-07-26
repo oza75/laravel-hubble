@@ -1,0 +1,9 @@
+<?php
+namespace %namespace%;
+
+use Oza75\LaravelHubble\HubbleResource;
+
+abstract class Resource extends HubbleResource
+{
+
+}

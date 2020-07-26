@@ -4,6 +4,7 @@
 namespace Oza75\LaravelHubble\Fields;
 
 
+use Illuminate\Http\Request;
 use Oza75\LaravelHubble\Field;
 
 class BooleanField extends Field
@@ -43,5 +44,15 @@ class BooleanField extends Field
         $this->addAttribute('unCheckedText', $unchecked);
 
         return $this;
+    }
+
+    /**
+     * @param Request $request
+     * @param string $section
+     * @return bool|mixed
+     */
+    public function retrieveFormData(Request $request, string $section)
+    {
+        return (bool)$request->get($this->getName());
     }
 }

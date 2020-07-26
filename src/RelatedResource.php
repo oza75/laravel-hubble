@@ -12,12 +12,13 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Http\Request;
 
-class RelatedResource extends Resource
+class RelatedResource extends HubbleResource
 {
     /**
-     * @var Resource|Resource
+     * @var HubbleResource
      */
     private $related;
+
     private $relationship;
     /**
      * @var Field
@@ -34,13 +35,13 @@ class RelatedResource extends Resource
 
     /**
      * RelatedResource constructor.
-     * @param Resource $related
-     * @param Resource $parent
+     * @param HubbleResource $related
+     * @param HubbleResource $parent
      * @param Model $parentModel
      * @param Field $field
      * @param $relationship
      */
-    public function __construct(Resource $related, Resource $parent, Model $parentModel, Field $field, $relationship)
+    public function __construct(HubbleResource $related, HubbleResource $parent, Model $parentModel, Field $field, $relationship)
     {
         $this->related = $related;
         $this->relationship = $relationship;

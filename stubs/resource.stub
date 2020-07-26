@@ -1,0 +1,84 @@
+<?php
+
+namespace %namespace%;
+
+use Illuminate\Database\Eloquent\Builder;
+use Oza75\LaravelHubble\Action;
+use Oza75\LaravelHubble\Field;
+use Oza75\LaravelHubble\Filter;
+use Oza75\LaravelHubble\Actions\DeleteAction;
+
+use %namespace%\Resource;
+
+class %class_name%Resource extends Resource
+{
+
+    /**
+     * @var string The title will be used as your resource name in the ui
+     */
+    protected $title = "%title%";
+
+    /**
+     * @var string[]
+     */
+    protected $searchColumns = ['id'];
+
+    /**
+     * @var string used to show resource value in relationship
+     */
+    protected $displayColumn = 'id';
+
+    /**
+     * Get the fields displayed that the %snake_name% resource
+     *
+     * @return Field[] array of fields
+     */
+    public function fields()
+    {
+        return [
+           Field::make('id', 'ID')->hideOnForms(),
+
+        ];
+    }
+
+    /**
+     * Register all actions that the %snake_name% resource have
+     *
+     * @return Action[] array of actions
+     */
+    public function actions()
+    {
+        return [
+            DeleteAction::make(%model_class%::query()),
+
+        ];
+    }
+
+    /**
+     * Register all filters that the %snake_name% resource have
+     *
+     * @return Filter[] array of filters
+     */
+    public function filters()
+    {
+        return [];
+    }
+
+    /**
+     * @return Builder
+     */
+    public function baseQuery(): Builder
+    {
+        return %model_class%::query();
+    }
+
+    /**
+    * Return this resource icon
+    *
+    * @return string|null
+    */
+    public function icon()
+    {
+        return null;
+    }
+}

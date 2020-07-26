@@ -5,6 +5,7 @@ namespace Oza75\LaravelHubble;
 
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Str;
 
 class Filter
 {
@@ -12,6 +13,7 @@ class Filter
      * @var string
      */
     protected $column;
+
     /**
      * @var string
      */
@@ -26,12 +28,13 @@ class Filter
      * @var bool
      */
     protected $multiple;
+
     /**
      * @var callable
      */
     protected $handler;
 
-    protected $component = 'dashboard-checkbox-filter';
+    protected $component = 'hubble-checkbox-filter';
     /**
      * @var string[]
      */
@@ -46,10 +49,10 @@ class Filter
      * @param string $title
      * @param array $options
      */
-    public function __construct(string $column, string $title, $options = [])
+    public function __construct(?string $column = null, ?string $title = null, $options = [])
     {
-        $this->column = $column;
-        $this->title = $title;
+        if ($column) $this->column = $column;
+        if ($title) $this->title = $title;
         $this->options = $options;
     }
 
@@ -128,7 +131,7 @@ class Filter
     public function toArray()
     {
         return [
-            'name' => $this->column,
+            'name' => $this->getName(),
             'title' => $this->title,
             'multiple' => $this->multiple,
             'options' => $this->getOptions(),
@@ -180,7 +183,7 @@ class Filter
             return !is_null($value);
         });
 
-        if (is_string($firstOption) || is_numeric($firstOption)) {
+        if (is_string($firstOption) || is_numeric($firstOption) || is_bool($firstOption)) {
             return collect($options)->map(function ($value, $key) {
                 return ['value' => $value, 'text' => $key];
             })->values()->toArray();
@@ -213,5 +216,21 @@ class Filter
             $this->addAttribute('searchPlaceholder', $placeholder);
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getColumn() ?? $this->getTitle();
+    }
+
+    /**
+     * @return string
+     */
+    public function getTitle(): string
+    {
+        return $this->title ?? Str::kebab(Str::lower(class_basename($this)));
     }
 }

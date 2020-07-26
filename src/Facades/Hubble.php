@@ -7,6 +7,17 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @see \Oza75\LaravelHubble\Hubble
  * @method static string namespace(?string $name = null)
+ * @method static string prefix()
+ * @method static \Oza75\LaravelHubble\Contracts\Hubble setResourcesFolder(string $path, string $namespace);
+ * @method static string getResourcesFolder();
+ * @method static string getResourcesNamespace();
+ * @method static array getResources();
+ * @method static \Oza75\LaravelHubble\Contracts\Hubble addResource(string $resource);
+ * @method static \Oza75\LaravelHubble\Contracts\Hubble setResources(array $resources);
+ * @method static \Oza75\LaravelHubble\Contracts\Hubble addResources(array $resources);
+ * @method static array getBooted();
+ * @method static \Oza75\LaravelHubble\Contracts\Hubble disableAutoDiscovering();
+ * @method static bool autoRegisterResources();
  */
 class Hubble extends Facade
 {

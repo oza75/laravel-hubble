@@ -4,7 +4,7 @@
 namespace Oza75\LaravelHubble\Fields;
 
 
-use Oza75\LaravelHubble\Resource;
+use Oza75\LaravelHubble\HubbleResource;
 use Illuminate\Config\Repository;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Carbon;
@@ -50,9 +50,9 @@ class DateTimeField extends TextField
     }
 
     /**
-     * @param Resource $resource
+     * @param HubbleResource $resource
      */
-    public function prepare(Resource $resource)
+    public function prepare(HubbleResource $resource)
     {
         parent::prepare($resource);
 

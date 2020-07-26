@@ -1,0 +1,40 @@
+<?php
+
+namespace %namespace%;
+
+use Oza75\LaravelHubble\Field;
+use Oza75\LaravelHubble\HubbleResource;
+
+class %class_name% extends Field
+{
+  /**
+     *  Register your vuejs components
+     */
+    protected function registerComponents()
+    {
+        parent::registerComponents();
+
+        $this->components = [
+            'index' => 'index-%field%-field',
+            'editing' => 'edit-%field%-field',
+            'creating' => 'edit-%field%-field',
+            'details' => 'show-%field%-field'
+        ];
+    }
+
+    /**
+     * This hook is called when the field is ready to work.
+     * Basically it will just set the resource within your field is added.
+     * So if you have some attributes to add  or actions that depends on the resource
+     * this is where you should do it.
+     *
+     * @param HubbleResource $resource
+     */
+    public function prepare(HubbleResource $resource)
+    {
+        parent::prepare($resource);
+
+        // do action that depends on the resource within this field is added
+    }
+
+}
