@@ -30,6 +30,15 @@ class InstallationCommand extends Command
     public function handle()
     {
         $this->checkAuthRouteExistence();
+
+        $this->publishPublicAssets();
+        $this->createHubbleDirectory();
+        $this->createBaseResource();
+        $this->createHubbleWebpackMix();
+
+        $this->info('Laravel Hubble is successfully installed !');
+        $url = route('hubble.home');
+        $this->line("Open hubble in browser : $url");
     }
 
     /**
@@ -48,14 +57,6 @@ class InstallationCommand extends Command
                 $this->warn('You need to add a login and logout route !');
             }
         }
-
-        $this->publishPublicAssets();
-        $this->createHubbleDirectory();
-        $this->createBaseResource();
-
-        $this->info('Laravel Hubble is successfully installed !');
-        $url = route('hubble.home');
-        $this->line("Open hubble in browser : $url");
     }
 
     private function installLaravelUiPackage()
@@ -113,5 +114,51 @@ class InstallationCommand extends Command
         $path = Hubble::getResourcesFolder() . DIRECTORY_SEPARATOR . 'Resource.php';
 
         $this->createStubFile('base_resource.stub', $data, $path);
+    }
+
+    private function createHubbleWebpackMix()
+    {
+        $path = base_path('hubble-webpack.mix.js');
+
+        $this->createDefaultResources();
+
+        if (!File::exists($path)) {
+            $this->createStubFile('hubble-webpack.mix.stub', [], $path);
+            $content = "if (process.env.hubble) {\n\trequire('./hubble-webpack.mix.js');\n\treturn;\n}\n\n";
+            File::prepend(base_path('webpack.mix.js'), $content);
+            $this->updatePackageJson();
+            $this->info('hubble-webpack.mix.js config file is created !');
+        }
+    }
+
+    private function updatePackageJson()
+    {
+        $content = File::get(base_path('package.json'));
+        $package = json_decode($content, true);
+        $scripts = [
+            'hubble:dev' => "cross-env NODE_ENV=development process.env.hubble=true node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+            "hubble:watch" => "cross-env NODE_ENV=development process.env.hubble=true node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --watch",
+            "hubble:prod" => "cross-env NODE_ENV=production process.env.hubble=true node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+        ];
+        $packageScripts = $package['scripts'] ?? [];
+        $packageScripts = array_merge($packageScripts, $scripts);
+        $package['scripts'] = $packageScripts;
+        File::put(base_path('package.json'), json_encode($package, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $this->info('package.json file updated !');
+    }
+
+    private function createDefaultResources()
+    {
+        $path = resource_path('hubble');
+
+        if (!File::isDirectory($path)) File::makeDirectory($path);
+        if (!File::isDirectory($path . DIRECTORY_SEPARATOR . "components")) File::makeDirectory($path . DIRECTORY_SEPARATOR . "components");
+
+        if (!File::exists($path . DIRECTORY_SEPARATOR . "components.js"))
+            File::put($path . DIRECTORY_SEPARATOR . "components.js", "");
+
+        if (!File::exists($path . DIRECTORY_SEPARATOR . "components.scss"))
+            File::put($path . DIRECTORY_SEPARATOR . "components.scss", "");
+
     }
 }

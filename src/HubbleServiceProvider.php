@@ -47,7 +47,7 @@ class HubbleServiceProvider extends ServiceProvider
             ], 'public');
 
             $this->publishes([
-                __DIR__ . '/../resources/js' => resource_path('js/laravel-hubble'),
+                __DIR__ . '/../resources/js' => resource_path('components/laravel-hubble'),
             ], 'assets');
 
             $this->publishes([

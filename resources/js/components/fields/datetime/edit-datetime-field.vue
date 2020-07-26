@@ -27,7 +27,7 @@
                     dateFormat: this.format,
                     enableTime: true,
                     locale: this.locale
-                    // locale: require(`flatpickr/dist/l10n/${this.locale}.js`).default[this.locale]
+                    // locale: require(`flatpickr/dist/l10n/${this.locale}.components`).default[this.locale]
                 })
             })
         }

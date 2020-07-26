@@ -1,0 +1,20 @@
+<template>
+    <div :class="{[`show--${type}--wrapper`]: true}">
+        <div v-html="value"></div>
+    </div>
+</template>
+
+<script>
+    export default {
+        name: "index-%field%-field",
+        props: {
+            field: {type: Object, required: true},
+            value: {default: null},
+            type: {default: 'text', type: String},
+        }
+    }
+</script>
+
+<style scoped>
+
+</style>

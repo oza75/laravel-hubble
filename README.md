@@ -561,6 +561,59 @@ As the `BelongsToField`, the `HasManyField` takes the relationship method name a
 ```php
 \Oza75\LaravelHubble\Fields\HasManyField::make('roles', 'User Roles', RoleResource::class);
 ```
+### Create a custom field
+You can create a custom field by using this command: 
+```bash
+php artisan hubble:field ColorField 
+```
+This will generate a new Field Class under `app/Hubble/Fields`
+```php
+<?php
+
+namespace App\Hubble\Fields;
+
+use Oza75\LaravelHubble\Field;
+use Oza75\LaravelHubble\HubbleResource;
+
+class ColorField extends Field
+{
+  /**
+     *  Register your vuejs components
+     */
+    protected function registerComponents()
+    {
+        parent::registerComponents();
+
+        $this->components = [
+            'index' => 'index-text-field',
+            'editing' => 'edit-text-field',
+            'creating' => 'edit-text-field',
+            'details' => 'show-text-field'
+        ];
+    }
+
+    /**
+     * This hook is called when the field is ready to work.
+     * Basically it will just set the resource within your field is added.
+     * So if you have some attributes to add  or actions that depends on the resource
+     * this is where you should do it.
+     *
+     * @param HubbleResource $resource
+     */
+    public function prepare(HubbleResource $resource)
+    {
+        parent::prepare($resource);
+
+        // do action that depends on the resource within this field is added
+    }
+
+}
+```
+You can also generate a new field with custom components by using this command: 
+```bash
+php artisan hubble:field ColorField --custom
+```
+This will created a new `VueJs` components for your field under `resources/hubble/components/fields/color`
 ### Testing
 
 ``` bash

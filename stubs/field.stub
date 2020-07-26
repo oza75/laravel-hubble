@@ -15,17 +15,17 @@ class %class_name% extends Field
         parent::registerComponents();
 
         $this->components = [
-            'index' => 'index-text-field',
-            'editing' => 'edit-text-field',
-            'creating' => 'edit-text-field',
-            'details' => 'show-text-field'
+            'index' => 'index-%field%-field',
+            'editing' => 'edit-%field%-field',
+            'creating' => 'edit-%field%-field',
+            'details' => 'show-%field%-field'
         ];
     }
 
     /**
      * This hook is called when the field is ready to work.
      * Basically it will just set the resource within your field is added.
-     * So it your have some attributes to add  or actions that depends on the resource
+     * So if you have some attributes to add  or actions that depends on the resource
      * this is where you should do it.
      *
      * @param HubbleResource $resource
