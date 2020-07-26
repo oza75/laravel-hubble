@@ -7,7 +7,7 @@
 
 Build a beautiful dashboard with laravel in no time.
 
-![Details screen](./docs/images/details-cropped.png)
+![Details screen](./docs/images/show-screen.png)
 
 ## Requirements
 - php : ^7.1
