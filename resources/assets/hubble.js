@@ -14728,7 +14728,8 @@ window.Vue.prototype.$axios = window.axios;
 window.Vue.prototype.$disableScroll = disableScroll;
 window.Vue.prototype.$isMobile = window.isMobile;
 window.Vue.prototype.$csrf = window.x_csrf_token;
-window.Vue.prototype.$auth_user = window.auth_user; // Vue.component('file-input', require('./components/FileInput.vue').default)
+window.Vue.prototype.$auth_user = window.auth_user;
+window.Vue.prototype.$t = window.trans; // Vue.component('file-input', require('./components/FileInput.vue').default)
 // Vue.component('v-input', require('./components/VInput.vue').default)
 // Vue.component('v-checkbox', require('./components/VCheckbox.vue').default)
 // Vue.component('v-textarea', require('./components/VTextarea.vue').default)

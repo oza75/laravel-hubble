@@ -45,7 +45,8 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Oza75\\LaravelHubble\\HubbleServiceProvider"
+                "Oza75\\LaravelHubble\\HubbleServiceProvider",
+                "Oza75\\LaravelHubble\\Utilities\\Javascript\\JavascriptServiceProvider"
             ],
             "aliases": {
                 "Hubble": "Oza75\\LaravelHubble\\Facades\\Hubble"

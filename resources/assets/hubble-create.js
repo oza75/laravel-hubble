@@ -220,7 +220,11 @@ var render = function() {
     [
       _c("header", { staticClass: "header" }, [
         _c("h2", { staticClass: "title" }, [
-          _vm._v("Création - " + _vm._s(_vm.resource.title))
+          _vm._v(
+            _vm._s(
+              _vm.$t("dashboard.create_title", { name: _vm.resource.title })
+            )
+          )
         ])
       ]),
       _vm._v(" "),
@@ -269,7 +273,7 @@ var staticRenderFns = [
           staticClass: "btn btn-primary btn-normal btn-radius",
           attrs: { type: "submit" }
         },
-        [_vm._v("Enregister")]
+        [_vm._v("{$t('dashboard.save')}}")]
       )
     ])
   }

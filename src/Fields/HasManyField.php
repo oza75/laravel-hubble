@@ -60,7 +60,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
         $this->setValueKey($relatedModel->getKeyName());
         $this->setTextKey($related->getDisplayColumn());
         $this->addAttribute('multiple', true);
-        $this->placeholder('Sélectionner les ' . Str::lower(Str::plural($this->title)) . ' associés');
+        $this->placeholder(trans('laravel-hubble::dashboard.associate_placeholder', ['title' => Str::plural($this->title)]));
 
         $displayResolver = function ($value, $resource) use ($related) {
             return $value->map(function ($item) use ($related, $resource) {

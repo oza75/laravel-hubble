@@ -1943,8 +1943,10 @@ var render = function() {
                 ? _c("span", [
                     _vm._v(
                       "\n                    " +
-                        _vm._s(_vm.total) +
-                        " résultats\n                "
+                        _vm._s(
+                          _vm.$t("dashboard.results", { total: _vm.total })
+                        ) +
+                        "\n                "
                     )
                   ])
                 : _vm._e()
@@ -1983,7 +1985,7 @@ var render = function() {
                     _c("input", {
                       attrs: {
                         type: "text",
-                        placeholder: "Faites une recherche ici"
+                        placeholder: _vm.$t("dashboard.search_placeholder")
                       },
                       on: { input: _vm.search }
                     })
@@ -2035,7 +2037,14 @@ var render = function() {
                                   attrs: { selected: "" },
                                   domProps: { value: null }
                                 },
-                                [_vm._v("Choisir une action")]
+                                [
+                                  _vm._v(
+                                    " " +
+                                      _vm._s(
+                                        _vm.$t("dashboard.choose_an_action")
+                                      )
+                                  )
+                                ]
                               ),
                               _vm._v(" "),
                               _vm._l(_vm.resource.actions, function(action, k) {
@@ -2235,7 +2244,13 @@ var render = function() {
                           target: _vm.resource.urls.create.target
                         }
                       },
-                      [_vm._v("\n                    Créer\n                ")]
+                      [
+                        _vm._v(
+                          "\n                    " +
+                            _vm._s(_vm.$t("dashboard.create")) +
+                            "\n                "
+                        )
+                      ]
                     )
                   : _vm._e(),
                 _vm._v(" "),
@@ -2249,7 +2264,9 @@ var render = function() {
                       },
                       [
                         _vm._v(
-                          "\n                    Attacher\n                "
+                          "\n                    " +
+                            _vm._s(_vm.$t("dashboard.attach")) +
+                            "\n                "
                         )
                       ]
                     )
@@ -2499,7 +2516,7 @@ var render = function() {
                                       target:
                                         item["@urls"]["show"]["target"] ||
                                         "_self",
-                                      title: "Voir"
+                                      title: _vm.$t("dashboard.show_details")
                                     }
                                   },
                                   [
@@ -2536,7 +2553,7 @@ var render = function() {
                                       target:
                                         item["@urls"]["edit"]["target"] ||
                                         "_self",
-                                      title: "Modifier"
+                                      title: _vm.$t("dashboard.edit")
                                     }
                                   },
                                   [
@@ -2569,8 +2586,8 @@ var render = function() {
                                   {
                                     attrs: {
                                       title: _vm.resource.isManyRelation
-                                        ? "Détacher"
-                                        : "Supprimer"
+                                        ? _vm.$t("dashboard.detach")
+                                        : _vm.$t("dashboard.delete")
                                     },
                                     on: {
                                       click: function($event) {
@@ -2714,9 +2731,7 @@ var render = function() {
                     ]
                   ),
                   _vm._v(" "),
-                  _c("h4", [
-                    _vm._v("Aucun élément ne correspondant à ces critères")
-                  ])
+                  _c("h4", [_vm._v(_vm._s(_vm.$t("dashboard.empty_message")))])
                 ])
               ])
             : _vm._e(),
@@ -2731,8 +2746,8 @@ var render = function() {
                   "prev-link-class": "item",
                   "next-link-class": "item",
                   "container-class": "pagination--container",
-                  "prev-text": "Precedent",
-                  "next-text": "Suivant"
+                  "prev-text": _vm.$t("dashboard.previous"),
+                  "next-text": _vm.$t("dashboard.next")
                 },
                 on: { input: _vm.paginate }
               })
@@ -2743,7 +2758,7 @@ var render = function() {
       _vm._v(" "),
       _vm.actionModalConfirmation
         ? _c("v-modal", {
-            attrs: { label: "Confirmation" },
+            attrs: { label: _vm.$t("dashboard.confirmation") },
             on: {
               close: function($event) {
                 _vm.actionModalConfirmation = false
@@ -2778,7 +2793,7 @@ var render = function() {
                             }
                           }
                         },
-                        [_vm._v("Annuler")]
+                        [_vm._v(_vm._s(_vm.$t("dashboard.cancel")))]
                       ),
                       _vm._v(" "),
                       _c(
@@ -2791,7 +2806,7 @@ var render = function() {
                             }
                           }
                         },
-                        [_vm._v("Confirmer")]
+                        [_vm._v(_vm._s(_vm.$t("dashboard.confirm")))]
                       )
                     ]
                   },
@@ -2800,14 +2815,14 @@ var render = function() {
               ],
               null,
               false,
-              4146658023
+              810372985
             )
           })
         : _vm._e(),
       _vm._v(" "),
       _vm.deleteItemModal
         ? _c("v-modal", {
-            attrs: { label: "Confirmation" },
+            attrs: { label: _vm.$t("dashboard.confirmation") },
             on: {
               close: function($event) {
                 _vm.deleteItemModal = false
@@ -2822,12 +2837,14 @@ var render = function() {
                       _vm.resource.isManyRelation
                         ? _c("span", [
                             _vm._v(
-                              "Voulez-vous vraiment détacher cet enregistrement ?"
+                              _vm._s(_vm.$t("dashboard.detach_record_message"))
                             )
                           ])
                         : _c("span", [
                             _vm._v(
-                              " Voulez-vous vraiment supprimer cet enregistrement ?"
+                              _vm._s(
+                                _vm.$t("dashboard.delete_record_message")
+                              ) + " "
                             )
                           ])
                     ]
@@ -2848,7 +2865,7 @@ var render = function() {
                             }
                           }
                         },
-                        [_vm._v("Annuler")]
+                        [_vm._v(_vm._s(_vm.$t("dashboard.cancel")))]
                       ),
                       _vm._v(" "),
                       _c(
@@ -2876,8 +2893,12 @@ var render = function() {
                             },
                             [
                               _vm.resource.isManyRelation
-                                ? _c("span", [_vm._v("Détacher")])
-                                : _c("span", [_vm._v("Confirmer")])
+                                ? _c("span", [
+                                    _vm._v(_vm._s(_vm.$t("dashboard.detach")))
+                                  ])
+                                : _c("span", [
+                                    _vm._v(_vm._s(_vm.$t("dashboard.confirm")))
+                                  ])
                             ]
                           ),
                           _vm._v(" "),
@@ -3016,14 +3037,17 @@ var render = function() {
               ],
               null,
               false,
-              2977155721
+              1125213236
             )
           })
         : _vm._e(),
       _vm._v(" "),
       _vm.attachModalState
         ? _c("v-modal", {
-            attrs: { label: "Associer", "card-classes": "attach-modal" },
+            attrs: {
+              label: _vm.$t("associate"),
+              "card-classes": "attach-modal"
+            },
             on: {
               close: function($event) {
                 _vm.attachModalState = false
@@ -3076,7 +3100,7 @@ var render = function() {
                             }
                           }
                         },
-                        [_vm._v("Annuler")]
+                        [_vm._v(_vm._s(_vm.$t("dashboard.cancel")))]
                       ),
                       _vm._v(" "),
                       _c(
@@ -3099,7 +3123,7 @@ var render = function() {
                                 }
                               ]
                             },
-                            [_vm._v("Attacher")]
+                            [_vm._v(_vm._s(_vm.$t("dashboard.attach")))]
                           ),
                           _vm._v(" "),
                           _c(
@@ -3237,7 +3261,7 @@ var render = function() {
               ],
               null,
               false,
-              4276009088
+              1601820478
             )
           })
         : _vm._e()

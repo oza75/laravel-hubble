@@ -124,7 +124,6 @@ class RelatedResource extends HubbleResource
         $data['isManyRelation'] = true;
 
         $field = $this->field->toArray('creating');
-
         $data['field'] = collect($field)->first();
 
         return $data;

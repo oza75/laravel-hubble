@@ -235,7 +235,9 @@ var render = function() {
     [
       _c("header", { staticClass: "header" }, [
         _c("h2", { staticClass: "title" }, [
-          _vm._v("Modification - " + _vm._s(_vm.resource.title))
+          _vm._v(
+            _vm._s(_vm.$t("dashboard.edit_title", { name: _vm.resource.title }))
+          )
         ])
       ]),
       _vm._v(" "),
@@ -268,7 +270,16 @@ var render = function() {
               on: { input: _vm.input }
             }),
             _vm._v(" "),
-            _vm._m(0)
+            _c("div", { staticClass: "form--actions" }, [
+              _c(
+                "button",
+                {
+                  staticClass: "btn btn-primary btn-normal btn-radius",
+                  attrs: { type: "submit" }
+                },
+                [_vm._v(_vm._s(_vm.$t("dashboard.save")))]
+              )
+            ])
           ],
           1
         )
@@ -276,23 +287,7 @@ var render = function() {
     ]
   )
 }
-var staticRenderFns = [
-  function() {
-    var _vm = this
-    var _h = _vm.$createElement
-    var _c = _vm._self._c || _h
-    return _c("div", { staticClass: "form--actions" }, [
-      _c(
-        "button",
-        {
-          staticClass: "btn btn-primary btn-normal btn-radius",
-          attrs: { type: "submit" }
-        },
-        [_vm._v("Enregister")]
-      )
-    ])
-  }
-]
+var staticRenderFns = []
 render._withStripped = true
 
 

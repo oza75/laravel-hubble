@@ -6,6 +6,7 @@ namespace Oza75\LaravelHubble\Concerns;
 
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Oza75\LaravelHubble\HubbleResource;
 
 trait InteractsWithDatabase
 {
@@ -81,7 +82,9 @@ trait InteractsWithDatabase
      */
     public function update($id, array $data, Request $request)
     {
-        $collection = collect($data);
+        $collection = collect($data)->filter(function ($value) {
+            return $value !== HubbleResource::NULL_VALUE;
+        });
 
         $this->fireEvent('updating', $id, $collection, $request);
 

@@ -16,6 +16,8 @@ abstract class HubbleResource
 {
     use InteractsWithDatabase, HandlesEvents;
 
+    const NULL_VALUE = "__laravel__hubble@null#";
+
     protected $name = null;
 
     protected $title = null;

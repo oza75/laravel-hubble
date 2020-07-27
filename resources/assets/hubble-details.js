@@ -262,7 +262,11 @@ var render = function() {
     [
       _c("header", { staticClass: "header" }, [
         _c("h2", { staticClass: "title" }, [
-          _vm._v("Détails - " + _vm._s(_vm.resource.title))
+          _vm._v(
+            _vm._s(
+              _vm.$t("dashboard.details_title", { name: _vm.resource.title })
+            )
+          )
         ]),
         _vm._v(" "),
         _c("div", { staticClass: "ctas" }, [
@@ -272,7 +276,7 @@ var render = function() {
               staticClass: "btn btn-normal btn-primary btn-radius",
               attrs: {
                 href: _vm.item["@urls"]["edit"]["url"],
-                title: "Modifier"
+                title: _vm.$t("dashboard.edit")
               }
             },
             [
@@ -302,7 +306,7 @@ var render = function() {
             "button",
             {
               staticClass: "btn btn-radius btn-white btn-normal",
-              attrs: { title: "Supprimer" },
+              attrs: { title: _vm.$t("dashboard.delete") },
               on: {
                 click: function($event) {
                   $event.stopPropagation()
@@ -396,7 +400,7 @@ var render = function() {
       _vm._v(" "),
       _vm.openDeleteModal
         ? _c("v-modal", {
-            attrs: { label: "Confirmation" },
+            attrs: { label: _vm.$t("dashboard.confirmation") },
             on: {
               close: function($event) {
                 _vm.openDeleteModal = false
@@ -409,7 +413,7 @@ var render = function() {
                   fn: function() {
                     return [
                       _c("p", [
-                        _vm._v("Voulez-vous vraiment supprimer cet élément.")
+                        _vm._v(_vm._s(_vm.$t("dashboard.delete_item_message")))
                       ])
                     ]
                   },
@@ -429,7 +433,7 @@ var render = function() {
                             }
                           }
                         },
-                        [_vm._v("Annuler")]
+                        [_vm._v(_vm._s(_vm.$t("dashboard.cancel")))]
                       ),
                       _vm._v(" "),
                       _c(
@@ -460,7 +464,7 @@ var render = function() {
                               staticClass: "btn btn-normal btn-primary",
                               attrs: { type: "submit" }
                             },
-                            [_vm._v("Supprimer")]
+                            [_vm._v(_vm._s(_vm.$t("dashboard.delete")))]
                           )
                         ]
                       )
@@ -471,7 +475,7 @@ var render = function() {
               ],
               null,
               false,
-              3871729931
+              1528599611
             )
           })
         : _vm._e(),
