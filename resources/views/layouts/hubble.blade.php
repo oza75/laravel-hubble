@@ -10,8 +10,8 @@
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Scripts -->
-{{--    @include("partials.components-php-vars")--}}
-    @yield('components')
+    @include('laravel-hubble::partials.js-php-vars')
+    @yield('js')
     <script src="https://npmcdn.com/flatpickr/dist/l10n/fr.js" defer></script>
     <script src="{{ asset('vendor/laravel-hubble/hubble.js') }}" defer></script>
     <script src="{{ asset('vendor/laravel-hubble/components.js') }}" defer></script>

@@ -26,7 +26,7 @@ class SelectField extends Field
 
         $this->setValueKey('value');
         $this->setTextKey('text');
-        $this->addAttribute('emptyOptionName', 'Pas de ' . $this->title);
+        $this->addAttribute('emptyOptionName', trans('laravel-hubble::dashboard.empty_option', ['title' => $this->title]));
     }
 
     protected function registerComponents()

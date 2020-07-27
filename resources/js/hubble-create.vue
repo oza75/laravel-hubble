@@ -1,14 +1,14 @@
 <template>
     <div class="container dashboard--container dashboard--edit">
         <header class="header">
-            <h2 class="title">Création - {{resource.title}}</h2>
+            <h2 class="title">{{$t('dashboard.create_title', {name: resource.title})}}</h2>
         </header>
         <section class="content--list">
             <form method="post" :action="resource.urls.store.url" enctype="multipart/form-data">
                 <input type="hidden" name="_token" :value="resource.token">
                 <hubble-form :resource="resource" :form-data="formData" @input="input" type="creating"/>
                 <div class="form--actions">
-                    <button type="submit" class="btn btn-primary btn-normal btn-radius">Enregister</button>
+                    <button type="submit" class="btn btn-primary btn-normal btn-radius">{$t('dashboard.save')}}</button>
                 </div>
             </form>
         </section>

@@ -37,7 +37,7 @@ window.Vue.prototype.$disableScroll = disableScroll
 window.Vue.prototype.$isMobile = window.isMobile
 window.Vue.prototype.$csrf = window.x_csrf_token
 window.Vue.prototype.$auth_user = window.auth_user
-
+window.Vue.prototype.$t = window.trans;
 // Vue.component('file-input', require('./components/FileInput.vue').default)
 // Vue.component('v-input', require('./components/VInput.vue').default)
 // Vue.component('v-checkbox', require('./components/VCheckbox.vue').default)
@@ -51,9 +51,9 @@ Vue.component('hubble-checkbox-filter', () => import(/* webpackChunkName: "hubbl
 // Vue.component(`datetime-x-axis-chart`, () => import(/* webpackChunkName: "[request]" */ /* webpackPrefetch: true */`./components/admin/components/charts/datetime-x-axis-chart.vue`))
 
 const mods = {
-    text: ['edit', 'show','index'],
-    file: ['edit', 'show','index'],
-    image: ['edit', 'show','index'],
+    text: ['edit', 'show', 'index'],
+    file: ['edit', 'show', 'index'],
+    image: ['edit', 'show', 'index'],
     'select': ['edit'],
     'datetime': ['edit'],
     'boolean': ['show', 'edit'],

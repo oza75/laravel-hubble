@@ -18,7 +18,7 @@ class BooleanField extends Field
             return $value === 1;
         });
 
-        $this->text('Oui', 'Non');
+        $this->text(trans('laravel-hubble::dashboard.yes'), trans('laravel-hubble::dashboard.no'));
     }
 
     protected function registerComponents()
