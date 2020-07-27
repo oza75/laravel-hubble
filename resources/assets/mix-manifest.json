@@ -21,6 +21,5 @@
     "/text-index-text-field-vue.js": "/text-index-text-field-vue.js",
     "/text-show-text-field-vue.js": "/text-show-text-field-vue.js",
     "/textarea-edit-textarea-field-vue.js": "/textarea-edit-textarea-field-vue.js",
-    "/vendors~datetime-edit-datetime-field-vue.js": "/vendors~datetime-edit-datetime-field-vue.js",
-    "/vendors~datetime-edit-datetime-field-vue~image-edit-image-field-vue.js": "/vendors~datetime-edit-datetime-field-vue~image-edit-image-field-vue.js"
+    "/vendors~datetime-edit-datetime-field-vue.js": "/vendors~datetime-edit-datetime-field-vue.js"
 }
