@@ -8,7 +8,7 @@
                 <input type="hidden" name="_token" :value="resource.token">
                 <hubble-form :resource="resource" :form-data="formData" @input="input" type="creating"/>
                 <div class="form--actions">
-                    <button type="submit" class="btn btn-primary btn-normal btn-radius">{$t('dashboard.save')}}</button>
+                    <button type="submit" class="btn btn-primary btn-normal btn-radius">{{$t('dashboard.save')}}</button>
                 </div>
             </form>
         </section>
