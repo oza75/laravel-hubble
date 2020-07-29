@@ -27,7 +27,10 @@ class JavascriptServiceProvider extends ServiceProvider
             JavascriptPut::put([
                 '_old' => $session->getOldInput(),
                 '_errors' => $errors,
-                '_trans' => ['dashboard' => Lang::get('laravel-hubble::dashboard')],
+                '_trans' => [
+                    'dashboard' => Lang::get('laravel-hubble::dashboard'),
+                    'validation' => Lang::get('validation')
+                ],
             ]);
         });
     }

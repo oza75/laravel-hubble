@@ -68,4 +68,5 @@ Route::prefix("/api{$prefix}")
         Route::get('/resources/{name}/{key}/fields/{field}/related', "{$namespace}ApiController@fieldRelatedOptions")
             ->name('api.hubble.fields.related');
 
+        Route::post('/validation', "{$namespace}ApiController@validate")->name('api.hubble.validation');
     });

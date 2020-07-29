@@ -4,7 +4,7 @@
             :class="{['field-'+field.name+'-row']: true}">
             <label class="table--list--cell label--cell" :for="field.name">{{field.title}}</label>
             <div class="table--list--cell input--cell">
-                <component :is="field.components[type]" v-bind="field.attributes"
+                <component :is="field.components[type]" v-bind="field.attributes" :item="item"
                            :form-data="formData" :field="field" @input="$emit('input', field.name, $event)"
                            :value="getValue(field)"></component>
             </div>
@@ -18,7 +18,8 @@
         props: {
             resource: {type: Object, required: true},
             type: {type: String, default: 'editing'},
-            formData: {type: Object, default: () => ({})}
+            formData: {type: Object, default: () => ({})},
+            item: {type: Object, default: () => ({})}
         },
         computed: {
             fields() {

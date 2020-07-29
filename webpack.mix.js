@@ -12,14 +12,17 @@ let mix = require('laravel-mix');
  */
 mix.webpackConfig({
     "output": {
-       publicPath: '/vendor/laravel-hubble/'
+        publicPath: '/vendor/laravel-hubble/',
+        chunkFilename: "[name].[contenthash].js"
     }
 })
 mix.options({processCssUrls: false});
 mix.js('resources/js/hubble.js', 'resources/assets')
     .sass('resources/sass/hubble.scss', 'resources/assets')
     .setPublicPath('resources/assets');
-
+if (!mix.inProduction()) {
+    mix.sourceMaps();
+}
 // Full API
 // mix.components(src, output);
 // mix.react(src, output); <-- Identical to mix.components(), but registers React Babel compilation.

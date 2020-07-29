@@ -155,10 +155,12 @@ class InstallationCommand extends Command
         if (!File::isDirectory($path . DIRECTORY_SEPARATOR . "components")) File::makeDirectory($path . DIRECTORY_SEPARATOR . "components");
 
         if (!File::exists($path . DIRECTORY_SEPARATOR . "components.js"))
-            File::put($path . DIRECTORY_SEPARATOR . "components.js", "");
+            $this->createStubFile('components.stub', [], $path . DIRECTORY_SEPARATOR . "components.js");
 
         if (!File::exists($path . DIRECTORY_SEPARATOR . "components.scss"))
             File::put($path . DIRECTORY_SEPARATOR . "components.scss", "");
 
+        if (!File::exists($path . DIRECTORY_SEPARATOR . "rules.js"))
+            $this->createStubFile('rules.stub', [], $path . DIRECTORY_SEPARATOR . "rules.js");
     }
 }

@@ -12,7 +12,7 @@
     </div>
 </template>
 
-<script lang="js">
+<script>
     export default {
         name: "file-input",
         data: () => ({
@@ -77,39 +77,5 @@
     input[type=file] {
         position: absolute;
         left: -99999px;
-    }
-
-    .input-main-card {
-        background-color: #34495e;
-        color: white;
-        cursor: pointer;
-        transition: background-color 0.3s;
-    }
-
-    .input-main-card:hover {
-        background-color: #1abc9c;
-    }
-
-    .remove-btn {
-        position: absolute;
-        left: -40px;
-        top: -40px;
-        color: white;
-        transform: translateX(20px) translateY(20px);
-        transition: all 0.3s;
-    }
-
-    .remove-btn:hover {
-        width: 112px !important;
-        height: 112px !important;
-        left: -80px;
-        top: -80px;
-        transform: translateX(40px) translateY(40px);
-    }
-
-    .round {
-        -webkit-border-radius: 50%;
-        -moz-border-radius: 50%;
-        border-radius: 50%;
     }
 </style>

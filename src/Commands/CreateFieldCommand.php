@@ -55,12 +55,11 @@ class CreateFieldCommand extends Command
 
         $path = resource_path("hubble" . DIRECTORY_SEPARATOR . "components" . DIRECTORY_SEPARATOR . "fields" . DIRECTORY_SEPARATOR . $field);
 
-        if (!File::exists($path))
+        if (!File::exists($path)) {
             File::makeDirectory($path, 0755, true);
-
-//        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'edit.stub', $data, $path . DIRECTORY_SEPARATOR . 'edit-' . $field . '-field.vue');
-//        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'index.stub', $data, $path . DIRECTORY_SEPARATOR . 'index-' . $field . '-field.vue');
-//        $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'show.stub', $data, $path . DIRECTORY_SEPARATOR . 'show-' . $field . '-field.vue');
+            $mixinPath = "hubble" . DIRECTORY_SEPARATOR . "components" . DIRECTORY_SEPARATOR . "fields" . DIRECTORY_SEPARATOR . "mixins.js";
+            $this->createStubFile('fields' . DIRECTORY_SEPARATOR . 'mixins.stub', [], resource_path($mixinPath));
+        }
 
         $components = ['edit', 'index', 'show'];
 
@@ -71,7 +70,7 @@ class CreateFieldCommand extends Command
             File::append(resource_path('hubble' . DIRECTORY_SEPARATOR . 'components.js'), $content);
         }
 
-        $this->info($name . ' components created at ' . str_replace(base_path() .'/', '', $path));
+        $this->info($name . ' components created at ' . str_replace(base_path() . '/', '', $path));
         $this->warn('Do not forget to run `npm run hubble:watch` or `npm run hubble:prod` to build the newly components !');
     }
 }

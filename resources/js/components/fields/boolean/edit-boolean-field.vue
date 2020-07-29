@@ -7,18 +7,19 @@
                 <span class="fake-radio"></span>
             </span>
         </label>
+        <input-errors :errors="errors"/>
     </div>
 </template>
 
 <script>
+    import {EditMixin} from "../mixins";
+
     export default {
         name: "edit-boolean-field",
         props: {
-            field: {type: Object, required: true},
-            formData: {type: Object, default: () => ({})},
-            value: {default: null},
             type: {type: String, default: 'text'}
         },
+        mixins: [EditMixin],
         computed: {
             isActive() {
                 return this.value;

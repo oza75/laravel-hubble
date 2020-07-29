@@ -1025,6 +1025,11 @@ select, input:not([type='checkbox']):not([type='radio']), textarea {
     -webkit-appearance: none;
     transition: .3s;
     outline-color: #d6e3eb;
+
+    &.error {
+        outline-color: $red;
+        border-color: $red;
+    }
 }
 
 textarea {
@@ -1065,6 +1070,11 @@ select {
         align-items: center;
         justify-content: flex-start;
         flex-wrap: wrap;
+
+        &.error {
+            outline-color: $red;
+            border-color: $red;
+        }
 
         .tag {
             background-color: $primary-color;
@@ -1463,6 +1473,7 @@ pre {
         }
     }
 }
+
 .index--image--component {
     img {
         width: 30px;

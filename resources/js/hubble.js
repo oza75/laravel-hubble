@@ -1,5 +1,4 @@
 window.Vue = require('vue');
-window.axios = require('axios');
 require('./bootstrap.js')
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -26,8 +25,6 @@ let disableScroll = {
     }
 }
 window.disableScroll = disableScroll
-window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.baseURL = '/api/hubble'
 
 // window.Vue.prototype.$old = window.old;
 // window.Vue.prototype.$hasFormError = window.hasFormError;
@@ -38,6 +35,10 @@ window.Vue.prototype.$isMobile = window.isMobile
 window.Vue.prototype.$csrf = window.x_csrf_token
 window.Vue.prototype.$auth_user = window.auth_user
 window.Vue.prototype.$t = window.trans;
+window.Vue.prototype.$formErrors = window.getFormErrors;
+window.Vue.prototype.$hasFormErrors = window.hasFormErrors;
+window.Vue.prototype.$old = window.old;
+
 // Vue.component('file-input', require('./components/FileInput.vue').default)
 // Vue.component('v-input', require('./components/VInput.vue').default)
 // Vue.component('v-checkbox', require('./components/VCheckbox.vue').default)
@@ -49,21 +50,23 @@ Vue.component('hubble-create', () => import(/* webpackChunkName: "hubble-create"
 Vue.component('hubble-checkbox-filter', () => import(/* webpackChunkName: "hubble-checkbox-filter"*/ /* webpackPrefetch: true */ "./components/filters/checkbox-filter.vue"))
 // Vue.component(`value-chart`, () => import(/* webpackChunkName: "[request]" */ /* webpackPrefetch: true */`./components/admin/components/charts/value-chart.vue`))
 // Vue.component(`datetime-x-axis-chart`, () => import(/* webpackChunkName: "[request]" */ /* webpackPrefetch: true */`./components/admin/components/charts/datetime-x-axis-chart.vue`))
-
+Vue.component('edit-image-field', () => import(/* webpackChunkName: "edit-image-field" */ /* webpackPrefetch: true */"./components/fields/image/edit-image-field.vue"))
+Vue.component('file-input', require("./components/fields/image/FileInput.vue").default)
+Vue.component('input-errors', require("./components/fields/input-errors.vue").default)
 const mods = {
     text: ['edit', 'show', 'index'],
     file: ['edit', 'show', 'index'],
-    image: ['edit', 'show', 'index'],
+    image: ['index', 'edit', 'show'],
     'select': ['edit'],
     'datetime': ['edit'],
     'boolean': ['show', 'edit'],
     'textarea': ['edit'],
-    'color-picker': ['show']
+    'color-picker': ['show'],
 };
 
 Object.keys(mods).forEach(key => {
     mods[key].forEach(mod => {
-        Vue.component(`${mod}-${key}-field`, () => import(/* webpackChunkName: "[request]"*/ /* webpackPrefetch: true */`./components/fields/${key}/${mod}-${key}-field.vue`))
+        Vue.component(`${mod}-${key}-field`, () => import(/* webpackChunkName: "[request]" */ /* webpackPrefetch: true */`./components/fields/${key}/${mod}-${key}-field.vue`))
     })
 })
 
