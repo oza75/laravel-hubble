@@ -74,7 +74,9 @@ class FileField extends Field
             return !collect($removed)->contains($item);
         })->toArray();
 
-        Storage::disk($this->storageDisk)->delete($removed);
+        $this->resource->registerEvent($section === 'creating' ? 'created' : 'updated', function () use ($removed) {
+            Storage::disk($this->storageDisk)->delete($removed);
+        });
 
         $files = collect(Arr::wrap($files))->slice(0, $max - count($paths))->toArray();
         foreach ($files as $file) $paths[] = $this->store($file);

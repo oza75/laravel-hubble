@@ -10,11 +10,15 @@ let mix = require('laravel-mix');
  | file for your application, as well as bundling up your JS files.
  |
  */
+let output = {
+    publicPath: '/vendor/laravel-hubble/',
+}
+if (mix.inProduction()) {
+    output.chunkFilename = "[name].[contenthash].js";
+}
+
 mix.webpackConfig({
-    "output": {
-        publicPath: '/vendor/laravel-hubble/',
-        chunkFilename: "[name].[contenthash].js"
-    }
+    "output": output
 })
 mix.options({processCssUrls: false});
 mix.js('resources/js/hubble.js', 'resources/assets')

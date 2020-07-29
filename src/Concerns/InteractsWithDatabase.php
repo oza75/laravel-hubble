@@ -89,7 +89,7 @@ trait InteractsWithDatabase
         });
 
         $rules = collect($this->rules('editing'))->filter(function ($rule, $field) use ($item, $collection) {
-            return $collection->has($field) && $item->{$field} !== $collection[$field];
+            return $collection->has($field) && ($item->{$field} !== $collection[$field] || empty($collection[$field]));
         })->toArray();
 
         $request->validate($rules);
