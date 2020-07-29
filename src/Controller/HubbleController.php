@@ -102,7 +102,7 @@ class HubbleController
 
         $resource->updateItem($request, $key);
 
-        return redirect()->route('hubble.edit', ['name' => $resource->getName(), 'key' => $key]);
+        return redirect()->route('hubble.show', ['name' => $resource->getName(), 'key' => $key]);
     }
 
     /***

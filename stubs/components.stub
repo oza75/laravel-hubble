@@ -1,0 +1,5 @@
+import * as rules from './rules'
+
+document.addEventListener('DOMContentLoaded', () => {
+    window.hubble_rules = {...window.hubble_rules, ...rules}
+});

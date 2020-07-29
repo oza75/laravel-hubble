@@ -4,6 +4,7 @@
 namespace Oza75\LaravelHubble\Controller;
 
 
+use Illuminate\Support\Facades\Validator;
 use Oza75\LaravelHubble\Contracts\Hubble;
 use Oza75\LaravelHubble\HubbleResource;
 use Oza75\LaravelHubble\Resources\IndexResource;
@@ -173,5 +174,18 @@ class ApiController
         $data = $related->attach($request);
 
         return response()->json(['success' => $data]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function validate(Request $request) {
+       $value = $request->get('value');
+       $rules = $request->get('rules');
+
+       Validator::make($value, $rules)->validate();
+
+       return response()->json(['data' => 'passed']);
     }
 }

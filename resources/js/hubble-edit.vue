@@ -7,7 +7,7 @@
             <form :action="item['@urls']['update']['url']" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="_method" value="PUT">
                 <input type="hidden" name="_token" :value="resource.token">
-                <hubble-form :resource="resource" :form-data="formData" @input="input" type="editing"/>
+                <hubble-form :resource="resource" :item="item" :form-data="formData" @input="input" type="editing"/>
                 <div class="form--actions">
                     <button type="submit" class="btn btn-primary btn-normal btn-radius">{{$t('dashboard.save')}}</button>
                 </div>

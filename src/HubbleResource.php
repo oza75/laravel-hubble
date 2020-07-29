@@ -105,13 +105,13 @@ abstract class HubbleResource
 
         switch ($section) {
             case 'index':
-                $data = array_merge($data, $this->indexingToArray());
+                $data = array_merge($data, $this->toArrayWhenIndexing());
                 break;
             case 'creating':
-                $data = array_merge($data, $this->creatingToArray());
+                $data = array_merge($data, $this->toArrayWhenCreating());
                 break;
             case 'editing':
-                $data = array_merge($data, $this->editingToArray());
+                $data = array_merge($data, $this->toArrayWhenEditing());
                 break;
             case 'details':
                 $data['relatedResource'] = $this->getRelatedResources();
@@ -124,7 +124,7 @@ abstract class HubbleResource
     /**
      * @return array
      */
-    protected function creatingToArray()
+    protected function toArrayWhenCreating()
     {
         return [];
     }
@@ -132,7 +132,7 @@ abstract class HubbleResource
     /**
      * @return array
      */
-    protected function editingToArray()
+    protected function toArrayWhenEditing()
     {
         return [];
     }
@@ -140,7 +140,7 @@ abstract class HubbleResource
     /**
      * @return array
      */
-    protected function indexingToArray()
+    protected function toArrayWhenIndexing()
     {
         $actions = collect($this->actions())->map(function (Action $action) {
             return array_merge($action->toArray(), [
@@ -233,6 +233,8 @@ abstract class HubbleResource
     {
         $data = $this->retrieveFormData($request, 'creating');
 
+        $request->validate($this->rules('creating'));
+
         $item = $this->create($data, $request);
 
         return route('hubble.show', ['name' => $this->getName(), 'key' => $item->{$this->key}]);
@@ -248,6 +250,21 @@ abstract class HubbleResource
         $data = $this->retrieveFormData($request, 'editing');
 
         return $this->update($id, $data, $request);
+    }
+
+    /**
+     * @param string $section
+     * @return array
+     */
+    public function rules(string $section)
+    {
+        $fields = $this->getVisibleFields($section);
+
+        return collect($fields)->mapWithKeys(function (Field $field) use ($section) {
+            return [$field->getName() => $field->rulesFor($section)];
+        })->filter(function ($rules) {
+            return !empty($rules);
+        })->toArray();
     }
 
     /**

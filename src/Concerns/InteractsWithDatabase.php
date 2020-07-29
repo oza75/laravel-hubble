@@ -82,13 +82,19 @@ trait InteractsWithDatabase
      */
     public function update($id, array $data, Request $request)
     {
+        $item = $this->baseQuery()->newQuery()->where($this->key, $id)->firstOrFail();
+
         $collection = collect($data)->filter(function ($value) {
             return $value !== HubbleResource::NULL_VALUE;
         });
 
-        $this->fireEvent('updating', $id, $collection, $request);
+        $rules = collect($this->rules('editing'))->filter(function ($rule, $field) use ($item, $collection) {
+            return $collection->has($field) && $item->{$field} !== $collection[$field];
+        })->toArray();
 
-        $item = $this->baseQuery()->newQuery()->where($this->key, $id)->firstOrFail();
+        $request->validate($rules);
+
+        $this->fireEvent('updating', $id, $collection, $request);
 
         $item->update($collection->toArray());
 

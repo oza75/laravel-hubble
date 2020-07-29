@@ -2,12 +2,12 @@
     <div class="custom--select--container">
         <template v-if="!multiple">
             <input type="text" @click.stop @keyup="onSearch" :placeholder="placeholder" @keydown="onKeydown"
-                   ref="textInput" :id="field.name" autocomplete="off"
+                   ref="textInput" :class="{error: hasErrors}" :id="field.name" autocomplete="off"
                    @focus="openDropdown">
             <input :name="field.name" :value="inputValue" ref="input" v-show="false">
         </template>
         <template v-if="multiple">
-            <div class="tags--wrapper" @click.stop="openDropdown">
+            <div class="tags--wrapper" :class="{error: hasErrors}" @click.stop="openDropdown">
                 <div class="tag" v-for="(tag,i) in tags" @click.stop="removeTag(tag)">
                     <span>{{tag[textKey]}}</span>
                     <div class="remove">
@@ -17,13 +17,14 @@
                         </svg>
                     </div>
                 </div>
-                <input type="text" :id="field.name" :placeholder="placeholder" @click.stop @keyup="onSearch"
+                <input type="text"  :id="field.name" :placeholder="placeholder" @click.stop @keyup="onSearch"
                        @keydown="onKeydown"
                        @focus="openDropdown">
             </div>
             <input :name="`${field.name}[]`" :value="val[valueKey]" :key="k" ref="input"
                    v-for="(val, k) in tags" v-show="false">
         </template>
+        <input-errors :errors="errors"/>
         <ul class="custom--select--content" :class="{open: dropdownOpened}" ref="optionsContent">
             <li @click="empty">{{emptyOptionName}}</li>
             <li v-for="(option, k) in realOptions" :id="'custom--select--option-'+k"
@@ -38,6 +39,7 @@
 <script>
     import InfiniteScroll from "../../../classes/InfiniteScroll";
     import ClickOutside from "../../../classes/ClickOutside"
+    import {EditMixin} from "../mixins";
 
     export default {
         name: "edit-select-field",
@@ -53,9 +55,6 @@
             tags: []
         }),
         props: {
-            field: {type: Object, required: true},
-            formData: {type: Object, default: () => ({})},
-            value: {default: null},
             options: {required: true, type: [Array, String]},
             valueKey: {required: true, type: String},
             textKey: {required: true, type: String},
@@ -63,6 +62,7 @@
             placeholder: {type: String, default: null},
             emptyOptionName: {type: String, default: null}
         },
+        mixins: [EditMixin],
         computed: {
             wrapper() {
                 return this.$refs['optionsContent'];
@@ -201,24 +201,24 @@
                     else values.splice(index, 1)
 
                     this.tags = values;
-                    this.$emit('input', this.tags)
+                    this.input(this.tags)
                     return;
                 }
 
                 this.inputValue = option[this.valueKey];
-                this.$emit('input', option);
+                this.input(option)
                 this.dropdownOpened = false;
             },
             empty() {
                 if (this.multiple) {
                     this.tags = [];
                     this.dropdownOpened = false;
-                    this.$emit('input', []);
+                    this.input([])
                     return;
                 }
 
                 this.inputValue = null;
-                this.$emit('input', null);
+                this.input(null)
                 this.dropdownOpened = false;
             },
             removeTag(tag) {

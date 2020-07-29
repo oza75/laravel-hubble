@@ -656,6 +656,17 @@ You can also generate a new field with custom components by using this command:
 php artisan hubble:field ColorField --custom
 ```
 This will created a new `VueJs` components for your field under `resources/hubble/components/fields/color`
+
+Use this command to build the newly components
+
+```bash
+npm run hubble:watch
+```
+
+or 
+```bash
+npm run hubble:prod
+```
 ### Testing
 
 ``` bash

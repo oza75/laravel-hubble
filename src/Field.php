@@ -5,6 +5,7 @@ namespace Oza75\LaravelHubble;
 
 
 use Illuminate\Support\Str;
+use Oza75\LaravelHubble\Concerns\HandlesRules;
 use Oza75\LaravelHubble\Concerns\HandlesVisibility;
 use Illuminate\Http\Request;
 use Oza75\LaravelHubble\Fields\BooleanField;
@@ -13,7 +14,7 @@ use Oza75\LaravelHubble\Fields\NumberField;
 
 class Field
 {
-    use HandlesVisibility;
+    use HandlesVisibility, HandlesRules;
 
     /**
      * @var string
@@ -132,14 +133,20 @@ class Field
      */
     public function toArray(string $section = 'index')
     {
+        $data = [
+            'name' => $this->getName(),
+            'title' => $this->getTitle(),
+            'sortable' => $this->sortable,
+            'components' => $this->components,
+            'attributes' => $this->attributes,
+        ];
+
+        if (in_array($section, ['creating', 'editing'])) {
+            $data = array_merge($data, ['rules' => $this->parsedRules($section)]);
+        }
+
         return [
-            $this->name => [
-                'name' => $this->getName(),
-                'title' => $this->getTitle(),
-                'sortable' => $this->sortable,
-                'components' => $this->components,
-                'attributes' => $this->attributes,
-            ]
+            $this->name => $data
         ];
     }
 

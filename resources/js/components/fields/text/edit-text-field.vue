@@ -1,18 +1,22 @@
 <template>
     <div>
-        <input :type="type" :value="value" :id="field.name" :name="field.name" v-bind="$attrs" @input="$emit('input', $event.target.value)">
+        <input :type="type" :value="value" :id="field.name"
+               :class="{error: hasErrors}"
+               :name="field.name" v-bind="{...$attrs, ...rulesAttrs}"
+               @input="input($event.target.value)">
+
+        <input-errors v-if="hasErrors" :errors="errors"/>
     </div>
 </template>
 
 <script>
+    import {EditMixin} from "../mixins";
+    import InputErrors from "../input-errors";
+
     export default {
         name: "edit-text-field",
-        props: {
-            field: {type: Object, required: true},
-            formData: {type: Object, default: () => ({})},
-            value: {default: null},
-            type: {type: String, default: 'text'}
-        }
+        components: {InputErrors},
+        mixins: [EditMixin],
     }
 </script>
 

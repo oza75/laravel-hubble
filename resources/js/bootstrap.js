@@ -1,3 +1,8 @@
+import * as rules from "./rules";
+window.axios = require('axios');
+window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+window.axios.defaults.baseURL = '/api/hubble';
+
 function handlePopovers() {
     let items = [].slice.call(document.querySelectorAll('.popover'))
     items.forEach((item, k) => {
@@ -43,6 +48,7 @@ function handlePopovers() {
     })
 }
 
-document.addEventListener('DOMContentLoaded', function () {
-    handlePopovers()
+document.addEventListener('DOMContentLoaded',  () => {
+    handlePopovers();
+    window.hubble_rules = rules;
 })
