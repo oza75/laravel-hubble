@@ -22,11 +22,14 @@ mix.webpackConfig({
 })
 mix.options({processCssUrls: false});
 mix.js('resources/js/hubble.js', 'resources/assets')
+    .js('resources/js/turbolinks.js', 'resources/assets')
     .sass('resources/sass/hubble.scss', 'resources/assets')
     .setPublicPath('resources/assets');
 if (!mix.inProduction()) {
     mix.sourceMaps();
 }
+
+
 // Full API
 // mix.components(src, output);
 // mix.react(src, output); <-- Identical to mix.components(), but registers React Babel compilation.

@@ -51,4 +51,9 @@ function handlePopovers() {
 document.addEventListener('DOMContentLoaded',  () => {
     handlePopovers();
     window.hubble_rules = rules;
+    document.addEventListener('turbolinks:load', () => {
+        handlePopovers();
+        window.hubble_rules = rules;
+    });
 })
+

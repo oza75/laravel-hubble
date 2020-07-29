@@ -19,9 +19,9 @@
     "author": "",
     "license": "ISC",
     "devDependencies": {
-        "laravel-mix": "^5.0.4",
         "axios": "^0.19",
         "cross-env": "^7.0",
+        "laravel-mix": "^5.0.4",
         "lodash": "^4.17.13",
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.20.1",
@@ -31,6 +31,8 @@
     },
     "dependencies": {
         "downloadjs": "^1.4.7",
-        "flatpickr": "^4.6.3"
+        "flatpickr": "^4.6.3",
+        "turbolinks": "^5.2.0",
+        "vue-turbolinks": "^2.1.0"
     }
 }

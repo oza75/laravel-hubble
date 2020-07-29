@@ -1,4 +1,5 @@
 window.Vue = require('vue');
+import TurbolinksAdapter from 'vue-turbolinks';
 require('./bootstrap.js')
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -81,8 +82,10 @@ Object.keys(mods).forEach(key => {
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-const app = new Vue({
-    el: '#hubble',
-    data: {},
-    components: {}
+document.addEventListener('turbolinks:load', () => {
+    const app = new Vue({
+        el: '#hubble',
+        data: {},
+        components: {}
+    });
 });

@@ -77,7 +77,7 @@ class DefaultResource extends JsonResource
 
             return [
                 'url' => $value,
-                'target' => '_self'
+                'target' => null
             ];
         });
     }
