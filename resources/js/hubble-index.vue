@@ -5,7 +5,7 @@
             <div class="filters">
                 <div v-for="(filter, k) in (resource.filters || [])" :key="'filter-'+k">
                     <hubble-filter :filter="filter" :value="customFilters[filter.name]"
-                                      @input="selectFilter(filter, $event)"/>
+                                   @input="selectFilter(filter, $event)"/>
                 </div>
             </div>
         </header>
@@ -133,15 +133,17 @@
 
                     <div class="table--list--data table--list--data--actions">
                         <div class="wrapper">
-                            <a :href="item['@urls']['show']['url']" :target="item['@urls']['show']['target'] || '_self'"
-                               v-if="item['@urls']['show']  && item['@urls']['show']['url']" :title="$t('dashboard.show_details')">
+                            <a :href="item['@urls']['show']['url']" v-bind="linkAttrs(item['@urls']['show'])"
+                               v-if="item['@urls']['show']  && item['@urls']['show']['url']"
+                               :title="$t('dashboard.show_details')">
                                 <svg width="24" height="12" viewBox="0 0 24 12" xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M11.9999 0C5.74794 0 0.937443 5.508 0.937443 5.508L0.491943 6L0.937443 6.492C0.937443 6.492 5.32344 11.493 11.1562 11.9535C11.4344 11.988 11.7127 12 11.9999 12C12.2872 12 12.5654 11.988 12.8437 11.9528C18.6764 11.493 23.0624 6.49275 23.0624 6.49275L23.5079 6L23.0624 5.508C23.0624 5.508 18.2519 0 11.9999 0ZM11.9999 1.5C13.6522 1.5 15.1754 1.9515 16.4999 2.5545C16.9777 3.34575 17.2499 4.257 17.2499 5.25C17.2531 6.54284 16.7788 7.79132 15.918 8.75593C15.0572 9.72053 13.8706 10.3333 12.5857 10.4767C12.5707 10.4797 12.5534 10.4737 12.5392 10.4767C12.3599 10.485 12.1814 10.5 11.9999 10.5C11.8004 10.5 11.6077 10.488 11.4142 10.4767C10.1293 10.3333 8.94267 9.72053 8.08187 8.75593C7.22108 7.79132 6.74677 6.54284 6.74994 5.25C6.74994 4.27125 7.01394 3.36 7.47669 2.57775H7.45344C8.78769 1.96275 10.3297 1.5 11.9999 1.5ZM11.9999 3C11.403 3.0002 10.8306 3.23752 10.4086 3.65976C9.98668 4.082 9.74974 4.65456 9.74994 5.2515C9.75014 5.84844 9.98746 6.42084 10.4097 6.8428C10.8319 7.26476 11.4045 7.5017 12.0014 7.5015C12.297 7.5014 12.5897 7.44309 12.8627 7.32989C13.1357 7.21668 13.3838 7.05081 13.5927 6.84174C13.8017 6.63267 13.9674 6.38449 14.0804 6.11138C14.1934 5.83827 14.2515 5.54557 14.2514 5.25C14.2513 4.95443 14.193 4.66177 14.0798 4.38873C13.9666 4.1157 13.8008 3.86763 13.5917 3.6587C13.3826 3.44977 13.1344 3.28406 12.8613 3.17104C12.5882 3.05802 12.2955 2.9999 11.9999 3V3ZM5.43744 3.7035C5.31551 4.21004 5.25259 4.72899 5.24994 5.25C5.24994 6.5655 5.62494 7.79625 6.28119 8.83575C4.94979 8.0558 3.72808 7.10218 2.64819 6C3.49829 5.14237 4.43278 4.37272 5.43744 3.70275V3.7035ZM18.5624 3.7035C19.5671 4.37323 20.5016 5.14263 21.3517 6C20.2718 7.10218 19.0501 8.0558 17.7187 8.83575C18.3952 7.76233 18.7528 6.51881 18.7499 5.25C18.7499 4.71375 18.6794 4.2015 18.5624 3.70275V3.7035Z"/>
                                 </svg>
                             </a>
-                            <a :href="item['@urls']['edit']['url']" :target="item['@urls']['edit']['target']|| '_self'"
-                               v-if="item['@urls']['edit'] && item['@urls']['edit']['url']" :title="$t('dashboard.edit')">
+                            <a :href="item['@urls']['edit']['url']" v-bind="linkAttrs(item['@urls']['edit'])"
+                               v-if="item['@urls']['edit'] && item['@urls']['edit']['url']"
+                               :title="$t('dashboard.edit')">
                                 <svg width="17" height="16" viewBox="0 0 17 16" xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M16.4001 3.33998L13.6601 0.59998C13.3024 0.264076 12.8338 0.0713388 12.3434 0.058432C11.8529 0.0455252 11.3748 0.213349 11.0001 0.52998L2.00005 9.52998C1.67682 9.85594 1.47556 10.2832 1.43005 10.74L1.00005 14.91C0.986582 15.0564 1.00559 15.2041 1.05571 15.3424C1.10584 15.4806 1.18585 15.6062 1.29005 15.71C1.38349 15.8027 1.49431 15.876 1.61615 15.9258C1.73798 15.9755 1.86845 16.0007 2.00005 16H2.09005L6.26005 15.62C6.71685 15.5745 7.14409 15.3732 7.47005 15.05L16.4701 6.04998C16.8194 5.68095 17.0082 5.18849 16.995 4.68052C16.9819 4.17254 16.768 3.69049 16.4001 3.33998V3.33998ZM6.08005 13.62L3.08005 13.9L3.35005 10.9L9.00005 5.31998L11.7001 8.01998L6.08005 13.62ZM13.0001 6.67998L10.3201 3.99998L12.2701 1.99998L15.0001 4.72998L13.0001 6.67998Z"/>
@@ -209,12 +211,15 @@
                           container-class="pagination--container"
                           :prev-text="$t('dashboard.previous')" :next-text="$t('dashboard.next')"/>
         </section>
-        <v-modal :label="$t('dashboard.confirmation')" v-if="actionModalConfirmation" @close="actionModalConfirmation = false">
+        <v-modal :label="$t('dashboard.confirmation')" v-if="actionModalConfirmation"
+                 @close="actionModalConfirmation = false">
             <template v-slot:body>
                 <p v-html="currentAction.confirm_message"></p>
             </template>
             <template v-slot:footer>
-                <button class="btn btn-text btn-normal" @click="actionModalConfirmation = false">{{$t('dashboard.cancel')}}</button>
+                <button class="btn btn-text btn-normal" @click="actionModalConfirmation = false">
+                    {{$t('dashboard.cancel')}}
+                </button>
                 <button class="btn btn-normal btn-primary" @click="runAction(true)">{{$t('dashboard.confirm')}}</button>
             </template>
         </v-modal>
@@ -224,7 +229,8 @@
                 <span v-else>{{$t('dashboard.delete_record_message')}} </span>
             </template>
             <template v-slot:footer>
-                <button class="btn btn-normal btn-text" @click="deleteItemModal = false">{{$t('dashboard.cancel')}}</button>
+                <button class="btn btn-normal btn-text" @click="deleteItemModal = false">{{$t('dashboard.cancel')}}
+                </button>
                 <button class="btn btn-normal btn-radius"
                         :class="{'btn-primary': !resource.isManyRelation, 'btn-coral': resource.isManyRelation}"
                         @click="removeItem">
@@ -256,14 +262,16 @@
                 </button>
             </template>
         </v-modal>
-        <v-modal :label="$t('associate')" v-if="attachModalState" @close="attachModalState = false" card-classes="attach-modal">
+        <v-modal :label="$t('associate')" v-if="attachModalState" @close="attachModalState = false"
+                 card-classes="attach-modal">
             <template v-slot:body>
                 <component :is="resource.field.components.creating" :field="resource.field"
                            :form-data="{}" :multiple="false" v-model="itemToAttach"
                            v-bind="resource.field.attributes"></component>
             </template>
             <template v-slot:footer>
-                <button class="btn btn-normal btn-text" @click="attachModalState = false">{{$t('dashboard.cancel')}}</button>
+                <button class="btn btn-normal btn-text" @click="attachModalState = false">{{$t('dashboard.cancel')}}
+                </button>
                 <button class="btn btn-normal btn-primary btn-radius" :disabled="!itemToAttach" @click="attachItem">
                     <span v-show="!attaching">{{$t('dashboard.attach')}}</span>
                     <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 120 30" fill="#fff"
@@ -482,6 +490,13 @@
                 }).finally(_ => {
                     this.attaching = false;
                 })
+            },
+            linkAttrs(link) {
+                let target = link.target || null;
+                if (!target) return {};
+                return {
+                    target: link.target
+                }
             }
         },
         watch: {

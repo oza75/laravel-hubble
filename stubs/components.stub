@@ -1,5 +1,8 @@
 import * as rules from './rules'
 
 document.addEventListener('DOMContentLoaded', () => {
-    window.hubble_rules = {...window.hubble_rules, ...rules}
+    window.hubble_rules = {...window.hubble_rules, ...rules};
+    document.addEventListener('turbolinks:load', () => {
+        window.hubble_rules = {...window.hubble_rules, ...rules};
+    })
 });
