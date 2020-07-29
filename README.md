@@ -608,7 +608,24 @@ You can create a custom field by using this command:
 ```bash
 php artisan hubble:field ColorField 
 ```
-This will generate a new Field Class under `app/Hubble/Fields`
+You can also generate a new field with custom components by using this command: 
+```bash
+php artisan hubble:field ColorField --custom
+```
+This will create new `VueJs` components for your field under `resources/hubble/components/fields/color`
+
+Use this command to build the newly components
+
+```bash
+npm run hubble:watch
+```
+
+or 
+```bash
+npm run hubble:prod
+```
+
+`php artisan hubble:field` will generate a new Field Class under `app/Hubble/Fields`
 ```php
 <?php
 
@@ -651,22 +668,7 @@ class ColorField extends Field
 
 }
 ```
-You can also generate a new field with custom components by using this command: 
-```bash
-php artisan hubble:field ColorField --custom
-```
-This will created a new `VueJs` components for your field under `resources/hubble/components/fields/color`
 
-Use this command to build the newly components
-
-```bash
-npm run hubble:watch
-```
-
-or 
-```bash
-npm run hubble:prod
-```
 ### Testing
 
 ``` bash
