@@ -479,7 +479,7 @@ All of these methods can pass a closure that will be used to hide or display the
 });
 ```
 
-`Hubble` ships with many types of fields
+`Hubble` ships with many types of fields, but you can also [create your own.](#create-a-custom-field) 
 
 - TextField
 - BooleanField
@@ -696,7 +696,7 @@ class ColorField extends Field
 ```
 ### Rules
 
-You can automatically validate your forms data by setting rules in each field.
+You can automatically validate your forms data by setting rules on each field.
 
 ```php
 \Oza75\LaravelHubble\Fields\TextField::make('email', 'Email')->rules('required|email|max:255');
