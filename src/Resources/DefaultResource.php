@@ -4,6 +4,8 @@
 namespace Oza75\LaravelHubble\Resources;
 
 
+use Illuminate\Support\Facades\Gate;
+use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Field;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Collection;
@@ -12,6 +14,8 @@ use LogicException;
 
 class DefaultResource extends JsonResource
 {
+    use HandlesAuthorization;
+
     private $presenter;
     /**
      * @var string
@@ -71,7 +75,7 @@ class DefaultResource extends JsonResource
     {
         $urls = $this->presenter->resolveItemUrls($this->resource);
 
-        return collect($urls)->map(function ($value) {
+        $urls = collect($urls)->map(function ($value) {
             if (is_array($value))
                 return $value;
 
@@ -79,7 +83,11 @@ class DefaultResource extends JsonResource
                 'url' => $value,
                 'target' => null
             ];
+        })->filter(function ($value, $key) {
+            return $this->canAccess($key, $this->resource);
         });
+
+        return $urls;
     }
 
     /**

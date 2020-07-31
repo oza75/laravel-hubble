@@ -78,6 +78,17 @@ body {
         display: flex;
         align-items: center;
     }
+
+    .ctas--wrapper {
+        display: flex;
+        align-items: center;
+
+        .btn, button {
+            img, svg {
+                width: 20px;
+            }
+        }
+    }
 }
 
 .admin-dashboard--sidebar {
@@ -577,14 +588,15 @@ body {
         .btn {
             font-weight: bold;
             height: 38px;
-            margin-right: 8px;
             border-radius: 5px;
             font-size: 1.5rem;
             //padding: 0 20px !important;
             display: flex;
             justify-content: center;
             align-items: center;
-
+            &:not(:last-child) {
+                margin-right: 8px;
+            }
             svg {
                 //fill: white;
                 display: inline-block;
@@ -668,6 +680,7 @@ body {
                 .wrapper {
                     display: flex;
                     align-items: center;
+                    justify-content: flex-end;
                 }
 
                 a, div {
@@ -742,7 +755,7 @@ body {
                 font-size: 1.2rem;
                 font-weight: 500;
                 letter-spacing: .1px;
-                color: #738a94;
+                color: #49545F;
                 text-transform: uppercase;
                 //padding: 10px 20px;
                 padding: 10px 12px;
@@ -947,18 +960,19 @@ body {
         }
     }
 
-    .resources--actions--wrapper {
-        display: flex;
-        align-items: center;
+}
+
+.resources--actions--wrapper {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+
+    label {
         margin-right: 8px;
+    }
 
-        label {
-            margin-right: 8px;
-        }
-
-        .btn {
-            height: 38px;
-        }
+    .btn {
+        height: 38px;
     }
 }
 

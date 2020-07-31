@@ -39,6 +39,7 @@ window.Vue.prototype.$t = window.trans;
 window.Vue.prototype.$formErrors = window.getFormErrors;
 window.Vue.prototype.$hasFormErrors = window.hasFormErrors;
 window.Vue.prototype.$old = window.old;
+window.Vue.use(TurbolinksAdapter)
 
 // Vue.component('file-input', require('./components/FileInput.vue').default)
 // Vue.component('v-input', require('./components/VInput.vue').default)

@@ -4,9 +4,12 @@
 namespace Oza75\LaravelHubble\Controller;
 
 
+use Exception;
 use Illuminate\Support\Facades\Validator;
+use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
 use Oza75\LaravelHubble\HubbleResource;
+use Oza75\LaravelHubble\Resources\DetailResource;
 use Oza75\LaravelHubble\Resources\IndexResource;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -16,19 +19,43 @@ use Illuminate\Http\Response;
 
 class ApiController
 {
+    use HandlesAuthorization;
+
     /**
      * @param Hubble $hubble
      * @param Request $request
      * @param $name
      * @return JsonResponse
+     * @throws Exception
      */
     public function index(Hubble $hubble, Request $request, $name)
     {
         $resource = $hubble->getResource($name);
 
+        $this->authorizes('index', get_class($resource->baseQuery()->getModel()));
+
         $data = $resource->findItems($request);
 
         return $this->indexResponse($resource, $data);
+    }
+
+    /**
+     * @param Hubble $hubble
+     * @param Request $request
+     * @param $name
+     * @param $key
+     * @return DetailResource
+     * @throws Exception
+     */
+    public function show(Hubble $hubble, Request $request, $name, $key)
+    {
+        $resource = $hubble->getResource($name);
+
+        $item = $resource->findItem($key);
+
+        $this->authorizes('show', $item);
+
+        return new DetailResource($item, $resource);
     }
 
     /**
@@ -91,10 +118,13 @@ class ApiController
      * @param Request $request
      * @param $name
      * @return JsonResponse
+     * @throws Exception
      */
     public function create(Hubble $hubble, Request $request, $name)
     {
         $resource = $hubble->getResource($name);
+
+        $this->authorizes('create', get_class($resource->baseQuery()->getModel()));
 
         $url = $resource->createItem($request);
 
@@ -180,12 +210,13 @@ class ApiController
      * @param Request $request
      * @return JsonResponse
      */
-    public function validate(Request $request) {
-       $value = $request->get('value');
-       $rules = $request->get('rules');
+    public function validate(Request $request)
+    {
+        $value = $request->get('value');
+        $rules = $request->get('rules');
 
-       Validator::make($value, $rules)->validate();
+        Validator::make($value, $rules)->validate();
 
-       return response()->json(['data' => 'passed']);
+        return response()->json(['data' => 'passed']);
     }
 }

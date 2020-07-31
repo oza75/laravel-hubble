@@ -24,7 +24,9 @@
                         <path
                             d="M19 17L13.846 11.846C14.7988 10.3979 15.1804 8.64774 14.917 6.93442C14.6535 5.22111 13.7637 3.66648 12.4199 2.57154C11.076 1.47659 9.37366 0.919227 7.64245 1.00735C5.91123 1.09547 4.27429 1.82281 3.04855 3.04855C1.82281 4.27429 1.09547 5.91123 1.00735 7.64245C0.919227 9.37366 1.47659 11.076 2.57154 12.4199C3.66648 13.7637 5.22111 14.6535 6.93442 14.917C8.64774 15.1804 10.3979 14.7988 11.846 13.846L17 19L19 17ZM2.99998 7.99998C2.99998 5.24298 5.24298 2.99998 7.99998 2.99998C10.757 2.99998 13 5.24298 13 7.99998C13 10.757 10.757 13 7.99998 13C5.24298 13 2.99998 10.757 2.99998 7.99998Z"/>
                     </svg>
-                    <input type="text" :placeholder="$t('dashboard.search_placeholder')" @input="search">
+                    <label for="table-search" class="sr-only">{{$t('dashboard.search_placeholder')}}</label>
+                    <input type="text" id="table-search" :placeholder="$t('dashboard.search_placeholder')"
+                           @input="search">
                 </div>
                 <div class="actions--header--right">
                     <div class="resources--actions--wrapper"
@@ -37,34 +39,13 @@
                                 </option>
                             </select>
                         </label>
-                        <button @click="runAction(false)" class="btn btn-coral btn-radius btn-icon">
+                        <button @click="runAction(false)" class="btn btn-secondary btn-radius btn-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px"
                                  v-show="!runningAction"
                                  height="24px">
                                 <path d="M8 5v14l11-7z"/>
                             </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 120 30"
-                                 fill="#fff"
-                                 v-show="runningAction">
-                                <circle cx="15" cy="15" r="14.7499">
-                                    <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                             calcMode="linear" repeatCount="indefinite"/>
-                                    <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s"
-                                             values="1;.5;1" calcMode="linear" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="60" cy="15" r="9.25014" fill-opacity="0.3">
-                                    <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9"
-                                             calcMode="linear" repeatCount="indefinite"/>
-                                    <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s"
-                                             values=".5;1;.5" calcMode="linear" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="105" cy="15" r="14.7499">
-                                    <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                             calcMode="linear" repeatCount="indefinite"/>
-                                    <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s"
-                                             values="1;.5;1" calcMode="linear" repeatCount="indefinite"/>
-                                </circle>
-                            </svg>
+                            <inline-loader v-show="runningAction"></inline-loader>
                         </button>
                     </div>
                     <a :href="resource.urls.create.url" :target="resource.urls.create.target"
@@ -308,6 +289,7 @@
     // import CheckboxFilter from "../search/checkbox-filter";
     import AdditionalActions from "./components/additional-actions";
     import HubbleFilter from "./components/filters/hubble-filter";
+    import InlineLoader from "./components/inline-loader";
 
     export default {
         name: "hubble-index",
@@ -335,7 +317,7 @@
             itemToAttach: null,
             attaching: false,
         }),
-        components: {HubbleFilter, AdditionalActions, VPagination, VModal},
+        components: {InlineLoader, HubbleFilter, AdditionalActions, VPagination, VModal},
         props: {
             resource: {type: Object, required: true}
         },

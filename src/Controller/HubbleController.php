@@ -4,6 +4,8 @@
 namespace Oza75\LaravelHubble\Controller;
 
 
+use Exception;
+use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
 use Oza75\LaravelHubble\Resources\DetailResource;
 use Oza75\LaravelHubble\Resources\EditResource;
@@ -16,6 +18,7 @@ use Illuminate\View\View;
 
 class HubbleController
 {
+    use HandlesAuthorization;
 
     public function home()
     {
@@ -26,10 +29,15 @@ class HubbleController
      * @param Hubble $dashboard
      * @param $name
      * @return Application|Factory|View
+     * @throws Exception
      */
     public function index(Hubble $dashboard, $name)
     {
-        $resource = $dashboard->getResource($name)->toArray();
+        $resource = $dashboard->getResource($name);
+
+        $this->authorizes('index', get_class($resource->baseQuery()->getModel()));
+
+        $resource = $resource->toArray();
 
         return view('laravel-hubble::index', compact('resource'));
     }
@@ -39,25 +47,41 @@ class HubbleController
      * @param $name
      * @param $key
      * @return Application|Factory|View
+     * @throws Exception
      */
     public function edit(Hubble $dashboard, $name, $key)
     {
         $match = $dashboard->getResource($name);
 
-        $item = new EditResource($match->findItem($key), $match);
+        $founded = $match->findItem($key);
+
+        $this->authorizes('edit', $founded);
+
+        $item = new EditResource($founded, $match);
 
         $resource = $match->toArray('editing');
 
         return view('laravel-hubble::edit', compact('resource', 'item'));
     }
 
+    /**
+     * @param Hubble $dashboard
+     * @param $name
+     * @param $key
+     * @return Application|Factory|View
+     * @throws Exception
+     */
     public function show(Hubble $dashboard, $name, $key)
     {
         $match = $dashboard->getResource($name);
 
-        $item = new DetailResource($match->findItem($key), $match);
+        $founded = $match->findItem($key);
 
-        $resource = $match->toArray('details');
+        $this->authorizes('show', $founded);
+
+        $item = new DetailResource($founded, $match);
+
+        $resource = $match->toArray('details', $founded);
 
         return view('laravel-hubble::details', compact('resource', 'item'));
     }
@@ -66,10 +90,15 @@ class HubbleController
      * @param Hubble $dashboard
      * @param $name
      * @return Application|Factory|View
+     * @throws Exception
      */
     public function create(Hubble $dashboard, $name)
     {
-        $resource = $dashboard->getResource($name)->toArray('creating');
+        $resource = $dashboard->getResource($name);
+
+        $this->authorizes('create', $resource->baseQuery()->getModel());
+
+        $resource = $resource->toArray('creating');
 
         return view('laravel-hubble::create', compact('resource'));
     }
@@ -79,10 +108,13 @@ class HubbleController
      * @param Request $request
      * @param $name
      * @return Application|RedirectResponse|Redirector
+     * @throws Exception
      */
     public function store(Hubble $dashboard, Request $request, $name)
     {
         $resource = $dashboard->getResource($name);
+
+        $this->authorizes('create', $resource->baseQuery()->getModel());
 
         $url = $resource->createItem($request);
 

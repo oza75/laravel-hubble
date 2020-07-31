@@ -15,7 +15,7 @@
                 </div>
             </li>
         </ul>
-        <file-input :id="field.name" :name="'__fake__' + field.name"
+        <file-input :id="field.name" :accept="accept" :name="'__fake__' + field.name"
                     :multiple="multiple" @upload="upload" v-if="canAdd">
             <template v-slot:activator>
                 <div class="add-card">
@@ -57,6 +57,9 @@
         computed: {
             files() {
                 return this.formData[this.field.name + '_files'] || [];
+            },
+            accept() {
+                return this.field.attributes.accept || 'image/*';
             },
             canAdd() {
                 if (!this.multiple) return this.previews.length < 1;

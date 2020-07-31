@@ -4,39 +4,59 @@
 namespace Oza75\LaravelHubble\Actions;
 
 
+use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\LazyCollection;
 use Oza75\LaravelHubble\Action;
+use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 
 class DeleteAction extends Action
 {
-    /**
-     * @var Builder
-     */
-    protected $builder;
+    use HandlesAuthorization;
 
     /**
      * DeleteAction constructor.
      *
-     * @param Builder $builder
      * @param string|null $name
      * @param string|null $title
      * @param string|null $confirmationMessage
      */
-    public function __construct(Builder $builder, ?string $name = null, ?string $title = null, ?string $confirmationMessage = null)
+    public function __construct(?string $name = null, ?string $title = null, ?string $confirmationMessage = null)
     {
         parent::__construct($name, $title, $confirmationMessage);
-
-        $this->builder = $builder;
+        $this->onlyInIndex();
     }
 
     /**
      * Handle your action
      *
-     * @param $ids
+     * @param LazyCollection $collection
+     * @param Builder $builder
      * @return mixed
      */
-    public function handle($ids)
+    public function handle(LazyCollection $collection, Builder $builder)
     {
-        $this->builder->newQuery()->where('id', $ids)->delete();
+        $builder = $builder->newQuery();
+
+        $collection->chunk(500)->each(function ($items) use ($builder) {
+            $builder->orWhereIn('id', collect($items)->pluck('id'));
+        });
+
+        $builder->delete();
+    }
+
+    /**
+     * @param User $user
+     * @param Model|null $model
+     * @return bool
+     * @throws Exception
+     */
+    public function can(User $user, ?Model $model = null): bool
+    {
+        if (is_null($model)) return true;
+
+        return $this->canAccess('delete', $model);
     }
 }
