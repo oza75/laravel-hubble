@@ -3,6 +3,7 @@
 
 namespace Oza75\LaravelHubble\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Arr;
 
 trait HandlesVisibility
@@ -178,12 +179,12 @@ trait HandlesVisibility
 
         if (is_array($visibility)) {
             list($handler, $negation) = $visibility;
-            $response = $handler(auth()->user());
+            $response = $handler(auth()->user(), $this->resource->getCurrentItem());
             return $negation ? !$response : $response;
         }
 
         if (is_callable($visibility)) {
-            return $visibility(auth()->user());
+            return $visibility(auth()->user(), $this->resource->getCurrentItem());
         }
 
         return true;

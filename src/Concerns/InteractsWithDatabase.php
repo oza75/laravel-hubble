@@ -38,20 +38,12 @@ trait InteractsWithDatabase
     }
 
     /**
-     * @param $id
+     * @param $item
      * @return mixed
-     * @throws Exception
      */
-    public function delete($id)
+    public function delete($item)
     {
-        $this->fireEvent('deleting', $id);
-
-        $item = $this->baseQuery()
-            ->newQuery()
-            ->where($this->key, $id)
-            ->firstOrFail();
-
-        $this->authorizes('delete', $item);
+        $this->fireEvent('deleting', $item);
 
         $deleted = $item->delete();
 
@@ -79,18 +71,13 @@ trait InteractsWithDatabase
     }
 
     /**
+     * @param $item
      * @param array $data
-     * @param $id
      * @param Request $request
      * @return mixed
-     * @throws Exception
      */
-    public function update($id, array $data, Request $request)
+    public function update($item, array $data, Request $request)
     {
-        $item = $this->baseQuery()->newQuery()->where($this->key, $id)->firstOrFail();
-
-        $this->authorizes('update', $item);
-
         $collection = collect($data)->filter(function ($value) {
             return $value !== HubbleResource::NULL_VALUE;
         });
@@ -101,7 +88,7 @@ trait InteractsWithDatabase
 
         $request->validate($rules);
 
-        $this->fireEvent('updating', $id, $collection, $request);
+        $this->fireEvent('updating', $item, $collection, $request);
 
         $item->update($collection->toArray());
 

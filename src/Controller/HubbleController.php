@@ -57,9 +57,11 @@ class HubbleController
 
         $this->authorizes('edit', $founded);
 
+        $match->setCurrentItem($founded);
+
         $item = new EditResource($founded, $match);
 
-        $resource = $match->toArray('editing');
+        $resource = $match->toArray('editing', $founded);
 
         return view('laravel-hubble::edit', compact('resource', 'item'));
     }
@@ -78,6 +80,8 @@ class HubbleController
         $founded = $match->findItem($key);
 
         $this->authorizes('show', $founded);
+
+        $match->setCurrentItem($founded);
 
         $item = new DetailResource($founded, $match);
 
@@ -127,12 +131,19 @@ class HubbleController
      * @param $name
      * @param $key
      * @return Application|RedirectResponse|Redirector
+     * @throws Exception
      */
     public function update(Hubble $dashboard, Request $request, $name, $key)
     {
         $resource = $dashboard->getResource($name);
 
-        $resource->updateItem($request, $key);
+        $item = $resource->findItem($key);
+
+        $resource->setCurrentItem($item);
+
+        $this->authorizes('update', $item);
+
+        $resource->updateItem($item, $request);
 
         return redirect()->route('hubble.show', ['name' => $resource->getName(), 'key' => $key]);
     }
@@ -142,12 +153,19 @@ class HubbleController
      * @param $name
      * @param $key
      * @return RedirectResponse
+     * @throws Exception
      */
     public function destroy(Hubble $dashboard, $name, $key)
     {
         $resource = $dashboard->getResource($name);
 
-        $resource->delete($key);
+        $item = $resource->findItem($key);
+
+        $this->authorizes('delete', $item);
+
+        $resource->setCurrentItem($item);
+
+        $resource->delete($item);
 
         return redirect()->route('hubble.index', ['name' => $resource->getName()]);
     }

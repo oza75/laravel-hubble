@@ -38,6 +38,8 @@ abstract class HubbleResource
 
     protected $displayInSidebar = true;
 
+    private $currentItem = null;
+
     /**
      * @return Field[] array of fields
      */
@@ -96,16 +98,15 @@ abstract class HubbleResource
 
     /**
      * @param string $section
-     * @param Model|null $item
      * @return array
      */
-    public function toArray(string $section = 'index', ?Model $item = null)
+    public function toArray(string $section = 'index')
     {
         $data = [
             'key' => $this->key,
             'title' => $this->getTitle(),
             'searchable' => $this->searchable(),
-            'urls' => $this->getUrls($item),
+            'urls' => $this->getUrls(),
             'fields' => $this->parseFields($section),
             'token' => csrf_token(),
         ];
@@ -121,7 +122,7 @@ abstract class HubbleResource
                 $data = array_merge($data, $this->toArrayWhenEditing());
                 break;
             case 'details':
-                $data['actions'] = $this->getActions($section, $item);
+                $data['actions'] = $this->getActions($section);
                 $data['relatedResource'] = $this->getRelatedResources();
                 break;
         }
@@ -247,16 +248,16 @@ abstract class HubbleResource
     }
 
     /**
+     * @param $item
      * @param Request $request
-     * @param $id
      * @return mixed
      * @throws Exception
      */
-    public function updateItem(Request $request, $id)
+    public function updateItem($item, Request $request)
     {
         $data = $this->retrieveFormData($request, 'editing');
 
-        return $this->update($id, $data, $request);
+        return $this->update($item, $data, $request);
     }
 
     /**
@@ -275,10 +276,9 @@ abstract class HubbleResource
     }
 
     /**
-     * @param Model|null $model
      * @return array
      */
-    protected function urls(?Model $model = null)
+    protected function urls()
     {
         $urls = [
             'create' => route('hubble.create', ['name' => $this->getName()]),
@@ -289,20 +289,19 @@ abstract class HubbleResource
             ],
         ];
 
-        if ($model) {
-            $urls['api']['show'] = route('api.hubble.show', ['name' => $this->getName(), 'key' => $model->{$this->key}]);
+        if (!is_null($this->currentItem)) {
+            $urls['api']['show'] = route('api.hubble.show', ['name' => $this->getName(), 'key' => $this->currentItem->{$this->key}]);
         }
 
         return $urls;
     }
 
     /**
-     * @param Model|null $model
      * @return array
      */
-    private function getUrls(?Model $model = null)
+    private function getUrls()
     {
-        $urls = $this->urls($model);
+        $urls = $this->urls();
 
         return collect($urls)->map(function ($value, $key) {
             if ($key === 'api' || is_array($value))
@@ -428,16 +427,15 @@ abstract class HubbleResource
 
     /**
      * @param string $section
-     * @param Model|null $model
      * @return array
      */
-    protected function getActions(string $section = 'index', ?Model $model = null): array
+    protected function getActions(string $section = 'index'): array
     {
         return collect($this->actions())
-            ->filter(function (Action $action) use ($model, $section) {
+            ->filter(function (Action $action) use ($section) {
                 /** @var User */
                 $user = auth()->user();
-                return $action->can($user, $model) && $action->visiblesIn($section);
+                return $action->can($user, $this->currentItem) && $action->visiblesIn($section);
             })
             ->map(function (Action $action) {
                 return array_merge($action->toArray(), [
@@ -446,5 +444,23 @@ abstract class HubbleResource
             })
             ->values()
             ->toArray();
+    }
+
+    /**
+     * @param null $currentItem
+     * @return HubbleResource
+     */
+    public function setCurrentItem($currentItem)
+    {
+        $this->currentItem = $currentItem;
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getCurrentItem()
+    {
+        return $this->currentItem;
     }
 }
