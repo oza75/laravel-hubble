@@ -3,6 +3,8 @@
 namespace %namespace%;
 
 use Oza75\LaravelHubble\Action;
+use Illuminate\Support\LazyCollection;
+use Illuminate\Database\Eloquent\Builder;
 
 class %class_name% extends Action
 {
@@ -19,11 +21,15 @@ class %class_name% extends Action
     /**
      * Handle your action
      *
-     * @param $ids
+     * @param LazyCollection $collection
      * @return void
      */
-    public function handle($ids)
+    public function handle(LazyCollection $models, Builder $query)
     {
-        // TODO: Implement handle() method.
+        // We use LazyCollection for performance purpose but you can turn out to default Laravel Collection
+        // by calling `$models->all()`;
+        // It is recommended to use a Job to Handle your action. See an example here :
+
+
     }
 }

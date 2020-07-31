@@ -4,7 +4,11 @@
 namespace Oza75\LaravelHubble;
 
 
+use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Str;
+use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Concerns\HandlesEvents;
 use Oza75\LaravelHubble\Concerns\InteractsWithDatabase;
 use Oza75\LaravelHubble\Contracts\Relations\HandleManyRelationship;
@@ -14,7 +18,7 @@ use Illuminate\Support\Collection;
 
 abstract class HubbleResource
 {
-    use InteractsWithDatabase, HandlesEvents;
+    use InteractsWithDatabase, HandlesAuthorization, HandlesEvents;
 
     const NULL_VALUE = "__laravel__hubble@null#";
 
@@ -31,6 +35,8 @@ abstract class HubbleResource
     protected $loadedFields = [];
 
     protected $perPage = 38;
+
+    protected $displayInSidebar = true;
 
     /**
      * @return Field[] array of fields
@@ -90,15 +96,16 @@ abstract class HubbleResource
 
     /**
      * @param string $section
+     * @param Model|null $item
      * @return array
      */
-    public function toArray(string $section = 'index')
+    public function toArray(string $section = 'index', ?Model $item = null)
     {
         $data = [
             'key' => $this->key,
             'title' => $this->getTitle(),
             'searchable' => $this->searchable(),
-            'urls' => $this->getUrls(),
+            'urls' => $this->getUrls($item),
             'fields' => $this->parseFields($section),
             'token' => csrf_token(),
         ];
@@ -114,6 +121,7 @@ abstract class HubbleResource
                 $data = array_merge($data, $this->toArrayWhenEditing());
                 break;
             case 'details':
+                $data['actions'] = $this->getActions($section, $item);
                 $data['relatedResource'] = $this->getRelatedResources();
                 break;
         }
@@ -142,11 +150,7 @@ abstract class HubbleResource
      */
     protected function toArrayWhenIndexing()
     {
-        $actions = collect($this->actions())->map(function (Action $action) {
-            return array_merge($action->toArray(), [
-                'url' => route('api.hubble.action', ['name' => $this->getName(), 'action' => $action->getName()])
-            ]);
-        })->toArray();
+        $actions = $this->getActions('index');
 
         $filters = collect($this->filters())->map(function (Filter $filter) {
             return $filter->toArray();
@@ -189,7 +193,9 @@ abstract class HubbleResource
         $request->validate(['items' => 'required']);
         $ids = $request->get('items');
 
-        $action->run($ids);
+        $models = $this->baseQuery()->whereIn($this->getKey(), $ids)->cursor();
+
+        $action->run($models, $this->baseQuery());
     }
 
     /**
@@ -244,6 +250,7 @@ abstract class HubbleResource
      * @param Request $request
      * @param $id
      * @return mixed
+     * @throws Exception
      */
     public function updateItem(Request $request, $id)
     {
@@ -268,11 +275,12 @@ abstract class HubbleResource
     }
 
     /**
+     * @param Model|null $model
      * @return array
      */
-    protected function urls()
+    protected function urls(?Model $model = null)
     {
-        return [
+        $urls = [
             'create' => route('hubble.create', ['name' => $this->getName()]),
             'store' => route('hubble.store', ['name' => $this->getName()]),
             'index' => route('hubble.index', ['name' => $this->getName()]),
@@ -280,14 +288,21 @@ abstract class HubbleResource
                 'index' => route('api.hubble.index', ['name' => $this->getName()]),
             ],
         ];
+
+        if ($model) {
+            $urls['api']['show'] = route('api.hubble.show', ['name' => $this->getName(), 'key' => $model->{$this->key}]);
+        }
+
+        return $urls;
     }
 
     /**
+     * @param Model|null $model
      * @return array
      */
-    private function getUrls()
+    private function getUrls(?Model $model = null)
     {
-        $urls = $this->urls();
+        $urls = $this->urls($model);
 
         return collect($urls)->map(function ($value, $key) {
             if ($key === 'api' || is_array($value))
@@ -402,4 +417,34 @@ abstract class HubbleResource
         return $this->perPage;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function isAccessible()
+    {
+        return $this->displayInSidebar && $this->canAccess('index', get_class($this->baseQuery()->getModel()));
+    }
+
+    /**
+     * @param string $section
+     * @param Model|null $model
+     * @return array
+     */
+    protected function getActions(string $section = 'index', ?Model $model = null): array
+    {
+        return collect($this->actions())
+            ->filter(function (Action $action) use ($model, $section) {
+                /** @var User */
+                $user = auth()->user();
+                return $action->can($user, $model) && $action->visiblesIn($section);
+            })
+            ->map(function (Action $action) {
+                return array_merge($action->toArray(), [
+                    'url' => route('api.hubble.action', ['name' => $this->getName(), 'action' => $action->getName()])
+                ]);
+            })
+            ->values()
+            ->toArray();
+    }
 }

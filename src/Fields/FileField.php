@@ -124,4 +124,15 @@ class FileField extends Field
     {
         return $this->getAttribute('multiple', false);
     }
+
+    /**
+     * @param string $accept
+     * @return $this
+     */
+    public function accept(string $accept)
+    {
+        $this->addAttribute('accept', $accept);
+
+        return $this;
+    }
 }

@@ -4,6 +4,7 @@
 namespace Oza75\LaravelHubble\Concerns;
 
 
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
 use Oza75\LaravelHubble\HubbleResource;
@@ -39,6 +40,7 @@ trait InteractsWithDatabase
     /**
      * @param $id
      * @return mixed
+     * @throws Exception
      */
     public function delete($id)
     {
@@ -48,6 +50,8 @@ trait InteractsWithDatabase
             ->newQuery()
             ->where($this->key, $id)
             ->firstOrFail();
+
+        $this->authorizes('delete', $item);
 
         $deleted = $item->delete();
 
@@ -79,10 +83,13 @@ trait InteractsWithDatabase
      * @param $id
      * @param Request $request
      * @return mixed
+     * @throws Exception
      */
     public function update($id, array $data, Request $request)
     {
         $item = $this->baseQuery()->newQuery()->where($this->key, $id)->firstOrFail();
+
+        $this->authorizes('update', $item);
 
         $collection = collect($data)->filter(function ($value) {
             return $value !== HubbleResource::NULL_VALUE;

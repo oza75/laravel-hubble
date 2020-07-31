@@ -105,9 +105,9 @@ class RelatedResource extends HubbleResource
         return $newQuery->getQuery();
     }
 
-    protected function urls()
+    protected function urls(?Model $model = null)
     {
-        $urls = parent::urls();
+        $urls = parent::urls($model);
 
         $urls['api']['index'] = route('api.hubble.related.index', [
             'name' => $this->parent->getName(),
@@ -118,9 +118,14 @@ class RelatedResource extends HubbleResource
         return $urls;
     }
 
-    public function toArray(string $section = 'index')
+    /**
+     * @param string $section
+     * @param Model|null $model
+     * @return array
+     */
+    public function toArray(string $section = 'index', ?Model $model = null)
     {
-        $data = parent::toArray($section);
+        $data = parent::toArray($section, $model);
         $data['isManyRelation'] = true;
 
         $field = $this->field->toArray('creating');
