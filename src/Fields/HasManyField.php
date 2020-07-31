@@ -148,12 +148,13 @@ class HasManyField extends SelectField implements HandleManyRelationship
     }
 
     /**
+     * @param callable|null $when
      * @return $this|HasManyField
      */
-    public function onlyOnDetails()
+    public function onlyOnDetails(?callable $when = null)
     {
-        $this->hideOnForms();
-        $this->hideOnIndex();
+        $this->hideOnForms($when);
+        $this->hideOnIndex($when);
 
         return $this;
     }
