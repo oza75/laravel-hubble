@@ -48,15 +48,16 @@
                             <inline-loader v-show="runningAction"></inline-loader>
                         </button>
                     </div>
-                    <a :href="resource.urls.create.url" :target="resource.urls.create.target"
-                       class="create-btn btn btn-radius btn-primary btn-normal" v-if="!resource.isManyRelation">
-                        {{$t('dashboard.create')}}
-                    </a>
+                    <component v-for="(button,k) in buttons" :key="'tb-'+k" :is="button.component" @refresh="fetchItems" v-bind="button"/>
+<!--                    <a :href="resource.urls.create.url" :target="resource.urls.create.target"-->
+<!--                       class="create-btn btn btn-radius btn-primary btn-normal" v-if="!resource.isManyRelation">-->
+<!--                        {{$t('dashboard.create')}}-->
+<!--                    </a>-->
 
-                    <button @click="attach" class="create-btn btn btn-radius btn-primary btn-normal"
-                            v-if="resource.isManyRelation">
-                        {{$t('dashboard.attach')}}
-                    </button>
+<!--                    <button @click="attach" class="create-btn btn btn-radius btn-primary btn-normal"-->
+<!--                            v-if="resource.isManyRelation">-->
+<!--                        {{$t('dashboard.attach')}}-->
+<!--                    </button>-->
 
                 </div>
             </div>
@@ -322,6 +323,9 @@
             resource: {type: Object, required: true}
         },
         computed: {
+            buttons() {
+                return this.resource.buttons;
+            },
             isEmpty() {
                 return this.items.length === 0 && this.fetching === false
             },

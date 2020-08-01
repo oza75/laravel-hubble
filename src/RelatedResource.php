@@ -10,7 +10,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Oza75\LaravelHubble\Fields\TextField;
 
 class RelatedResource extends HubbleResource
 {
@@ -81,6 +85,28 @@ class RelatedResource extends HubbleResource
         return $this->related->filters();
     }
 
+    public function tableButtons()
+    {
+        $url = route('api.hubble.related.attach', [
+            'name' => $this->parent->getName(),
+            'key' => \request('key'),
+            'field' => $this->field->getName()
+        ]);
+
+        return [
+            TableModal::make(trans('laravel-hubble::dashboard.attach'), $url)
+                ->setClasses('btn-secondary')
+                ->setFields([
+                    (clone $this->field)->addAttribute('multiple', true)->addAttribute('returnObject', false),
+                ])
+                ->displayWhen(function (User $user) {
+                    $model = $this->related->baseQuery()->getModel();
+                    return $this->canAccess('attach', get_class($model));
+                })
+                ->confirmText(trans('laravel-hubble::dashboard.attach'))
+        ];
+    }
+
     /**
      * @return Builder
      */
@@ -105,9 +131,9 @@ class RelatedResource extends HubbleResource
         return $newQuery->getQuery();
     }
 
-    protected function urls(?Model $model = null)
+    protected function urls()
     {
-        $urls = parent::urls($model);
+        $urls = parent::urls();
 
         $urls['api']['index'] = route('api.hubble.related.index', [
             'name' => $this->parent->getName(),
@@ -120,12 +146,11 @@ class RelatedResource extends HubbleResource
 
     /**
      * @param string $section
-     * @param Model|null $model
      * @return array
      */
-    public function toArray(string $section = 'index', ?Model $model = null)
+    public function toArray(string $section = 'index')
     {
-        $data = parent::toArray($section, $model);
+        $data = parent::toArray($section);
         $data['isManyRelation'] = true;
 
         $field = $this->field->toArray('creating');
@@ -179,20 +204,19 @@ class RelatedResource extends HubbleResource
      */
     public function attach(Request $request)
     {
-        $request->validate(['id' => 'required']);
-
-        $id = $request->get('id');
+        $request->validate([$this->field->getName() => 'required']);
+        $ids = Arr::wrap($request->get($this->getName()));
         $model = $this->relationship->getRelated();
-        $item = $model->where($model->getKeyName(), $id)->firstOrFail();
+        $items = $model->whereIn($model->getKeyName(), $ids)->get();
 
         if ($this->relationship instanceof HasMany) {
-            $this->relationship->save($item);
+            $this->relationship->saveMany($items);
         } elseif ($this->relationship instanceof BelongsToMany) {
-            $this->relationship->attach($item);
+            $this->relationship->attach($items);
         } elseif ($this->relationship instanceof MorphMany) {
-            $this->relationship->save($item);
+            $this->relationship->saveMany($items);
         } elseif ($this->relationship instanceof MorphOne) {
-            $this->relationship->save($item);
+            $this->relationship->saveMany($items);
         }
 
         return true;

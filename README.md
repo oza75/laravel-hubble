@@ -461,6 +461,11 @@ All these methods as the same signature.
 * hideOnDetails
 * hideWhenCreating
 * hideWhenEditing
+* showOnIndex
+* showOnDetails
+* showOnForm
+* showWhenCreating
+* showWhenEditing
 * onlyOnIndex 
 * onlyOnDetails 
 * onlyOnForms 
@@ -603,7 +608,7 @@ or
 Used to display a related resource
 - signature
 ```php
-\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'Title', 'related_class');
+\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'related_class', 'Title');
 ```
 The first argument is the name relationship method. Let's assume we have in our `User` model a `belongsTo` method to `City` Model.
 ```php 
@@ -616,18 +621,18 @@ The first argument is the name relationship method. Let's assume we have in our 
 ```
 Then to add this relationship in our resource
 ```php
-\Oza75\LaravelHubble\Fields\BelongsToField::make('city', 'User City', CityResource::class);
+\Oza75\LaravelHubble\Fields\BelongsToField::make('city', CityResource::class);
 ```
 #### HasManyField
 Used to display related resources
 
 - signature
 ```php
-\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'Title', 'related_class');
+\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'related_class', 'Title');
 ```
 As the `BelongsToField`, the `HasManyField` takes the relationship method name as his first argument.
 ```php
-\Oza75\LaravelHubble\Fields\HasManyField::make('roles', 'User Roles', RoleResource::class);
+\Oza75\LaravelHubble\Fields\HasManyField::make('roles', RoleResource::class, 'User Roles');
 ```
 ### Create a custom field
 You can create a custom field by using this command: 
@@ -729,7 +734,7 @@ export const string = function (value, fieldName) {
 
 Authorization is used to restrict access of certain screen of your dashboard. Internally, it uses mostly `Laravel Authorization Gate`.
 
-You just need to create a [Laravel Policy]() for your resource that will control which user can access or not to a specific screen.
+You just need to create a [Laravel Policy](https://laravel.com/docs/7.x/authorization#gates) for your resource that will control which user can access or not to a specific screen.
 
 For example, let's assume I have a `Post` model :
 
@@ -840,6 +845,23 @@ class PostPolicy
     {
         return false;
     }
+
+    /**
+    * Determines if the current user can attach users to post 
+    * when using a HasManyField
+    */
+    public function attach(User $user) {
+        return false;
+    }
+
+    /**
+    * Determines if the current user can detach users to post 
+    * when using a HasManyField
+    */
+    public function detach(User $user, Post $model) {
+        return false;
+    }
+
 }
 ```
 

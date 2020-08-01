@@ -61,6 +61,21 @@ abstract class HubbleResource
     public abstract function baseQuery(): Builder;
 
     /**
+     * @return TableButton[] array of buttons
+     */
+    public function tableButtons()
+    {
+        return [
+            TableButton::make(
+                trans('laravel-hubble::dashboard.create'),
+                route('hubble.create', ['name' => $this->getName()])
+            )->displayWhen(function (User $user) {
+                return $this->canAccess('create', get_class($this->baseQuery()->getModel()));
+            })
+        ];
+    }
+
+    /**
      * @return null
      */
     public function getName()
@@ -123,7 +138,7 @@ abstract class HubbleResource
                 break;
             case 'details':
                 $data['actions'] = $this->getActions($section);
-                $data['relatedResource'] = $this->getRelatedResources();
+                $data['relatedResource'] = $this->getRelatedResources($section);
                 break;
         }
 
@@ -157,7 +172,13 @@ abstract class HubbleResource
             return $filter->toArray();
         })->toArray();
 
-        return ['actions' => $actions, 'filters' => $filters];
+        $buttons = collect($this->tableButtons())->filter(function (TableButton $button) {
+            return $button->isVisible();
+        })->map(function (TableButton $button) {
+            return $button->toArray();
+        })->toArray();
+
+        return ['actions' => $actions, 'filters' => $filters, 'buttons' => $buttons];
     }
 
     /**
@@ -178,7 +199,7 @@ abstract class HubbleResource
     public function getVisibleFields(string $section)
     {
         return collect($this->loadedFields)->filter(function (Field $field) use ($section) {
-            return $field->isVisibleOn($section);
+            return $field->isVisibleOn($section) && ! $field instanceof HandleManyRelationship;
         })->toArray();
     }
 
@@ -362,13 +383,14 @@ abstract class HubbleResource
     }
 
     /**
+     * @param string $section
      * @return Collection
      */
-    protected function getRelatedResources()
+    protected function getRelatedResources(string $section)
     {
         return collect($this->getLoadedFields())
-            ->filter(function (Field $field) {
-                return $field instanceof HandleManyRelationship;
+            ->filter(function (Field $field) use ($section) {
+                return $field instanceof HandleManyRelationship && $field->isVisibleOn($section);
             })->map(function (Field $field) {
                 return $field->getRelatedResource()->toArray();
             })->values();

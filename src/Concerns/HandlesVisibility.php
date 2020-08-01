@@ -88,6 +88,61 @@ trait HandlesVisibility
      * @param callable|null $when
      * @return $this
      */
+    public function showOnIndex(?callable $when = null)
+    {
+        $this->setVisibility('index', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function showOnForms(?callable $when = null)
+    {
+        $this->setVisibility(['editing', 'creating'], $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function showOnDetails(?callable $when = null)
+    {
+        $this->setVisibility('details', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function showWhenEditing(?callable $when = null)
+    {
+        $this->setVisibility('editing', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function showWhenCreating(?callable $when = null)
+    {
+        $this->setVisibility('creating', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
     public function hideOnDetails(?callable $when = null)
     {
         $this->setVisibility('details', $when ?? false, true);

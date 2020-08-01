@@ -53,8 +53,12 @@ Vue.component('hubble-checkbox-filter', () => import(/* webpackChunkName: "hubbl
 // Vue.component(`value-chart`, () => import(/* webpackChunkName: "[request]" */ /* webpackPrefetch: true */`./components/admin/components/charts/value-chart.vue`))
 // Vue.component(`datetime-x-axis-chart`, () => import(/* webpackChunkName: "[request]" */ /* webpackPrefetch: true */`./components/admin/components/charts/datetime-x-axis-chart.vue`))
 Vue.component('edit-image-field', () => import(/* webpackChunkName: "edit-image-field" */ /* webpackPrefetch: true */"./components/fields/image/edit-image-field.vue"))
+Vue.component('table-button', () => import(/* webpackChunkName: "table-button" */ /* webpackPrefetch: true */"./components/table-buttons/t-button.vue"))
+Vue.component('table-button-attach', () => import(/* webpackChunkName: "table-button-attach" */ /* webpackPrefetch: true */"./components/table-buttons/t-attach.vue"))
+Vue.component('table-modal', () => import(/* webpackChunkName: "table-modal" */ /* webpackPrefetch: true */"./components/table-buttons/table-modal.vue"))
 Vue.component('file-input', require("./components/fields/image/FileInput.vue").default)
 Vue.component('input-errors', require("./components/fields/input-errors.vue").default)
+
 const mods = {
     text: ['edit', 'show', 'index'],
     file: ['edit', 'show', 'index'],

@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class BelongsToField
- * @method static BelongsToField make(string $method_name, string $title, string $related, ?bool $sortable = false)
+ * @method static BelongsToField make(string $method_name, string $related, ?string $title = null, ?bool $sortable = false)
  * @package Oza75\Hubble\Fields
  */
 class BelongsToField extends SelectField
@@ -25,16 +25,16 @@ class BelongsToField extends SelectField
     /**
      * BelongsToField constructor.
      * @param string $methodName
-     * @param string $title
      * @param string $related
+     * @param string|null $title
      * @param bool $sortable
      */
-    public function __construct(string $methodName, string $title, string $related, bool $sortable = false)
+    public function __construct(string $methodName, string $related, ?string $title = null, ?bool $sortable = false)
     {
         $this->methodName = $methodName;
         $this->related = $related;
 
-        parent::__construct($methodName, $title, [], $sortable);
+        parent::__construct($methodName, $title ?? $this->newRelatedInstance()->getTitle(), [], $sortable);
     }
 
     /**
