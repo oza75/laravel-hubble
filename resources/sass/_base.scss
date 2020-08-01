@@ -889,55 +889,52 @@ img.lazy-image {
             background-color: rgba(0, 0, 0, 0.02);
         }
 
-        .fake-checkbox {
-            width: 24px;
-            height: 24px;
-            border-radius: 3px;
-            border: 1px solid $border-color;
-            background-color: white;
-            position: relative;
-            transition: .3s;
 
-            &.selected {
-                background-color: $primary-color;
-                border-color: $primary-color;
+    }
+}
+.checkbox--filter .checkbox--filter--item, .fake-checkbox--container {
+    .fake-checkbox {
+        width: 24px;
+        height: 24px;
+        border-radius: 3px;
+        border: 1px solid $border-color;
+        background-color: white;
+        position: relative;
+        transition: .3s;
 
-                &:after {
-                    display: inline-block;
-                }
-            }
-
-            //&:after {
-            //    content: ' ';
-            //    display: none;
-            //    position: absolute;
-            //    top: 50%;
-            //    left: 50%;
-            //    width: 13px;
-            //    height: 13px;
-            //    background-color: $primary-color;
-            //    border-radius: 3px;
-            //    transform: translateX(-50%) translateY(-50%);
-            //}
+        &.selected {
+            background-color: $primary-color;
+            border-color: $primary-color;
 
             &:after {
-                content: ' ';
-                display: none;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 10px;
-                height: 10px;
-                background-position: center;
-                background-size: cover;
-                background-image: url('data:image/svg+xml;utf-8,<svg fill="none" viewBox="0 0 11 8" xmlns="http://www.w3.org/2000/svg"><path d="M3.9375 5.99375L0.6125 2.66875L0 3.28125L3.9375 7.21875L10.5 0.65625L9.8875 0L3.9375 5.99375Z" fill="white"/></svg>');
-                border-radius: 3px;
-                transform: translateX(-50%) translateY(-50%);
+                display: inline-block;
             }
+        }
+
+        &:after {
+            content: ' ';
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background-position: center;
+            background-size: cover;
+            background-image: url('data:image/svg+xml;utf-8,<svg fill="none" viewBox="0 0 11 8" xmlns="http://www.w3.org/2000/svg"><path d="M3.9375 5.99375L0.6125 2.66875L0 3.28125L3.9375 7.21875L10.5 0.65625L9.8875 0L3.9375 5.99375Z" fill="white"/></svg>');
+            border-radius: 3px;
+            transform: translateX(-50%) translateY(-50%);
         }
     }
 }
-
+.fake-checkbox--container {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    .fake-checkbox {
+        margin-right: 8px;
+    }
+}
 .search--filter--wrapper {
     position: relative;
 

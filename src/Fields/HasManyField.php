@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 
 /**
  * Class HasManyField
- * @method static HasManyField make(string $method_name, string $title, string $related, ?bool $sortable = false)
+ * @method static HasManyField make(string $method_name, string $related, ?string $title = null, ?bool $sortable = false)
  * @package Oza75\Hubble\Fields
  */
 class HasManyField extends SelectField implements HandleManyRelationship
@@ -29,22 +29,23 @@ class HasManyField extends SelectField implements HandleManyRelationship
         'index' => true,
         'editing' => false,
         'creating' => false,
-        'details' => false,
+        'details' => true,
     ];
 
     /**
      * HasManyField constructor.
      * @param string $methodName
-     * @param string $title
      * @param string $related
+     * @param string|null $title
      * @param bool $sortable
      */
-    public function __construct(string $methodName, string $title, string $related, bool $sortable = false)
+    public function __construct(string $methodName, string $related, ?string $title = null, ?bool $sortable = false)
     {
-        parent::__construct($methodName, $title, [], $sortable);
+        $this->related = $related;
+
+        parent::__construct($methodName, $title ?? $this->newRelatedInstance()->getTitle(), [], $sortable);
 
         $this->methodName = $methodName;
-        $this->related = $related;
     }
 
     public function prepare(HubbleResource $resource)
@@ -209,7 +210,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
 
         $related = $relationship->getRelated();
 
-        $keyName = $related->getTable() . '.'. $relatedResource->getKey();
+        $keyName = $related->getTable() . '.' . $relatedResource->getKey();
         $relationship->select($keyName);
 
         $query = $related->newQuery();

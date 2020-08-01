@@ -29,13 +29,13 @@ trait HandlesAuthorization
      */
     protected function canAccess($section, $model)
     {
-        $ability = $this->authorizationMethods[$section] ?? null;
+        $ability = $this->getAbility($section);
 
-        if (app()->environment('local') && is_null($ability)) {
-            throw new Exception("There is no authorization handler for $section section !");
-        }
+        $policy = Gate::getPolicyFor($model);
 
-        if (is_null(Gate::getPolicyFor($model)) || is_null($ability)) return true;
+        if (is_null($policy) || is_null($ability)) return true;
+
+        if (!method_exists($policy, $ability)) return true;
 
         return Gate::allows($ability, $model);
     }
@@ -48,14 +48,30 @@ trait HandlesAuthorization
      */
     protected function authorizes($section, $model)
     {
+        $ability = $this->getAbility($section);
+
+        $policy = Gate::getPolicyFor($model);
+
+        if (is_null($policy) || is_null($ability)) return true;
+
+        if (!method_exists($policy, $ability)) return true;
+
+        return Gate::authorize($ability, $model);
+    }
+
+    /**
+     * @param $section
+     * @return string|null
+     * @throws Exception
+     */
+    protected function getAbility($section)
+    {
         $ability = $this->authorizationMethods[$section] ?? null;
 
         if (app()->environment('local') && is_null($ability)) {
             throw new Exception("There is no authorization handler for $section section !");
         }
 
-        if (is_null(Gate::getPolicyFor($model)) || is_null($ability)) return true;
-
-        return Gate::authorize($ability, $model);
+        return $ability;
     }
 }
