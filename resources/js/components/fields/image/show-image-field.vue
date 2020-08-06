@@ -1,5 +1,5 @@
 <template>
-    <ul :class="{[`show--image--wrapper`]: true}" class="show--image--component">
+    <ul :class="{[`show--image--wrapper`]: true, [classes]: true}" class="show--image--component">
         <li v-for="file in value" :key="file.name">
             <a :href="file.url" target="_blank" class="image-card" :style="`background-image: url(${file.url})`">
                 <button :href="file.url"  class="btn download" @click.stop.prevent="downloadImage(file)">
@@ -14,6 +14,8 @@
 </template>
 
 <script>
+    import {DetailsMixins} from "../mixins";
+
     const download = require('downloadjs')
     export default {
         name: "show-image-field",
@@ -22,6 +24,7 @@
             field: {type: Object, required: true},
             value: {default: null},
         },
+        mixins: [DetailsMixins],
         computed: {},
         methods: {
             downloadImage(file) {

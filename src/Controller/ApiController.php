@@ -32,7 +32,7 @@ class ApiController
     {
         $resource = $hubble->getResource($name);
 
-        $this->authorizes('index', get_class($resource->baseQuery()->getModel()));
+        $this->authorizes('index', get_class($resource->getModel()));
 
         $data = $resource->findItems($request);
 
@@ -92,9 +92,9 @@ class ApiController
     {
         $resource = $hubble->getResource($name);
 
-        $resource->runAction($action, $request);
+        $notification = $resource->runAction($action, $request);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'notification' => $notification]);
     }
 
     /**
@@ -108,9 +108,17 @@ class ApiController
     {
         $resource = $hubble->getResource($name);
 
-        $resource->delete($key);
+        $item = $resource->findItem($key);
 
-        return response()->json(['success' => true]);
+        $resource->delete($item);
+
+        return response()->json([
+            'success' => true,
+            'notification' => [
+                'message' => trans('laravel-hubble::dashboard.deleted'),
+                'state' => 'success'
+            ]
+        ]);
     }
 
     /**
@@ -124,7 +132,7 @@ class ApiController
     {
         $resource = $hubble->getResource($name);
 
-        $this->authorizes('create', get_class($resource->baseQuery()->getModel()));
+        $this->authorizes('create', get_class($resource->getModel()));
 
         $url = $resource->createItem($request);
 
@@ -184,7 +192,13 @@ class ApiController
 
         $data = $related->detach($id, $request);
 
-        return response(['success' => $data]);
+        return response([
+            'success' => $data,
+            'notification' => [
+                'message' => trans('laravel-hubble::dashboard.detached'),
+                'state' => 'success'
+            ]
+        ]);
     }
 
     /**
@@ -203,7 +217,14 @@ class ApiController
 
         $data = $related->attach($request);
 
-        return response()->json(['success' => $data]);
+        return response()->json(
+            [
+                'success' => $data,
+                'notification' => [
+                    'message' => trans('laravel-hubble::dashboard.attached'),
+                    'state' => 'success'
+                ]
+            ]);
     }
 
     /**

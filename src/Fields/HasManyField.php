@@ -43,7 +43,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
     {
         $this->related = $related;
 
-        parent::__construct($methodName, $title ?? $this->newRelatedInstance()->getTitle(), [], $sortable);
+        parent::__construct($methodName, $title ?? Str::title($methodName), [], $sortable);
 
         $this->methodName = $methodName;
     }
@@ -60,7 +60,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
 
         $this->setValueKey($relatedModel->getKeyName());
         $this->setTextKey($related->getDisplayColumn());
-        $this->addAttribute('multiple', true);
+        $this->addProp('multiple', true);
         $this->placeholder(trans('laravel-hubble::dashboard.associate_placeholder', ['title' => Str::plural($this->title)]));
 
         $displayResolver = function ($value, $resource) use ($related) {

@@ -1,3 +1,12 @@
+const classes = function (field, section) {
+    let attributes = field.props;
+    if (!attributes) return '';
+    let classes = attributes.classes;
+    if (!classes) return '';
+
+    return classes[section] || '';
+}
+
 export const EditMixin = {
     data: () => ({
         allErrors: {},
@@ -8,9 +17,13 @@ export const EditMixin = {
         formData: {type: Object, default: () => ({})},
         item: {type: Object, default: () => ({})},
         value: {default: null},
-        type: {type: String, default: 'text'}
+        type: {type: String, default: 'text'},
+        attributes: {type: [Object, Array], default: () => ({})}
     },
     computed: {
+        inputAttrs() {
+            return {...this.attrs, ...this.rulesAttrs, ...this.attributes}
+        },
         errors() {
             return Object.values(this.allErrors);
         },
@@ -40,6 +53,9 @@ export const EditMixin = {
                 'min': 'minlength',
                 'max': 'maxlength'
             }
+        },
+        classes() {
+            return classes(this.field, 'edit')
         }
     },
     methods: {
@@ -113,6 +129,22 @@ export const EditMixin = {
         }
         if (errors && errors.length > 0) {
             this.$set(this.allErrors, 'any', errors[0])
+        }
+    }
+}
+
+export const IndexMixin = {
+    computed: {
+        classes() {
+            return classes(this.field, 'index')
+        }
+    }
+}
+
+export const DetailsMixins = {
+    computed: {
+        classes() {
+            return classes(this.field, 'details')
         }
     }
 }

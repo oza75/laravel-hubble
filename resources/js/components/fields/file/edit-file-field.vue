@@ -1,5 +1,5 @@
 <template>
-    <div class="edit-file-field">
+    <div class="edit-file-field" :class="{[classes]: true}">
         <ul class="current-files">
             <li v-for="file in files" :key="file.name" class="file">
                 <a :href="file.url" target="_blank">{{file.name}}</a>
@@ -11,9 +11,9 @@
                 </svg>
             </li>
         </ul>
-        <input type="file" :id="field.name" :accept="field.attributes.accept || '*'" :class="{error: hasErrors}" :name="multiple ? field.name+ '[]' : field.name"
+        <input type="file" :id="field.name"  :class="{error: hasErrors}" :name="multiple ? field.name+ '[]' : field.name"
                :multiple="multiple" v-if="canAdd"  :maxlength="!max ? Infinity : max - files.length"
-               v-bind="{...$attrs, ...rulesAttrs}" @input="input($event.target.value)">
+               v-bind="inputAttrs" @change="onFileChange">
         <input type="hidden" :name="`${field.name}__removed__[]`" :value="file.name" v-for="file in removed"
                :key="'remove-'+file.name">
         <input type="hidden" :name="`${field.name}__current__[]`" :value="file.name" v-for="file in oldFiles"
@@ -55,6 +55,11 @@
                 this.removed.push(file);
 
                 this.$set(this.formData, this.field.name + '_files', files);
+            },
+            onFileChange($event) {
+                const files = $event.target.files || $event.dataTransfer.files;
+
+                this.input(this.multiple ? files : files[0]);
             }
         },
         created() {

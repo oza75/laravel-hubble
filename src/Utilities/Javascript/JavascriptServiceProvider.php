@@ -1,7 +1,7 @@
 <?php
 
 
-namespace  Oza75\LaravelHubble\Utilities\Javascript;
+namespace Oza75\LaravelHubble\Utilities\Javascript;
 
 
 use Illuminate\Support\Facades\Lang;
@@ -24,9 +24,15 @@ class JavascriptServiceProvider extends ServiceProvider
                 $errors = [];
             }
 
+            $notifications = [];
+            if ($notification = $session->get('notification')) {
+                $notifications[] = $notification;
+            }
+
             JavascriptPut::put([
                 '_old' => $session->getOldInput(),
                 '_errors' => $errors,
+                '_notifications' => $notifications,
                 '_trans' => [
                     'dashboard' => Lang::get('laravel-hubble::dashboard'),
                     'validation' => Lang::get('validation')

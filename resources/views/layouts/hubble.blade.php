@@ -18,8 +18,11 @@
 
 <!-- Styles -->
     <link href="{{ asset('vendor/laravel-hubble/hubble.css') }}" media="screen" rel="stylesheet">
-    <link rel="preload" href="{{ asset('vendor/laravel-hubble/components.css') }}" as="style" onload="this.onload=null;this.rel='stylesheet'">
-    <noscript><link rel="stylesheet" href="{{ asset('vendor/laravel-hubble/components.css') }}"></noscript>
+    <link rel="preload" href="{{ asset('vendor/laravel-hubble/components.css') }}" as="style"
+          onload="this.onload=null;this.rel='stylesheet'">
+    <noscript>
+        <link rel="stylesheet" href="{{ asset('vendor/laravel-hubble/components.css') }}">
+    </noscript>
     @yield('css')
 <!-- Scripts -->
     @include('laravel-hubble::partials.js-php-vars')
@@ -39,5 +42,8 @@
     </main>
 </div>
 @yield('body-scripts')
+<div class="notification--container">
+</div>
+
 </body>
 </html>

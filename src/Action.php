@@ -64,7 +64,7 @@ abstract class Action
     /**
      * @param LazyCollection $models
      * @param Builder $builder
-     * @return void
+     * @return array|string|void|null
      */
     public abstract function handle(LazyCollection $models, Builder $builder);
 
@@ -119,6 +119,7 @@ abstract class Action
     /**
      * @param LazyCollection $collection
      * @param Builder $query
+     * @return array|string|void|null
      */
     public function run(LazyCollection $collection, Builder $query)
     {
@@ -126,9 +127,11 @@ abstract class Action
 
         $this->runHook($models, 'before');
 
-        $this->handle($models, $query);
+        $message = $this->handle($models, $query);
 
         $this->runHook($models, 'after');
+
+        return $message;
     }
 
     /**

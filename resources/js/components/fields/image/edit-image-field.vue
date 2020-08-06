@@ -1,5 +1,5 @@
 <template>
-    <div class="edit-image-field">
+    <div class="edit-image-field" :class="{[classes]: true}">
         <ul class="current-files">
             <li v-for="file in previews" :key="file.name" class="file">
                 <div class="add-card" :style="`background-image: url(${file.url})`">
@@ -15,7 +15,7 @@
                 </div>
             </li>
         </ul>
-        <file-input :id="field.name" :accept="accept" :name="'__fake__' + field.name"
+        <file-input :id="field.name" v-bind="inputAttrs" :accept="accept" :name="'__fake__' + field.name"
                     :multiple="multiple" @upload="upload" v-if="canAdd">
             <template v-slot:activator>
                 <div class="add-card">
@@ -28,7 +28,7 @@
         </file-input>
         <input type="file" :class="{error: hasErrors}" :id="field.name" :name="multiple ? field.name+ '[]' : field.name" style="display: none"
                :multiple="multiple" ref="fileInput"
-               v-bind="$attrs">
+               v-bind="inputAttrs">
         <input type="hidden" :name="`${field.name}__removed__[]`" :value="file.name" v-for="file in removed"
                :key="'remove-'+file.name">
         <input type="hidden" :name="`${field.name}__current__[]`" :value="file.name" v-for="file in oldFiles"

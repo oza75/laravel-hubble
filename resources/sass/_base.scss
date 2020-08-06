@@ -94,6 +94,7 @@ a:not(.btn) {
     color: black;
     background-color: transparent;
     border: none;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
 
@@ -110,7 +111,7 @@ a:not(.btn) {
         letter-spacing: .15px;
         font-size: 14px;
         cursor: pointer;
-        border-radius: 3px;
+        border-radius: 6px;
         height: 36px;
         padding: 0 12px !important;
         text-align: center;
@@ -144,7 +145,7 @@ a:not(.btn) {
     }
 
     &-radius {
-        border-radius: $border-radius;
+        border-radius: 6px;
     }
 
     &-sofia {
@@ -811,6 +812,7 @@ img.lazy-image {
         background: #555;
     }
 }
+
 .checkbox--filter {
     position: relative;
 
@@ -892,6 +894,7 @@ img.lazy-image {
 
     }
 }
+
 .checkbox--filter .checkbox--filter--item, .fake-checkbox--container {
     .fake-checkbox {
         width: 24px;
@@ -927,14 +930,24 @@ img.lazy-image {
         }
     }
 }
+
 .fake-checkbox--container {
     display: flex;
     align-items: center;
     justify-content: flex-start;
+
+    & > *:first-child {
+        flex: 1 auto;
+    }
+    & > *:last-child{
+        flex: 1 100%;
+    }
+
     .fake-checkbox {
         margin-right: 8px;
     }
 }
+
 .search--filter--wrapper {
     position: relative;
 
@@ -1024,6 +1037,7 @@ img.lazy-image {
         border: 1px solid $light-border-color;
     }
 }
+
 @media screen and (max-width: $mobile-breakpoint) {
     .checkbox--filter {
         //z-index: 500;
@@ -1037,11 +1051,12 @@ img.lazy-image {
         }
     }
 }
+
 .sr-only {
-    position:absolute;
-    left:-10000px;
-    top:auto;
-    width:1px;
-    height:1px;
-    overflow:hidden;
+    position: absolute;
+    left: -10000px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
 }

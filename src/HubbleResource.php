@@ -70,7 +70,7 @@ abstract class HubbleResource
                 trans('laravel-hubble::dashboard.create'),
                 route('hubble.create', ['name' => $this->getName()])
             )->displayWhen(function (User $user) {
-                return $this->canAccess('create', get_class($this->baseQuery()->getModel()));
+                return $this->canAccess('create', get_class($this->getModel()));
             })
         ];
     }
@@ -199,13 +199,14 @@ abstract class HubbleResource
     public function getVisibleFields(string $section)
     {
         return collect($this->loadedFields)->filter(function (Field $field) use ($section) {
-            return $field->isVisibleOn($section) && ! $field instanceof HandleManyRelationship;
+            return $field->isVisibleOn($section) && !$field instanceof HandleManyRelationship;
         })->toArray();
     }
 
     /**
      * @param string $name
      * @param Request $request
+     * @return array|string|void|null
      */
     public function runAction(string $name, Request $request)
     {
@@ -217,7 +218,13 @@ abstract class HubbleResource
 
         $models = $this->baseQuery()->whereIn($this->getKey(), $ids)->cursor();
 
-        $action->run($models, $this->baseQuery());
+        $message = $action->run($models, $this->baseQuery());
+
+        if (!$message) return null;
+
+        if (is_array($message)) return $message;
+
+        return ['message' => $message, 'state' => 'success'];
     }
 
     /**
@@ -265,6 +272,8 @@ abstract class HubbleResource
 
         $item = $this->create($data, $request);
 
+        session()->flash('notification', ['message' => trans('laravel-hubble::dashboard.created'), 'state' => 'success']);
+
         return route('hubble.show', ['name' => $this->getName(), 'key' => $item->{$this->key}]);
     }
 
@@ -278,7 +287,11 @@ abstract class HubbleResource
     {
         $data = $this->retrieveFormData($request, 'editing');
 
-        return $this->update($item, $data, $request);
+        $updated = $this->update($item, $data, $request);
+
+        session()->flash('notification', ['message' => trans('laravel-hubble::dashboard.updated'), 'state' => 'success']);
+
+        return $updated;
     }
 
     /**
@@ -342,7 +355,7 @@ abstract class HubbleResource
     public function retrieveFormData(Request $request, string $section): array
     {
         $fields = collect($this->loadedFields)->filter(function (Field $field) use ($request, $section) {
-            return $field->isVisibleOn($section);
+            return $field->isVisibleOn($section) && !$field instanceof HandleManyRelationship;
         });
 
         return $fields->mapWithKeys(function (Field $field) use ($request, $section) {
@@ -444,7 +457,7 @@ abstract class HubbleResource
      */
     public function isAccessible()
     {
-        return $this->displayInSidebar && $this->canAccess('index', get_class($this->baseQuery()->getModel()));
+        return $this->displayInSidebar && $this->canAccess('index', get_class($this->getModel()));
     }
 
     /**
@@ -484,5 +497,13 @@ abstract class HubbleResource
     public function getCurrentItem()
     {
         return $this->currentItem;
+    }
+
+    /**
+     * @return Builder|Model
+     */
+    public function getModel()
+    {
+        return $this->baseQuery()->getModel();
     }
 }

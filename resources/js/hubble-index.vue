@@ -49,16 +49,6 @@
                         </button>
                     </div>
                     <component v-for="(button,k) in buttons" :key="'tb-'+k" :is="button.component" @refresh="fetchItems" v-bind="button"/>
-<!--                    <a :href="resource.urls.create.url" :target="resource.urls.create.target"-->
-<!--                       class="create-btn btn btn-radius btn-primary btn-normal" v-if="!resource.isManyRelation">-->
-<!--                        {{$t('dashboard.create')}}-->
-<!--                    </a>-->
-
-<!--                    <button @click="attach" class="create-btn btn btn-radius btn-primary btn-normal"-->
-<!--                            v-if="resource.isManyRelation">-->
-<!--                        {{$t('dashboard.attach')}}-->
-<!--                    </button>-->
-
                 </div>
             </div>
             <ol class="table--list"
@@ -68,7 +58,7 @@
                         <div class="fake-checkbox" :class="{active: isAllSelected}" @click="selectAll()"></div>
                     </div>
                     <div class="table--list--cell table--header--cell"
-                         :class="{['table--'+ field.name+ '-header']: true, 'numeric-field': field.attributes.is_numeric || false}"
+                         :class="{['table--'+ field.name+ '-header']: true, 'numeric-field': field.props.is_numeric || false}"
                          v-for="field in fields" :key="field.name">
                         <div class="table--header--cell--content"
                              @click="field.sortable ? sortBy(field.name): null">
@@ -108,8 +98,8 @@
                          v-for="field in fields" :key="'table-row--'+k+'-'+field.name"
                     >
                         <div class="table--list--data--content">
-                            <component :is="field.components.index" :field="field"
-                                       :value="item[field.name]" v-bind="field.attributes" :data="item"></component>
+                            <component :is="field.components.index" :field="field" :attributes="field.attributes"
+                                       :value="item[field.name]" v-bind="field.props" :data="item"></component>
                         </div>
                     </div>
 
@@ -213,70 +203,13 @@
             <template v-slot:footer>
                 <button class="btn btn-normal btn-text" @click="deleteItemModal = false">{{$t('dashboard.cancel')}}
                 </button>
-                <button class="btn btn-normal btn-radius"
-                        :class="{'btn-primary': !resource.isManyRelation, 'btn-coral': resource.isManyRelation}"
+                <button class="btn btn-normal btn-radius btn-primary"
                         @click="removeItem">
                     <span v-show="!removing">
                         <span v-if="resource.isManyRelation">{{$t('dashboard.detach')}}</span>
                         <span v-else>{{$t('dashboard.confirm')}}</span>
                     </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 120 30" fill="#fff"
-                         v-show="removing">
-                        <circle cx="15" cy="15" r="12.9998">
-                            <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="60" cy="15" r="11.0002" fill-opacity="0.3">
-                            <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s"
-                                     values=".5;1;.5" calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="105" cy="15" r="12.9998">
-                            <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                    </svg>
-                </button>
-            </template>
-        </v-modal>
-        <v-modal :label="$t('associate')" v-if="attachModalState" @close="attachModalState = false"
-                 card-classes="attach-modal">
-            <template v-slot:body>
-                <component :is="resource.field.components.creating" :field="resource.field"
-                           :form-data="{}" :multiple="false" v-model="itemToAttach"
-                           v-bind="resource.field.attributes"></component>
-            </template>
-            <template v-slot:footer>
-                <button class="btn btn-normal btn-text" @click="attachModalState = false">{{$t('dashboard.cancel')}}
-                </button>
-                <button class="btn btn-normal btn-primary btn-radius" :disabled="!itemToAttach" @click="attachItem">
-                    <span v-show="!attaching">{{$t('dashboard.attach')}}</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 120 30" fill="#fff"
-                         v-show="attaching">
-                        <circle cx="15" cy="15" r="12.9998">
-                            <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="60" cy="15" r="11.0002" fill-opacity="0.3">
-                            <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s"
-                                     values=".5;1;.5" calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="105" cy="15" r="12.9998">
-                            <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                    </svg>
+                    <inline-loader v-show="removing"></inline-loader>
                 </button>
             </template>
         </v-modal>
@@ -287,7 +220,6 @@
     import VModal from './components/v-modal.vue'
     import VPagination from "./components/VPagination";
     import {encodeUrl} from "./utils";
-    // import CheckboxFilter from "../search/checkbox-filter";
     import AdditionalActions from "./components/additional-actions";
     import HubbleFilter from "./components/filters/hubble-filter";
     import InlineLoader from "./components/inline-loader";
@@ -314,9 +246,6 @@
                 sort: {by: null, type: null},
                 search: null
             },
-            attachModalState: false,
-            itemToAttach: null,
-            attaching: false,
         }),
         components: {InlineLoader, HubbleFilter, AdditionalActions, VPagination, VModal},
         props: {
@@ -458,23 +387,6 @@
                     this.deleteItemModal = false;
                 }).finally(_ => {
                     this.removing = false;
-                })
-            },
-            attach() {
-                this.attachModalState = true;
-            },
-            attachItem() {
-                if (!this.itemToAttach) return;
-                let value = this.itemToAttach[this.resource.field.attributes.valueKey];
-                this.attaching = true;
-                this.$axios.post(this.itemToAttach['attach_url'], {
-                    id: value
-                }).then(res => {
-                    this.attachModalState = false
-                    this.fetchItems()
-                    this.itemToAttach = null;
-                }).finally(_ => {
-                    this.attaching = false;
                 })
             },
             linkAttrs(link) {

@@ -32,5 +32,10 @@ return [
     "logout" => "Déconnexion",
     "email_placeholder" => "Entrer votre adresse email",
     "password_placeholder" => "Mot de passe",
-    "login" => "Connexion"
+    "login" => "Connexion",
+    "updated" => "Modification enregistrée avec succès !",
+    "created" => "Création réussie !",
+    "deleted" => "Enregistrement supprimé avec succès !",
+    "detached" => "Enregistrement détaché avec succès !",
+    "attached" => "Enregistrement attaché avec succès !",
 ];

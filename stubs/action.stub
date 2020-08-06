@@ -22,7 +22,7 @@ class %class_name% extends Action
      * Handle your action
      *
      * @param LazyCollection $collection
-     * @return void
+     * @return array|string|void|null
      */
     public function handle(LazyCollection $models, Builder $query)
     {

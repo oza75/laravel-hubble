@@ -190,7 +190,7 @@ trait HandlesVisibility
      * @param callable|null $when
      * @return $this
      */
-    public function onlyOnEditing(?callable $when = null)
+    public function onlyWhenEditing(?callable $when = null)
     {
         $this->setVisibility(['details', 'creating', 'index'], false);
         $this->setVisibility('editing', $when ?? true);
@@ -202,7 +202,7 @@ trait HandlesVisibility
      * @param callable|null $when
      * @return $this
      */
-    public function onlyOnCreating(?callable $when = null)
+    public function onlyWhenCreating(?callable $when = null)
     {
         $this->setVisibility(['details', 'editing', 'index'], false);
         $this->setVisibility('creating', $when ?? true);

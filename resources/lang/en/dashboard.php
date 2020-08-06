@@ -32,5 +32,10 @@ return [
     "logout" => "Logout",
     "email_placeholder" => "Enter your email address",
     "password_placeholder" => "Password",
-    "login" => "Login"
+    "login" => "Login",
+    "updated" => "Changes saved successfully!",
+    "created" => "The new item has been successfully created !",
+    "deleted" => "This item has been successfully removed!",
+    "detached" => "This item has been successfully detached!",
+    "attached" => "Items have been successfully attached!",
 ];

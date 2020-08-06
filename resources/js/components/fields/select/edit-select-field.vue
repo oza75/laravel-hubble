@@ -1,8 +1,8 @@
 <template>
-    <div class="custom--select--container">
+    <div class="custom--select--container" :class="{[classes]: true}">
         <template v-if="!multiple">
             <input type="text" @click.stop @keyup="onSearch" :placeholder="placeholder" @keydown="onKeydown"
-                   ref="textInput" :class="{error: hasErrors}" :id="field.name" autocomplete="off"
+                   ref="textInput" v-bind="inputAttrs" :class="{error: hasErrors}" :id="field.name" autocomplete="off"
                    @focus="openDropdown">
             <input :name="field.name" :value="inputValue" ref="input" v-show="false">
         </template>
@@ -36,7 +36,7 @@
                     </div>
                 </div>
             </div>
-            <input :name="`${field.name}[]`" :value="val[valueKey]" :key="k" ref="input"
+            <input :name="`${field.name}[]`" v-bind="inputAttrs" :value="val[valueKey]" :key="k" ref="input"
                    v-for="(val, k) in tags" v-show="false">
         </template>
         <input-errors :errors="errors"/>

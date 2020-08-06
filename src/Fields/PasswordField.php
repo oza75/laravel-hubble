@@ -10,7 +10,7 @@ use Oza75\LaravelHubble\HubbleResource;
 
 class PasswordField extends TextField
 {
-    public function __construct(string $name, string $title, bool $sortable = false)
+    public function __construct(string $name, ?string $title = null, bool $sortable = false)
     {
         parent::__construct($name, $title, $sortable);
         $this->onlyOnForms();

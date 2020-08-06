@@ -81,7 +81,7 @@ class Javascript
             $content .= "window.{$key}=" . json_encode($datum) . ";";
         }
 
-        $content.='let $_jp_php_vars_gv=function(e,l){if(!l||!e)return null;let t=String(e).replace(/[\[\]]/gm,".").replace("..",".").split(".");t=t.filter(e=>""!==e);let r=!1,n=l;for(let e=0;e<t.length;e++){let l=n[t[e]];if(!l){r=!0;break}n=l}return r?null:n};';
+        $content.='$_jp_php_vars_gv=function(e,l){if(!l||!e)return null;let t=String(e).replace(/[\[\]]/gm,".").replace("..",".").split(".");t=t.filter(e=>""!==e);let r=!1,n=l;for(let e=0;e<t.length;e++){let l=n[t[e]];if(!l){r=!0;break}n=l}return r?null:n};';
         $content.='window.old=function(n,o){return $_jp_php_vars_gv(n,window._old)||o};';
         $content.='window.trans=function(r,n={},t=""){let e=String($_jp_php_vars_gv(r,window._trans)||t);return Object.keys(n).forEach(r=>{e=e.replace(`:${r}`,n[r])}),e};';
         $content.='window.hasFormErrors=function(r){return!!$_jp_php_vars_gv(r,window._errors)};';

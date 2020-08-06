@@ -55,7 +55,7 @@
                     :class="{['field-'+field.name+'-row']: true}">
                     <label class="table--list--cell label--cell" :for="field.name">{{field.title}}</label>
                     <div class="table--list--cell input--cell">
-                        <component :is="field.components.details" v-bind="field.attributes"
+                        <component :is="field.components.details" v-bind="field.props" :attributes="field.attributes"
                                    :field="field"
                                    :value="datum[field.name]"></component>
                     </div>

@@ -13,8 +13,6 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Oza75\LaravelHubble\Fields\TextField;
 
 class RelatedResource extends HubbleResource
 {
@@ -97,10 +95,10 @@ class RelatedResource extends HubbleResource
             TableModal::make(trans('laravel-hubble::dashboard.attach'), $url)
                 ->setClasses('btn-secondary')
                 ->setFields([
-                    (clone $this->field)->addAttribute('multiple', true)->addAttribute('returnObject', false),
+                    (clone $this->field)->addProp('multiple', true)->addProp('returnObject', false),
                 ])
                 ->displayWhen(function (User $user) {
-                    $model = $this->related->baseQuery()->getModel();
+                    $model = $this->related->getModel();
                     return $this->canAccess('attach', get_class($model));
                 })
                 ->confirmText(trans('laravel-hubble::dashboard.attach'))

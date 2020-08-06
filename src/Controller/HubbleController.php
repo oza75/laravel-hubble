@@ -7,6 +7,7 @@ namespace Oza75\LaravelHubble\Controller;
 use Exception;
 use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
+use Oza75\LaravelHubble\Resources\CreateResource;
 use Oza75\LaravelHubble\Resources\DetailResource;
 use Oza75\LaravelHubble\Resources\EditResource;
 use Illuminate\Contracts\Foundation\Application;
@@ -35,7 +36,7 @@ class HubbleController
     {
         $resource = $dashboard->getResource($name);
 
-        $this->authorizes('index', get_class($resource->baseQuery()->getModel()));
+        $this->authorizes('index', get_class($resource->getModel()));
 
         $resource = $resource->toArray();
 
@@ -100,11 +101,13 @@ class HubbleController
     {
         $resource = $dashboard->getResource($name);
 
-        $this->authorizes('create', $resource->baseQuery()->getModel());
+        $this->authorizes('create', $resource->getModel());
+
+        $item = new CreateResource($resource->getModel(), $resource);
 
         $resource = $resource->toArray('creating');
 
-        return view('laravel-hubble::create', compact('resource'));
+        return view('laravel-hubble::create', compact('resource', 'item'));
     }
 
     /**
@@ -118,7 +121,7 @@ class HubbleController
     {
         $resource = $dashboard->getResource($name);
 
-        $this->authorizes('create', $resource->baseQuery()->getModel());
+        $this->authorizes('create', $resource->getModel());
 
         $url = $resource->createItem($request);
 
@@ -166,6 +169,8 @@ class HubbleController
         $resource->setCurrentItem($item);
 
         $resource->delete($item);
+
+        session()->flash('notification', ['message' => trans('laravel-hubble::dashboard.deleted'), 'state' => 'success']);
 
         return redirect()->route('hubble.index', ['name' => $resource->getName()]);
     }

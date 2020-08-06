@@ -1,8 +1,8 @@
 <template>
     <div>
-        <label class="fake-radio--container" :class="{active: isActive}">
-            <input type="hidden" :name="field.name"  :value="0">
-            <input type="checkbox" :name="field.name" :value="1" :id="field.name" @input="toggle" :checked="isActive">
+        <label class="fake-radio--container" :class="{active: isActive, [classes]: true}">
+            <input type="hidden" :name="field.name" v-bind="inputAttrs"  :value="0">
+            <input type="checkbox" :name="field.name" v-bind="inputAttrs" :value="1" :id="field.name" @input="toggle" :checked="isActive">
             <span class="fake-radio--wrapper">
                 <span class="fake-radio"></span>
             </span>

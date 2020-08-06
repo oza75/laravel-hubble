@@ -1,8 +1,8 @@
 <template>
-    <div>
+    <div :class="{[classes]: true}">
         <input :type="type" :value="value" :id="field.name"
                :class="{error: hasErrors}"
-               :name="field.name" v-bind="{...$attrs, ...rulesAttrs}"
+               :name="field.name" v-bind="inputAttrs"
                @input="input($event.target.value)">
 
         <input-errors v-if="hasErrors" :errors="errors"/>

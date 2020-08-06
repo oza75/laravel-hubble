@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <input type="datetime-local" :value="value" :class="{error: hasErrors}" :id="field.name"
-               :name="field.name" v-bind="{...$attrs, ...rulesAttrs}" ref="input"
+    <div :class="{[classes]: true}">
+        <input type="datetime-local" :value="value" :class="{error: hasErrors, }" :id="field.name"
+               :name="field.name" v-bind="inputAttrs" ref="input"
                @input="input($event.target.value)">
         <input-errors :errors="errors"/>
     </div>
@@ -24,11 +24,13 @@
             this.$nextTick(() => {
                 flatpickr(this.$refs['input'], {
                     dateFormat: this.format,
+                    defaultDate: this.value,
                     enableTime: true,
                     locale: this.locale
                     // locale: require(`flatpickr/dist/l10n/${this.locale}.components`).default[this.locale]
-                })
-            })
+                });
+
+            });
         }
     }
 </script>

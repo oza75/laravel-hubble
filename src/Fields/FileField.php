@@ -16,10 +16,11 @@ class FileField extends Field
 {
     protected $storageDisk = 'public';
 
-    public function __construct(string $name, string $title)
+    public function __construct(string $name, ?string $title = null)
     {
         parent::__construct($name, $title, false);
-        $this->addAttribute('isFile', true);
+        $this->addProp('isFile', true);
+        $this->registerFileResolver();
     }
 
     /**
@@ -46,14 +47,14 @@ class FileField extends Field
 
     public function multiple()
     {
-        $this->addAttribute('multiple', true);
+        $this->addProp('multiple', true);
 
         return $this;
     }
 
     public function max(int $max)
     {
-        $this->addAttribute('max', $max);
+        $this->addProp('max', $max);
 
         return $this;
     }
@@ -66,7 +67,7 @@ class FileField extends Field
      */
     public function retrieveFormData(Request $request, string $section)
     {
-        $max = $this->getAttribute('max', $this->hasMultiple() ? INF : 1);
+        $max = $this->getProp('max', $this->hasMultiple() ? INF : 1);
         $files = $request->file($this->getName());
         $removed = $request->get($this->getName() . '__removed__', []);
         $old = $request->get($this->getName() . '__current__', []);
@@ -82,27 +83,6 @@ class FileField extends Field
         foreach ($files as $file) $paths[] = $this->store($file);
 
         return implode(",", $paths);
-    }
-
-    /**
-     * @param $value
-     * @param $resource
-     * @param string $type
-     * @return mixed
-     */
-    public function resolveData($value, $resource, string $type)
-    {
-        if (!$value) return parent::resolveData($value, $resource, $type);
-
-        $value = explode(",", $value);
-        $value = collect($value)->map(function ($item) {
-            return [
-                'url' => Storage::disk($this->storageDisk)->url($item),
-                'name' => $item
-            ];
-        })->toArray();
-
-        return parent::resolveData($value, $resource, $type);
     }
 
     /**
@@ -122,7 +102,7 @@ class FileField extends Field
      */
     public function hasMultiple()
     {
-        return $this->getAttribute('multiple', false);
+        return $this->getProp('multiple', false);
     }
 
     /**
@@ -131,8 +111,24 @@ class FileField extends Field
      */
     public function accept(string $accept)
     {
-        $this->addAttribute('accept', $accept);
+        $this->addProp('accept', $accept);
 
         return $this;
+    }
+
+    protected function registerFileResolver(): void
+    {
+        $callable = function ($value) {
+            if (is_null($value)) return [];
+            $value = explode(",", $value);
+            return collect($value)->map(function ($item) {
+                return [
+                    'url' => Storage::disk($this->storageDisk)->url($item),
+                    'name' => $item
+                ];
+            })->toArray();
+        };
+
+        $this->displayUsing($callable);
     }
 }

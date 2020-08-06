@@ -10,7 +10,7 @@ use Oza75\LaravelHubble\Field;
 class BooleanField extends Field
 {
 
-    public function __construct(string $name, string $title, bool $sortable = false)
+    public function __construct(string $name, ?string $title = null, bool $sortable = false)
     {
         parent::__construct($name, $title, $sortable);
 
@@ -40,8 +40,8 @@ class BooleanField extends Field
      */
     public function text(string $checked, ?string $unchecked = 'No')
     {
-        $this->addAttribute('checkedText', $checked);
-        $this->addAttribute('unCheckedText', $unchecked);
+        $this->addProp('checkedText', $checked);
+        $this->addProp('unCheckedText', $unchecked);
 
         return $this;
     }

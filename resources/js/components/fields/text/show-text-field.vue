@@ -1,5 +1,5 @@
 <template>
-    <div :class="{[`show--${type}--wrapper`]: true}">
+    <div :class="{[`show--${type}--wrapper`]: true, [classes]: true}">
         <pre v-html="value" v-if="!limit"></pre>
         <div v-else>
             <div v-html="text" v-if="!showMore"></div>
@@ -15,6 +15,8 @@
 </template>
 
 <script>
+    import {DetailsMixins} from "../mixins";
+
     export default {
         name: "show-text-field",
         data: () => ({
@@ -26,6 +28,7 @@
             type: {default: 'text', type: String},
             limit: {default: null}
         },
+        mixins: [DetailsMixins],
         computed: {
             text() {
                 if (!this.limit) return this.value;

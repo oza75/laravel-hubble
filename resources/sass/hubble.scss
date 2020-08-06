@@ -577,12 +577,13 @@ body {
     width: 296px;
 }
 
+.model--wrapper {
+    align-items: flex-start;
+    z-index: 1000;
+    padding-top: 60px;
+}
+
 .dashboard--details {
-    .model--wrapper {
-        align-items: flex-start;
-        z-index: 1000;
-        padding-top: 60px;
-    }
 
     .ctas {
         .btn {
@@ -673,7 +674,8 @@ body {
             }
 
             .show--number--wrapper {
-                text-align: right;
+                //text-align: right;
+                padding-left: 16px;
             }
 
             &.table--list--data--actions {
@@ -766,7 +768,7 @@ body {
 
                 &.numeric-field {
                     .table--header--cell--content {
-                        justify-content: flex-end;
+                        //justify-content: flex-end;
                     }
                 }
 
@@ -938,6 +940,12 @@ body {
             display: flex;
             justify-content: center;
             align-items: center;
+
+            & > * {
+                &:not(:nth-last-child(1)) {
+                    margin-right: 8px;
+                }
+            }
 
             .btn {
                 font-weight: bold;
@@ -1636,4 +1644,59 @@ pre {
 
         margin-bottom: 16px;
     }
+}
+
+.notification--container {
+    position: fixed;
+    right: 30px;
+    bottom: 30px;
+    max-width: 350px;
+
+    .notification {
+        padding: 10px 30px;
+        border-radius: 6px;
+        display: none;
+        margin-bottom: 10px;
+        transition: .3s;
+
+        &.active {
+            display: block;
+            animation: notification-in .5s forwards, notification-out .5s 6s forwards;
+        }
+
+        @mixin notification($bg, $color) {
+            background-color: $bg;
+            color: $color;
+        }
+
+        &.notification--info {
+            @include notification($info, white)
+        }
+
+        &.notification--success {
+            @include notification($green, white)
+        }
+
+        &.notification--error {
+            @include notification($red, white)
+        }
+
+        @keyframes notification-in {
+            from {
+                transform: translateX(150%);
+            }
+            to {
+                transform: translateX(0);
+            }
+        }
+        @keyframes notification-out {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+    }
+
 }

@@ -31,6 +31,7 @@
 <script>
     import InlineLoader from "../inline-loader";
     import VModal from "../v-modal";
+    import {buildFormData} from "../../utils";
 
     export default {
         name: "table-modal",
@@ -59,7 +60,11 @@
             submit() {
                 if (!this.valid) return;
                 this.submitting = true;
-                this.$axios.post(this.url, this.form).then(res => {
+                this.$axios.post(this.url, buildFormData(this.form), {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }).then(res => {
                     this.modalState = false;
                     this.form = {};
                     this.$emit('refresh');

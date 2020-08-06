@@ -1,7 +1,7 @@
 <template>
-    <div>
-        <textarea :value="value" :class="{error: hasErrors}" :id="field.name" rows="5" :name="field.name" v-bind="$attrs"
-                  @input="$emit('input', $event.target.value)">
+    <div :class="{[classes]: true}">
+        <textarea :value="value" :class="{error: hasErrors}" :id="field.name" rows="5" :name="field.name" v-bind="inputAttrs"
+                  @input="input($event.target.value)">
         </textarea>
         <input-errors :errors="errors"/>
     </div>
