@@ -232,7 +232,6 @@ class ActiveUsers extends Action
     }
 }
 ```
-
 The `title` property contains the name of the action that will be shown on the User Interface
 
 In the `handle` method you can perform your action. For our example, let's assume that our users table has an active column which determine whether the user is active or not. 
