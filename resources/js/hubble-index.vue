@@ -136,6 +136,7 @@
                     </div>
                 </li>
             </ol>
+            <component :is="panel.component" :resource="resource" page="index" :panel="panel" v-for="(panel, k) in resource.panels" :key="k"></component>
             <div class="empty--states" v-if="isEmpty">
                 <div class="wrapper">
                     <svg enable-background="new 0 0 24 24" viewBox="0 0 24 24"

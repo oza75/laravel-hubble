@@ -56,6 +56,8 @@ Vue.component('edit-image-field', () => import(/* webpackChunkName: "edit-image-
 Vue.component('table-button', () => import(/* webpackChunkName: "table-button" */ /* webpackPrefetch: true */"./components/table-buttons/t-button.vue"))
 Vue.component('table-button-attach', () => import(/* webpackChunkName: "table-button-attach" */ /* webpackPrefetch: true */"./components/table-buttons/t-attach.vue"))
 Vue.component('table-modal', () => import(/* webpackChunkName: "table-modal" */ /* webpackPrefetch: true */"./components/table-buttons/table-modal.vue"))
+Vue.component('hubble-panel', () => import(/* webpackChunkName: "hubble-panel" */ /* webpackPrefetch: true */"./hubble-panel.vue"))
+Vue.component('hubble-form', () => import(/* webpackChunkName: "hubble-panel" */ /* webpackPrefetch: true */"./components/hubble-form.vue"))
 Vue.component('file-input', require("./components/fields/image/FileInput.vue").default)
 Vue.component('input-errors', require("./components/fields/input-errors.vue").default)
 

@@ -148,3 +148,16 @@ export const DetailsMixins = {
         }
     }
 }
+export const PanelMixins = {
+    props: {
+        panel: {required: true, type: Object},
+        page: String,
+        resource: Object,
+        formData: Object
+    },
+    methods: {
+        input(field, value) {
+            this.$emit('input', field, value)
+        }
+    }
+}

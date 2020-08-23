@@ -1,7 +1,7 @@
 <template>
     <div class="custom--select--container" :class="{[classes]: true}">
         <template v-if="!multiple">
-            <input type="text" @click.stop @keyup="onSearch" :placeholder="placeholder" @keydown="onKeydown"
+            <input type="text" @click.stop @keyup="onSearch" :placeholder="inputAttrs.placeholder" @keydown="onKeydown"
                    ref="textInput" v-bind="inputAttrs" :class="{error: hasErrors}" :id="field.name" autocomplete="off"
                    @focus="openDropdown">
             <input :name="field.name" :value="inputValue" ref="input" v-show="false">
@@ -10,7 +10,7 @@
             <div class="tags--wrapper" :class="{error: hasErrors}">
                 <div class="tags--fake--input" @click.stop="openDropdown" :class="{focused: dropdownOpened}">
                     <div class="tags--container">
-                        <span class="placeholder" v-if="!tags || (tags && tags.length === 0)">{{placeholder}}</span>
+                        <span class="placeholder" v-if="!tags || (tags && tags.length === 0)">{{inputAttrs.placeholder}}</span>
                         <div class="tag" v-for="(tag, k) in (tags || []).slice(0, tagsToDisplay)" :key="'tag-'+k">
                             <span class="tag--content" :title="tag[textKey]">{{tag[textKey]}}</span>
                             <svg fill="none" @click="removeTag(tag)" stroke-linecap="round" stroke-linejoin="round"

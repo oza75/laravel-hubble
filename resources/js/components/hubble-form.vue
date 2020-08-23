@@ -19,12 +19,13 @@
             resource: {type: Object, required: true},
             type: {type: String, default: 'editing'},
             formData: {type: Object, default: () => ({})},
-            item: {type: Object, default: () => ({})}
+            item: {type: Object, default: () => ({})},
+            fields: {type: Array, required: true}
         },
         computed: {
-            fields() {
-                return Object.values(this.resource.fields)
-            }
+            // fields() {
+            //     return Object.values(this.resource.fields)
+            // }
         },
         methods: {
             getValue(field) {

@@ -61,6 +61,7 @@
                     </div>
                 </li>
             </ol>
+            <component :is="panel.component" :resource="resource" page="details" :panel="panel" v-for="(panel, k) in resource.panels" :key="k"></component>
         </section>
         <v-modal :label="$t('dashboard.confirmation')" @close="openDeleteModal = false" v-if="openDeleteModal">
             <template v-slot:body>

@@ -9,11 +9,12 @@ use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Concerns\HandlesRules;
 use Oza75\LaravelHubble\Concerns\HandlesVisibility;
 use Illuminate\Http\Request;
+use Oza75\LaravelHubble\Contracts\HasVisibility;
 use Oza75\LaravelHubble\Fields\BooleanField;
 use Oza75\LaravelHubble\Fields\DateTimeField;
 use Oza75\LaravelHubble\Fields\NumberField;
 
-class Field
+class Field implements HasVisibility
 {
     use HandlesVisibility, HandlesRules;
 

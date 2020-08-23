@@ -85,7 +85,7 @@ class InstallationCommand extends Command
     {
         $this->call('vendor:publish', [
             "--provider" => "Oza75\LaravelHubble\HubbleServiceProvider",
-            "--tag" => "public",
+//            "--tag" => "public",
         ]);
     }
 

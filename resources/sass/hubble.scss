@@ -553,6 +553,14 @@ body {
 }
 
 .dashboard--edit, .dashboard--details {
+    .table--list--row {
+        &:first-child {
+            .table--list--cell {
+                border-top: unset !important;
+            }
+        }
+    }
+
     .table--list--cell {
         display: table-cell;
         vertical-align: middle;
@@ -1696,6 +1704,38 @@ pre {
             to {
                 opacity: 0;
             }
+        }
+    }
+
+}
+
+.hubble-panel {
+    margin-top: 20px;
+
+    .panel-header {
+        padding: 8px 0;
+
+        .panel-title {
+            overflow: hidden;
+            margin: -3px 0 0;
+            padding: 0;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            font-size: 2rem;
+            line-height: 1.2em;
+            font-weight: 600;
+            letter-spacing: 0.2px;
+            min-height: 35px;
+        }
+    }
+
+    .panel-body {
+        background-color: white;
+        border-radius: 5px;
+        padding: 16px 0;
+
+        .table--list {
+            box-shadow: none;
         }
     }
 

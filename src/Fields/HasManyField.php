@@ -86,7 +86,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
      */
     public function toArray(string $section = 'index')
     {
-        if (in_array($section, ['creating'])) {
+        if (in_array($section, ['creating', 'editing'])) {
             $this->options = route('api.hubble.fields.related',
                 [
                     'name' => $this->resource->getName(),

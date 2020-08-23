@@ -26,7 +26,7 @@
                     dateFormat: this.format,
                     defaultDate: this.value,
                     enableTime: true,
-                    locale: this.locale
+                    // locale: this.locale
                     // locale: require(`flatpickr/dist/l10n/${this.locale}.components`).default[this.locale]
                 });
 

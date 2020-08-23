@@ -10,7 +10,7 @@
                     <label :for="field.name">{{field.title}}</label>
                     <component :is="field.components[section]" :field="field"
                                :form-data="form" :value="form[field.name]" @input="input(field, $event)"
-                               v-bind="field.attributes"></component>
+                               :attributes="field.attributes" v-bind="field.props"></component>
                 </div>
 
             </template>

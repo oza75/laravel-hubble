@@ -34,7 +34,7 @@ class HubbleServiceProvider extends ServiceProvider
         if ($this->app->runningInConsole()) {
             $this->publishes([
                 __DIR__ . '/../config/config.php' => config_path('laravel-hubble.php'),
-            ], 'config');
+            ]);
 
             // Publishing the views.
             $this->publishes([
