@@ -4,9 +4,14 @@
 namespace Oza75\LaravelHubble;
 
 
+use Exception;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Str;
+use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Concerns\HandlesEvents;
 use Oza75\LaravelHubble\Concerns\InteractsWithDatabase;
+use Oza75\LaravelHubble\Contracts\HasVisibility;
 use Oza75\LaravelHubble\Contracts\Relations\HandleManyRelationship;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -14,7 +19,9 @@ use Illuminate\Support\Collection;
 
 abstract class HubbleResource
 {
-    use InteractsWithDatabase, HandlesEvents;
+    use InteractsWithDatabase, HandlesAuthorization, HandlesEvents;
+
+    const NULL_VALUE = "__laravel__hubble@null#";
 
     protected $name = null;
 
@@ -30,8 +37,12 @@ abstract class HubbleResource
 
     protected $perPage = 38;
 
+    protected $displayInSidebar = true;
+
+    private $currentItem = null;
+
     /**
-     * @return Field[] array of fields
+     * @return Field[]  array of fields
      */
     public abstract function fields();
 
@@ -49,6 +60,29 @@ abstract class HubbleResource
      * @return Builder
      */
     public abstract function baseQuery(): Builder;
+
+    /**
+     * @return TableButton[] array of buttons
+     */
+    public function tableButtons()
+    {
+        return [
+            TableButton::make(
+                trans('laravel-hubble::dashboard.create'),
+                route('hubble.create', ['name' => $this->getName()])
+            )->displayWhen(function (User $user) {
+                return $this->canAccess('create', get_class($this->getModel()));
+            })
+        ];
+    }
+
+    /**
+     * @return Panel[]
+     */
+    public function panels()
+    {
+        return [];
+    }
 
     /**
      * @return null
@@ -98,21 +132,23 @@ abstract class HubbleResource
             'searchable' => $this->searchable(),
             'urls' => $this->getUrls(),
             'fields' => $this->parseFields($section),
+            'panels' => $this->getPanels($section),
             'token' => csrf_token(),
         ];
 
         switch ($section) {
             case 'index':
-                $data = array_merge($data, $this->indexingToArray());
+                $data = array_merge($data, $this->toArrayWhenIndexing());
                 break;
             case 'creating':
-                $data = array_merge($data, $this->creatingToArray());
+                $data = array_merge($data, $this->toArrayWhenCreating());
                 break;
             case 'editing':
-                $data = array_merge($data, $this->editingToArray());
+                $data = array_merge($data, $this->toArrayWhenEditing());
                 break;
             case 'details':
-                $data['relatedResource'] = $this->getRelatedResources();
+                $data['actions'] = $this->getActions($section);
+                $data['relatedResource'] = $this->getRelatedResources($section);
                 break;
         }
 
@@ -122,7 +158,7 @@ abstract class HubbleResource
     /**
      * @return array
      */
-    protected function creatingToArray()
+    protected function toArrayWhenCreating()
     {
         return [];
     }
@@ -130,7 +166,7 @@ abstract class HubbleResource
     /**
      * @return array
      */
-    protected function editingToArray()
+    protected function toArrayWhenEditing()
     {
         return [];
     }
@@ -138,19 +174,21 @@ abstract class HubbleResource
     /**
      * @return array
      */
-    protected function indexingToArray()
+    protected function toArrayWhenIndexing()
     {
-        $actions = collect($this->actions())->map(function (Action $action) {
-            return array_merge($action->toArray(), [
-                'url' => route('api.hubble.action', ['name' => $this->getName(), 'action' => $action->getName()])
-            ]);
-        })->toArray();
+        $actions = $this->getActions('index');
 
         $filters = collect($this->filters())->map(function (Filter $filter) {
             return $filter->toArray();
         })->toArray();
 
-        return ['actions' => $actions, 'filters' => $filters];
+        $buttons = collect($this->tableButtons())->filter(function (TableButton $button) {
+            return $button->isVisible();
+        })->map(function (TableButton $button) {
+            return $button->toArray();
+        })->toArray();
+
+        return ['actions' => $actions, 'filters' => $filters, 'buttons' => $buttons];
     }
 
     /**
@@ -170,14 +208,15 @@ abstract class HubbleResource
      */
     public function getVisibleFields(string $section)
     {
-        return collect($this->loadedFields)->filter(function (Field $field) use ($section) {
-            return $field->isVisibleOn($section);
+        return collect($this->loadedFields)->filter(function (HasVisibility $field) use ($section) {
+            return $field->isVisibleOn($section) && !$field instanceof HandleManyRelationship;
         })->toArray();
     }
 
     /**
      * @param string $name
      * @param Request $request
+     * @return array|string|void|null
      */
     public function runAction(string $name, Request $request)
     {
@@ -187,7 +226,15 @@ abstract class HubbleResource
         $request->validate(['items' => 'required']);
         $ids = $request->get('items');
 
-        $action->run($ids);
+        $models = $this->baseQuery()->whereIn($this->getKey(), $ids)->cursor();
+
+        $message = $action->run($models, $this->baseQuery());
+
+        if (!$message) return null;
+
+        if (is_array($message)) return $message;
+
+        return ['message' => $message, 'state' => 'success'];
     }
 
     /**
@@ -231,21 +278,45 @@ abstract class HubbleResource
     {
         $data = $this->retrieveFormData($request, 'creating');
 
+        $request->validate($this->rules('creating'));
+
         $item = $this->create($data, $request);
+
+        session()->flash('notification', ['message' => trans('laravel-hubble::dashboard.created'), 'state' => 'success']);
 
         return route('hubble.show', ['name' => $this->getName(), 'key' => $item->{$this->key}]);
     }
 
     /**
+     * @param $item
      * @param Request $request
-     * @param $id
      * @return mixed
+     * @throws Exception
      */
-    public function updateItem(Request $request, $id)
+    public function updateItem($item, Request $request)
     {
         $data = $this->retrieveFormData($request, 'editing');
 
-        return $this->update($id, $data, $request);
+        $updated = $this->update($item, $data, $request);
+
+        session()->flash('notification', ['message' => trans('laravel-hubble::dashboard.updated'), 'state' => 'success']);
+
+        return $updated;
+    }
+
+    /**
+     * @param string $section
+     * @return array
+     */
+    public function rules(string $section)
+    {
+        $fields = $this->getVisibleFields($section);
+
+        return collect($fields)->mapWithKeys(function (Field $field) use ($section) {
+            return [$field->getName() => $field->rulesFor($section)];
+        })->filter(function ($rules) {
+            return !empty($rules);
+        })->toArray();
     }
 
     /**
@@ -253,7 +324,7 @@ abstract class HubbleResource
      */
     protected function urls()
     {
-        return [
+        $urls = [
             'create' => route('hubble.create', ['name' => $this->getName()]),
             'store' => route('hubble.store', ['name' => $this->getName()]),
             'index' => route('hubble.index', ['name' => $this->getName()]),
@@ -261,6 +332,12 @@ abstract class HubbleResource
                 'index' => route('api.hubble.index', ['name' => $this->getName()]),
             ],
         ];
+
+        if (!is_null($this->currentItem)) {
+            $urls['api']['show'] = route('api.hubble.show', ['name' => $this->getName(), 'key' => $this->currentItem->{$this->key}]);
+        }
+
+        return $urls;
     }
 
     /**
@@ -287,9 +364,20 @@ abstract class HubbleResource
      */
     public function retrieveFormData(Request $request, string $section): array
     {
-        $fields = collect($this->loadedFields)->filter(function (Field $field) use ($request, $section) {
-            return $field->isVisibleOn($section);
+        $allFields = array_merge($this->loadedFields, collect($this->panels())
+            ->filter(function (Panel $panel) use ($section) {
+                return $panel->isVisibleOn($section);
+            })->map(function (Panel $panel) {
+                return $panel->getFields();
+            })->flatten()->toArray());
+
+        $fields = collect($allFields)->filter(function (Field $field) use ($request, $section) {
+            return $field->isVisibleOn($section) && !$field instanceof HandleManyRelationship;
         });
+
+//        dd($fields->mapWithKeys(function (Field $field) use ($request, $section) {
+//            return [$field->getName() => $field->retrieveFormData($request, $section)];
+//        })->toArray());
 
         return $fields->mapWithKeys(function (Field $field) use ($request, $section) {
             return [$field->getName() => $field->retrieveFormData($request, $section)];
@@ -329,13 +417,14 @@ abstract class HubbleResource
     }
 
     /**
+     * @param string $section
      * @return Collection
      */
-    protected function getRelatedResources()
+    protected function getRelatedResources(string $section)
     {
         return collect($this->getLoadedFields())
-            ->filter(function (Field $field) {
-                return $field instanceof HandleManyRelationship;
+            ->filter(function (Field $field) use ($section) {
+                return $field instanceof HandleManyRelationship && $field->isVisibleOn($section);
             })->map(function (Field $field) {
                 return $field->getRelatedResource()->toArray();
             })->values();
@@ -383,4 +472,69 @@ abstract class HubbleResource
         return $this->perPage;
     }
 
+    /**
+     * @return bool
+     * @throws Exception
+     */
+    public function isAccessible()
+    {
+        return $this->displayInSidebar && $this->canAccess('index', get_class($this->getModel()));
+    }
+
+    /**
+     * @param string $section
+     * @return array
+     */
+    protected function getActions(string $section = 'index'): array
+    {
+        return collect($this->actions())
+            ->filter(function (Action $action) use ($section) {
+                /** @var User */
+                $user = auth()->user();
+                return $action->can($user, $this->currentItem) && $action->visiblesIn($section);
+            })
+            ->map(function (Action $action) {
+                return array_merge($action->toArray(), [
+                    'url' => route('api.hubble.action', ['name' => $this->getName(), 'action' => $action->getName()])
+                ]);
+            })
+            ->values()
+            ->toArray();
+    }
+
+    /**
+     * @param null $currentItem
+     * @return HubbleResource
+     */
+    public function setCurrentItem($currentItem)
+    {
+        $this->currentItem = $currentItem;
+        return $this;
+    }
+
+    /**
+     * @return null
+     */
+    public function getCurrentItem()
+    {
+        return $this->currentItem;
+    }
+
+    /**
+     * @return Builder|Model
+     */
+    public function getModel()
+    {
+        return $this->baseQuery()->getModel();
+    }
+
+    private function getPanels(string $section)
+    {
+        return collect($this->panels())->filter(function (Panel $panel) use ($section) {
+            return $panel->isVisibleOn($section);
+        })->map(function (Panel $panel) use ($section) {
+            $panel->prepare($this);
+            return $panel->toArray($section);
+        })->toArray();
+    }
 }

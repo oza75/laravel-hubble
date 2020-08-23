@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 
 /**
  * Class HasManyField
- * @method static HasManyField make(string $method_name, string $title, string $related, ?bool $sortable = false)
+ * @method static HasManyField make(string $method_name, string $related, ?string $title = null, ?bool $sortable = false)
  * @package Oza75\Hubble\Fields
  */
 class HasManyField extends SelectField implements HandleManyRelationship
@@ -29,22 +29,23 @@ class HasManyField extends SelectField implements HandleManyRelationship
         'index' => true,
         'editing' => false,
         'creating' => false,
-        'details' => false,
+        'details' => true,
     ];
 
     /**
      * HasManyField constructor.
      * @param string $methodName
-     * @param string $title
      * @param string $related
+     * @param string|null $title
      * @param bool $sortable
      */
-    public function __construct(string $methodName, string $title, string $related, bool $sortable = false)
+    public function __construct(string $methodName, string $related, ?string $title = null, ?bool $sortable = false)
     {
-        parent::__construct($methodName, $title, [], $sortable);
+        $this->related = $related;
+
+        parent::__construct($methodName, $title ?? Str::title($methodName), [], $sortable);
 
         $this->methodName = $methodName;
-        $this->related = $related;
     }
 
     public function prepare(HubbleResource $resource)
@@ -59,8 +60,8 @@ class HasManyField extends SelectField implements HandleManyRelationship
 
         $this->setValueKey($relatedModel->getKeyName());
         $this->setTextKey($related->getDisplayColumn());
-        $this->addAttribute('multiple', true);
-        $this->placeholder('Sélectionner les ' . Str::lower(Str::plural($this->title)) . ' associés');
+        $this->addProp('multiple', true);
+        $this->placeholder(trans('laravel-hubble::dashboard.associate_placeholder', ['title' => Str::plural($this->title)]));
 
         $displayResolver = function ($value, $resource) use ($related) {
             return $value->map(function ($item) use ($related, $resource) {
@@ -85,7 +86,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
      */
     public function toArray(string $section = 'index')
     {
-        if (in_array($section, ['creating'])) {
+        if (in_array($section, ['creating', 'editing'])) {
             $this->options = route('api.hubble.fields.related',
                 [
                     'name' => $this->resource->getName(),
@@ -148,12 +149,13 @@ class HasManyField extends SelectField implements HandleManyRelationship
     }
 
     /**
+     * @param callable|null $when
      * @return $this|HasManyField
      */
-    public function onlyOnDetails()
+    public function onlyOnDetails(?callable $when = null)
     {
-        $this->hideOnForms();
-        $this->hideOnIndex();
+        $this->hideOnForms($when);
+        $this->hideOnIndex($when);
 
         return $this;
     }
@@ -208,7 +210,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
 
         $related = $relationship->getRelated();
 
-        $keyName = $related->getTable() . '.'. $relatedResource->getKey();
+        $keyName = $related->getTable() . '.' . $relatedResource->getKey();
         $relationship->select($keyName);
 
         $query = $related->newQuery();

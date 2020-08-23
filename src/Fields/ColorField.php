@@ -6,7 +6,7 @@ namespace Oza75\LaravelHubble\Fields;
 
 class ColorField extends TextField
 {
-    public function __construct(string $name, string $title, bool $sortable = false)
+    public function __construct(string $name, ?string $title = null, bool $sortable = false)
     {
         parent::__construct($name, $title, $sortable);
         $this->type('color');
@@ -22,7 +22,7 @@ class ColorField extends TextField
 
     public function displayUsingHex()
     {
-        $this->addAttribute('useHex', true);
+        $this->addProp('useHex', true);
 
         return $this;
     }

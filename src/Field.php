@@ -4,16 +4,19 @@
 namespace Oza75\LaravelHubble;
 
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Oza75\LaravelHubble\Concerns\HandlesRules;
 use Oza75\LaravelHubble\Concerns\HandlesVisibility;
 use Illuminate\Http\Request;
+use Oza75\LaravelHubble\Contracts\HasVisibility;
 use Oza75\LaravelHubble\Fields\BooleanField;
 use Oza75\LaravelHubble\Fields\DateTimeField;
 use Oza75\LaravelHubble\Fields\NumberField;
 
-class Field
+class Field implements HasVisibility
 {
-    use HandlesVisibility;
+    use HandlesVisibility, HandlesRules;
 
     /**
      * @var string
@@ -28,13 +31,13 @@ class Field
      */
     protected $sortable;
 
-    protected $default = null;
+    protected $default = 'N/A';
 
     protected $displayResolver = [
-        'index' => null,
-        'editing' => null,
-        'creating' => null,
-        'details' => null,
+        'index' => [],
+        'editing' => [],
+        'creating' => [],
+        'details' => [],
     ];
 
     protected $resource;
@@ -48,11 +51,30 @@ class Field
         'creating' => 'edit-text-field',
         'details' => 'show-text-field'
     ];
+    /**
+     * @var bool|callable
+     */
+    protected $disabled = false;
 
     /**
-     * @var array
+     * @var array of all props that will be passed to field components
      */
-    protected $attributes = [];
+    protected $props = [
+        'index' => [],
+        'editing' => [],
+        'creating' => [],
+        'details' => [],
+    ];
+
+    /**
+     * @var array of all attributes that will passed to field html input when editing or creating
+     */
+    protected $attributes = [
+        'index' => [],
+        'editing' => [],
+        'creating' => [],
+        'details' => [],
+    ];
 
     /**
      * @var string
@@ -62,13 +84,13 @@ class Field
     /**
      * Field constructor.
      * @param string $name
-     * @param string $title
+     * @param string|null $title
      * @param bool $sortable
      */
-    public function __construct(string $name, string $title, bool $sortable = false)
+    public function __construct(string $name, ?string $title = null, bool $sortable = false)
     {
         $this->name = $name;
-        $this->title = $title;
+        $this->title = $title ?? Str::title($name);
         $this->sortable = $sortable;
 
         $this->registerComponents();
@@ -124,6 +146,7 @@ class Field
     public function prepare(HubbleResource $resource)
     {
         $this->resource = $resource;
+
     }
 
     /**
@@ -132,14 +155,24 @@ class Field
      */
     public function toArray(string $section = 'index')
     {
+        $data = [
+            'name' => $this->getName(),
+            'title' => $this->getTitle(),
+            'sortable' => $this->sortable,
+            'components' => $this->components,
+            'props' => $this->getProps($section),
+            'attributes' => $this->getAttributes($section),
+        ];
+
+
+        if (in_array($section, ['creating', 'editing'])) {
+            $data = array_merge($data, [
+                'rules' => $this->parsedRules($section)
+            ]);
+        }
+
         return [
-            $this->name => [
-                'name' => $this->getName(),
-                'title' => $this->getTitle(),
-                'sortable' => $this->sortable,
-                'components' => $this->components,
-                'attributes' => $this->attributes,
-            ]
+            $this->name => $data
         ];
     }
 
@@ -155,16 +188,21 @@ class Field
      * @param $value
      * @param $resource
      * @param string $type
+     * @return mixed
      */
     public function resolveData($value, $resource, string $type)
     {
-        $resolver = $this->displayResolver[$type] ?? null;
+        $this->registerDefaultResolver();
 
-        if (is_null($resolver)) {
+        $resolvers = $this->displayResolver[$type] ?? [];
+
+        if (empty($resolvers)) {
             return $value;
         }
 
-        return $resolver($value, $resource);
+        return collect($resolvers)->reduce(function ($carry, $resolver) use ($resource) {
+            return $resolver($carry, $resource);
+        }, $value);
     }
 
     /**
@@ -244,7 +282,8 @@ class Field
      */
     protected function addDisplayResolver(callable $callable, string $type)
     {
-        $this->displayResolver[$type] = $callable;
+        $this->displayResolver[$type][] = $callable;
+
         return $this;
     }
 
@@ -279,7 +318,7 @@ class Field
     public function default($value)
     {
         $this->default = $value;
-        $this->addAttribute('defaultValue', $value);
+        $this->addProp('defaultValue', $value);
 
         return $this;
     }
@@ -288,11 +327,57 @@ class Field
     /**
      * @param string $name
      * @param $value
+     * @param null $section
+     * @param bool $when
      * @return $this
      */
-    public function addAttribute(string $name, $value)
+    public function addProp(string $name, $value, $section = null, $when = true)
     {
-        $this->attributes[$name] = $value;
+        if ($section === null) $section = ['index', 'editing', 'creating', 'details'];
+
+        foreach (Arr::wrap($section) as $screen) {
+            $this->props[$screen][$name] = [
+                'value' => $value,
+                'condition' => $when
+            ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param $value
+     * @param null $section
+     * @param bool $when
+     * @return $this
+     */
+    public function addAttribute(string $name, $value, $section = null, $when = true)
+    {
+        if ($section === null) $section = ['index', 'editing', 'creating', 'details'];
+
+        foreach (Arr::wrap($section) as $screen) {
+            $this->attributes[$screen][$name] = [
+                'value' => $value,
+                'condition' => $when
+            ];
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param $value
+     * @return $this
+     */
+    public function inputAttribute(string $name, $value)
+    {
+        $attributes = $this->getProp('input', []);
+
+        $attributes[$name] = $value;
+
+        $this->addProp('input', $attributes);
 
         return $this;
     }
@@ -302,9 +387,9 @@ class Field
      * @param $default
      * @return mixed
      */
-    public function getAttribute(string $name, $default = null)
+    public function getProp(string $name, $default = null)
     {
-        return $this->attributes[$name] ?? $default;
+        return $this->props[$name] ?? $default;
     }
 
     /**
@@ -339,6 +424,91 @@ class Field
     private function setIsNumeric()
     {
         if ($this instanceof NumberField || $this instanceof DateTimeField)
-            $this->addAttribute('is_numeric', true);
+            $this->addProp('is_numeric', true);
+    }
+
+    /**
+     * @param string $classes
+     * @param string|null $section
+     * @return $this
+     */
+    public function classes(string $classes, ?string $section = null)
+    {
+        $all = $this->getProp('classes', []);
+        if ($section) $all[$section] = $classes;
+        else {
+            $all['index'] = $classes;
+            $all['edit'] = $classes;
+            $all['create'] = $classes;
+            $all['details'] = $classes;
+        }
+
+        $this->addProp('classes', $all);
+
+        return $this;
+    }
+
+    protected function registerDefaultResolver(): void
+    {
+        $resolver = function ($value) {
+            if (is_null($value)) return $this->default;
+            return $value;
+        };
+
+        $this->displayOnDetailsUsing($resolver);
+        $this->displayOnIndexUsing($resolver);
+    }
+
+    /**
+     * @param bool $condition
+     * @return $this
+     */
+    public function disable($condition = true)
+    {
+        $this->addAttribute('disabled', true, null, $condition);
+
+        return $this;
+    }
+
+
+    /**
+     * @param string $section
+     * @return array|mixed
+     */
+    protected function getProps(string $section)
+    {
+        $props = collect($this->props[$section] ?? []);
+
+        $props = $props->filter(function ($item) {
+            $when = $item['condition'] ?? true;
+
+            return is_bool($when) ? $when : $when(auth()->user(), $this->resource->getCurrentItem());
+        })->map(function ($item) {
+            return $item['value'];
+        });
+
+        return $props->toArray();
+    }
+
+    /**
+     * @param string $section
+     * @return array|mixed
+     */
+    private function getAttributes(string $section)
+    {
+        $attributes = collect($this->attributes[$section] ?? []);
+
+        $attributes = $attributes->filter(function ($item) {
+            $condition = $item['condition'] ?? true;
+
+            return is_bool($condition)
+                ? $condition
+                : $condition(auth()->user(), $this->resource->getCurrentItem());
+
+        })->map(function ($item) {
+            return $item['value'];
+        });
+
+        return $attributes->toArray();
     }
 }

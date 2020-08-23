@@ -452,8 +452,39 @@ All these methods as the same signature.
     return "<a href='mailto:$value'>$value</a>";
 });
 ```
+#### Visibility
+`Field` comes with some methods that you can use to tell when to display 
 
-`Hubble` ships with many types of fields
+* hide : will hide the field in all screen
+* hideOnIndex
+* hideOnForms
+* hideOnDetails
+* hideWhenCreating
+* hideWhenEditing
+* showOnIndex
+* showOnDetails
+* showOnForm
+* showWhenCreating
+* showWhenEditing
+* onlyOnIndex 
+* onlyOnDetails 
+* onlyOnForms 
+* onlyOnCreating 
+* onlyOnEditing 
+
+```php 
+\Oza75\LaravelHubble\TextField::make('email', 'Email')->hideOnIndex();
+```
+
+All of these methods can pass a closure that will be used to hide or display the field on a specific screen.
+
+```php
+\Oza75\LaravelHubble\PasswordField::make('password', 'Change the password')->onlyOnForms(function (User $user, ?\Illuminate\Database\Eloquent\Model $model = null) {
+        return $user->isAdmin() || ($model && $model->id === $user->id);
+});
+```
+
+`Hubble` ships with many types of fields, but you can also [create your own.](#create-a-custom-field) 
 
 - TextField
 - BooleanField
@@ -577,7 +608,7 @@ or
 Used to display a related resource
 - signature
 ```php
-\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'Title', 'related_class');
+\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'related_class', 'Title');
 ```
 The first argument is the name relationship method. Let's assume we have in our `User` model a `belongsTo` method to `City` Model.
 ```php 
@@ -590,25 +621,42 @@ The first argument is the name relationship method. Let's assume we have in our 
 ```
 Then to add this relationship in our resource
 ```php
-\Oza75\LaravelHubble\Fields\BelongsToField::make('city', 'User City', CityResource::class);
+\Oza75\LaravelHubble\Fields\BelongsToField::make('city', CityResource::class);
 ```
 #### HasManyField
 Used to display related resources
 
 - signature
 ```php
-\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'Title', 'related_class');
+\Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'related_class', 'Title');
 ```
 As the `BelongsToField`, the `HasManyField` takes the relationship method name as his first argument.
 ```php
-\Oza75\LaravelHubble\Fields\HasManyField::make('roles', 'User Roles', RoleResource::class);
+\Oza75\LaravelHubble\Fields\HasManyField::make('roles', RoleResource::class, 'User Roles');
 ```
 ### Create a custom field
 You can create a custom field by using this command: 
 ```bash
 php artisan hubble:field ColorField 
 ```
-This will generate a new Field Class under `app/Hubble/Fields`
+You can also generate a new field with custom components by using this command: 
+```bash
+php artisan hubble:field ColorField --custom
+```
+This will create new `VueJs` components for your field under `resources/hubble/components/fields/color`
+
+Use this command to build the newly components
+
+```bash
+npm run hubble:watch
+```
+
+or 
+```bash
+npm run hubble:prod
+```
+
+`php artisan hubble:field` will generate a new Field Class under `app/Hubble/Fields`
 ```php
 <?php
 
@@ -651,11 +699,172 @@ class ColorField extends Field
 
 }
 ```
-You can also generate a new field with custom components by using this command: 
-```bash
-php artisan hubble:field ColorField --custom
+### Rules
+
+You can automatically validate your forms data by setting rules on each field.
+
+```php
+\Oza75\LaravelHubble\Fields\TextField::make('email', 'Email')->rules('required|email|max:255');
 ```
-This will created a new `VueJs` components for your field under `resources/hubble/components/fields/color`
+There are also `rules` methods for each `creation` and `editing` screen
+
+- `rulesWhenUpdating` will define the rules only when updating
+- `rulesWhenCreating` will define the rules only when creating
+
+> Warning:  the rules' method cannot yet take a validation object (such as a rule class) or a closure
+> but any `Pull Request` is welcoming.
+
+For frontend interactivity, you may set a handler that can be used to validate automatically your field value under 
+`resources/hubble/rules.js`. If you don't, an `ajax` request will be sent to the backend to check if the value is valid when user is filling the form.
+
+```js
+// this method must return a boolean, a string or a promise (for validations that need to make ajax requests) 
+export const string = function (value, fieldName) {
+    if (typeof value !== "string") {
+        // For localization purposes your laravel validation language file is injected into the javascript window,
+        // then you can use the `window.trans` method to return a translated string
+        return window.trans('validation.string', {attribute: fieldName})
+    }
+    
+    return true;
+}
+```
+
+### Authorization
+
+Authorization is used to restrict access of certain screen of your dashboard. Internally, it uses mostly `Laravel Authorization Gate`.
+
+You just need to create a [Laravel Policy](https://laravel.com/docs/7.x/authorization#gates) for your resource that will control which user can access or not to a specific screen.
+
+For example, let's assume I have a `Post` model :
+
+```bash
+php artisan make:policy PostPolicy --model=Post
+```  
+
+This will generate a new `Laravel Policy` under `app/Policies`.
+
+```php
+<?php
+
+namespace App\Policies;
+
+use App\Post;
+use Illuminate\Auth\Access\HandlesAuthorization;
+
+class PostPolicy
+{
+    use HandlesAuthorization;
+
+    public function before(User $user)
+    {
+        // bypass all authorization check when user is admin
+        if ($user->isAdmin()) {
+            return true;
+        }
+    }
+
+    /**
+     * Determine whether the user can view any models.
+     *
+     * @param \App\User $user
+     * @return mixed
+     */
+    public function viewAny(User $user)
+    {
+        return true; // Anyone can see `the index table`. You can also return false to remove the hubble' PostResource in sidebar.
+    }
+
+    /**
+     * Determine whether the user can view the model.
+     *
+     * @param \App\User $user
+     * @param \App\Post $model
+     * @return mixed
+     */
+    public function view(User $user, Post $model)
+    {
+        return true; // anyone can see the details screen.
+    }
+
+    /**
+     * Determine whether the user can create models.
+     *
+     * @param \App\User $user
+     * @return mixed
+     */
+    public function create(User $user)
+    {
+        return true; // anyone can create a new user
+    }
+
+    /**
+     * Determine whether the user can update the model.
+     *
+     * @param \App\User $user
+     * @param \App\Post $model
+     * @return mixed
+     */
+    public function update(User $user, Post $model)
+    {
+        return $user->id === $model->user_id; // only the owner of the post can edit this post
+    }
+
+    /**
+     * Determine whether the user can delete the model.
+     *
+     * @param \App\User $user
+     * @param \App\Post $model
+     * @return mixed
+     */
+    public function delete(User $user, Post $model)
+    {
+        return $user->id === $model->user_id; // only the owner of the post can delete this post
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     *
+     * @param \App\User $user
+     * @param \App\User $model
+     * @return mixed
+     */
+    public function restore(User $user, User $model)
+    {
+        return false;
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     *
+     * @param \App\User $user
+     * @param \App\User $model
+     * @return mixed
+     */
+    public function forceDelete(User $user, User $model)
+    {
+        return false;
+    }
+
+    /**
+    * Determines if the current user can attach users to post 
+    * when using a HasManyField
+    */
+    public function attach(User $user) {
+        return false;
+    }
+
+    /**
+    * Determines if the current user can detach users to post 
+    * when using a HasManyField
+    */
+    public function detach(User $user, Post $model) {
+        return false;
+    }
+
+}
+```
+
 ### Testing
 
 ``` bash

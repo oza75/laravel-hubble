@@ -1,19 +1,20 @@
 <template>
-    <div>
-        <textarea :value="value" :id="field.name" rows="5" :name="field.name" v-bind="$attrs"
-                  @input="$emit('input', $event.target.value)">
+    <div :class="{[classes]: true}">
+        <textarea :value="value" :class="{error: hasErrors}" :id="field.name" rows="5" :name="field.name" v-bind="inputAttrs"
+                  @input="input($event.target.value)">
         </textarea>
+        <input-errors :errors="errors"/>
     </div>
 </template>
 
 <script>
+    import {EditMixin} from "../mixins";
+
+
     export default {
         name: "edit-textarea-field",
-        props: {
-            field: {type: Object, required: true},
-            formData: {type: Object, default: () => ({})},
-            value: {default: null},
-        }
+        mixins: [EditMixin],
+        props: {}
     }
 </script>
 

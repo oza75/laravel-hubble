@@ -1,31 +1,29 @@
 <template>
     <div class="container dashboard--container dashboard--edit">
         <header class="header">
-            <h2 class="title">Modification - {{resource.title}}</h2>
+            <h2 class="title">{{$t('dashboard.edit_title', {name: resource.title})}}</h2>
         </header>
         <section class="content--list">
             <form :action="item['@urls']['update']['url']" method="post" enctype="multipart/form-data">
                 <input type="hidden" name="_method" value="PUT">
                 <input type="hidden" name="_token" :value="resource.token">
-                <hubble-form :resource="resource" :form-data="formData" @input="input" type="editing"/>
+                <hubble-form :resource="resource" :fields="Object.values(resource.fields)" :item="item" :form-data="formData" @input="input" type="editing"/>
                 <div class="form--actions">
-                    <button type="submit" class="btn btn-primary btn-normal btn-radius">Enregister</button>
+                    <button type="submit" class="btn btn-primary btn-normal btn-radius">{{$t('dashboard.save')}}</button>
                 </div>
+                <component :is="panel.component" page="edit" :resource="resource"   :form-data="formData"  @input="input" :panel="panel" v-for="(panel, k) in resource.panels" :key="k"></component>
             </form>
         </section>
     </div>
 </template>
 
 <script>
-
-    import HubbleForm from "./components/hubble-form";
-
     export default {
         name: "dashboard-edit",
         data: () => ({
             formData: {}
         }),
-        components: {HubbleForm},
+        components: {},
         props: {
             resource: {type: Object, required: true},
             item: {type: Object, required: true}

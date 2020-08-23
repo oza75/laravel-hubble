@@ -4,13 +4,14 @@
 namespace Oza75\LaravelHubble\Fields;
 
 
+use Illuminate\Support\Str;
 use Oza75\LaravelHubble\HubbleResource;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
  * Class BelongsToField
- * @method static BelongsToField make(string $method_name, string $title, string $related, ?bool $sortable = false)
+ * @method static BelongsToField make(string $method_name, string $related, ?string $title = null, ?bool $sortable = false)
  * @package Oza75\Hubble\Fields
  */
 class BelongsToField extends SelectField
@@ -25,16 +26,18 @@ class BelongsToField extends SelectField
     /**
      * BelongsToField constructor.
      * @param string $methodName
-     * @param string $title
      * @param string $related
+     * @param string|null $title
      * @param bool $sortable
      */
-    public function __construct(string $methodName, string $title, string $related, bool $sortable = false)
+    public function __construct(string $methodName, string $related, ?string $title = null, ?bool $sortable = false)
     {
         $this->methodName = $methodName;
         $this->related = $related;
 
-        parent::__construct($methodName, $title, [], $sortable);
+        parent::__construct($methodName, $title ?? Str::title($methodName), [], $sortable);
+
+        $this->addValueResolver();
     }
 
     /**
@@ -45,7 +48,7 @@ class BelongsToField extends SelectField
     {
         $related = $this->newRelatedInstance();
 
-        $relatedModel = $related->baseQuery()->getModel();
+        $relatedModel = $related->getModel();
 
         $this->options = $relatedModel->newQuery()->pluck($relationship->getOwnerKeyName(), $related->getDisplayColumn());
 
@@ -58,20 +61,20 @@ class BelongsToField extends SelectField
     {
         parent::prepare($resource);
 
-        $model = $resource->baseQuery()->getModel();
+        $model = $resource->getModel();
 
         $relationship = $model->{$this->methodName}();
 
         $this->guessColumnName($model, $relationship);
 
-        $this->registerDisplayResolver($resource);
+//        $this->registerDisplayResolver($resource);
 
     }
 
     public function toArray(string $section = 'index')
     {
         if (in_array($section, ['creating', 'editing'])) {
-            $model = $this->resource->baseQuery()->getModel();
+            $model = $this->resource->getModel();
             $relationship = $model->{$this->methodName}();
 
             $this->getOptionsFromRelated($model, $relationship);
@@ -108,16 +111,34 @@ class BelongsToField extends SelectField
             $relation = $data->{$this->methodName};
             if (!$relation) return null;
 
-            $name = $relation->{$related->getDisplayColumn()} ?? $this->default;
             $url = route('hubble.show', [
                 'name' => $related->getName(),
                 'key' => $relation->{$related->getKey()}
             ]);
 
-            return "<a href='{$url}' class='default--color'>{$name}</a>";
+            return "<a href='{$url}' class='default--color'>{$value}</a>";
         };
 
         $this->displayOnDetailsUsing($callable);
         $this->displayOnIndexUsing($callable);
+    }
+
+    public function resolveData($value, $resource, string $type)
+    {
+        $this->registerDisplayResolver($this->resource);
+
+        return parent::resolveData($value, $resource, $type);
+    }
+
+    private function addValueResolver()
+    {
+        $callable = function ($value, $data) {
+            $model = $data->{$this->methodName};
+            $related = $this->newRelatedInstance();
+            return $model->{$related->getDisplayColumn()} ?? $this->default;
+        };
+
+        $this->displayOnIndexUsing($callable);
+        $this->displayOnDetailsUsing($callable);
     }
 }

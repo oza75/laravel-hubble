@@ -1,11 +1,12 @@
 <template>
-    <div :class="{[`show--${type}--wrapper`]: true}">
+    <div :class="{[`show--${type}--wrapper`]: true, [classes]: true}">
         <div v-html="text"></div>
     </div>
 </template>
 
 <script>
     import {smart_substr} from "../../../utils";
+    import {IndexMixin} from "../mixins";
 
     export default {
         name: "index-text-field",
@@ -15,6 +16,7 @@
             type: {default: 'text', type: String},
             limit: {default: null}
         },
+        mixins: [IndexMixin],
         computed: {
             text() {
                 if (!this.limit) return this.value;

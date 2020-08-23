@@ -5,7 +5,7 @@
             <div class="filters">
                 <div v-for="(filter, k) in (resource.filters || [])" :key="'filter-'+k">
                     <hubble-filter :filter="filter" :value="customFilters[filter.name]"
-                                      @input="selectFilter(filter, $event)"/>
+                                   @input="selectFilter(filter, $event)"/>
                 </div>
             </div>
         </header>
@@ -13,7 +13,7 @@
             <div class="total--wrapper">
                 <div class="total">
                     <span v-if="total > 0">
-                        {{total}} résultats
+                        {{$t('dashboard.results', {total: total})}}
                     </span>
                 </div>
             </div>
@@ -24,59 +24,31 @@
                         <path
                             d="M19 17L13.846 11.846C14.7988 10.3979 15.1804 8.64774 14.917 6.93442C14.6535 5.22111 13.7637 3.66648 12.4199 2.57154C11.076 1.47659 9.37366 0.919227 7.64245 1.00735C5.91123 1.09547 4.27429 1.82281 3.04855 3.04855C1.82281 4.27429 1.09547 5.91123 1.00735 7.64245C0.919227 9.37366 1.47659 11.076 2.57154 12.4199C3.66648 13.7637 5.22111 14.6535 6.93442 14.917C8.64774 15.1804 10.3979 14.7988 11.846 13.846L17 19L19 17ZM2.99998 7.99998C2.99998 5.24298 5.24298 2.99998 7.99998 2.99998C10.757 2.99998 13 5.24298 13 7.99998C13 10.757 10.757 13 7.99998 13C5.24298 13 2.99998 10.757 2.99998 7.99998Z"/>
                     </svg>
-                    <input type="text" placeholder="Faites une recherche ici" @input="search">
+                    <label for="table-search" class="sr-only">{{$t('dashboard.search_placeholder')}}</label>
+                    <input type="text" id="table-search" :placeholder="$t('dashboard.search_placeholder')"
+                           @input="search">
                 </div>
                 <div class="actions--header--right">
                     <div class="resources--actions--wrapper"
                          v-if="resource.actions && resource.actions.length > 0 && selected.length > 0">
                         <label class="resources--actions--wrapper">
                             <select name="action" id="action" v-model="action">
-                                <option :value="null" selected>Choisir une action</option>
+                                <option :value="null" selected> {{$t('dashboard.choose_an_action')}}</option>
                                 <option :value="k" v-for="(action, k) in resource.actions" :key="'action-'+k">
                                     {{action.title}}
                                 </option>
                             </select>
                         </label>
-                        <button @click="runAction(false)" class="btn btn-coral btn-radius btn-icon">
+                        <button @click="runAction(false)" class="btn btn-secondary btn-radius btn-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px"
                                  v-show="!runningAction"
                                  height="24px">
                                 <path d="M8 5v14l11-7z"/>
                             </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 120 30"
-                                 fill="#fff"
-                                 v-show="runningAction">
-                                <circle cx="15" cy="15" r="14.7499">
-                                    <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                             calcMode="linear" repeatCount="indefinite"/>
-                                    <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s"
-                                             values="1;.5;1" calcMode="linear" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="60" cy="15" r="9.25014" fill-opacity="0.3">
-                                    <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9"
-                                             calcMode="linear" repeatCount="indefinite"/>
-                                    <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s"
-                                             values=".5;1;.5" calcMode="linear" repeatCount="indefinite"/>
-                                </circle>
-                                <circle cx="105" cy="15" r="14.7499">
-                                    <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                             calcMode="linear" repeatCount="indefinite"/>
-                                    <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s"
-                                             values="1;.5;1" calcMode="linear" repeatCount="indefinite"/>
-                                </circle>
-                            </svg>
+                            <inline-loader v-show="runningAction"></inline-loader>
                         </button>
                     </div>
-                    <a :href="resource.urls.create.url" :target="resource.urls.create.target"
-                       class="create-btn btn btn-radius btn-primary btn-normal" v-if="!resource.isManyRelation">
-                        Créer
-                    </a>
-
-                    <button @click="attach" class="create-btn btn btn-radius btn-primary btn-normal"
-                            v-if="resource.isManyRelation">
-                        Attacher
-                    </button>
-
+                    <component v-for="(button,k) in buttons" :key="'tb-'+k" :is="button.component" @refresh="fetchItems" v-bind="button"/>
                 </div>
             </div>
             <ol class="table--list"
@@ -86,7 +58,7 @@
                         <div class="fake-checkbox" :class="{active: isAllSelected}" @click="selectAll()"></div>
                     </div>
                     <div class="table--list--cell table--header--cell"
-                         :class="{['table--'+ field.name+ '-header']: true, 'numeric-field': field.attributes.is_numeric || false}"
+                         :class="{['table--'+ field.name+ '-header']: true, 'numeric-field': field.props.is_numeric || false}"
                          v-for="field in fields" :key="field.name">
                         <div class="table--header--cell--content"
                              @click="field.sortable ? sortBy(field.name): null">
@@ -126,29 +98,31 @@
                          v-for="field in fields" :key="'table-row--'+k+'-'+field.name"
                     >
                         <div class="table--list--data--content">
-                            <component :is="field.components.index" :field="field"
-                                       :value="item[field.name]" v-bind="field.attributes" :data="item"></component>
+                            <component :is="field.components.index" :field="field" :attributes="field.attributes"
+                                       :value="item[field.name]" v-bind="field.props" :data="item"></component>
                         </div>
                     </div>
 
                     <div class="table--list--data table--list--data--actions">
                         <div class="wrapper">
-                            <a :href="item['@urls']['show']['url']" :target="item['@urls']['show']['target'] || '_self'"
-                               v-if="item['@urls']['show']  && item['@urls']['show']['url']" title="Voir">
+                            <a :href="item['@urls']['show']['url']" v-bind="linkAttrs(item['@urls']['show'])"
+                               v-if="item['@urls']['show']  && item['@urls']['show']['url']"
+                               :title="$t('dashboard.show_details')">
                                 <svg width="24" height="12" viewBox="0 0 24 12" xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M11.9999 0C5.74794 0 0.937443 5.508 0.937443 5.508L0.491943 6L0.937443 6.492C0.937443 6.492 5.32344 11.493 11.1562 11.9535C11.4344 11.988 11.7127 12 11.9999 12C12.2872 12 12.5654 11.988 12.8437 11.9528C18.6764 11.493 23.0624 6.49275 23.0624 6.49275L23.5079 6L23.0624 5.508C23.0624 5.508 18.2519 0 11.9999 0ZM11.9999 1.5C13.6522 1.5 15.1754 1.9515 16.4999 2.5545C16.9777 3.34575 17.2499 4.257 17.2499 5.25C17.2531 6.54284 16.7788 7.79132 15.918 8.75593C15.0572 9.72053 13.8706 10.3333 12.5857 10.4767C12.5707 10.4797 12.5534 10.4737 12.5392 10.4767C12.3599 10.485 12.1814 10.5 11.9999 10.5C11.8004 10.5 11.6077 10.488 11.4142 10.4767C10.1293 10.3333 8.94267 9.72053 8.08187 8.75593C7.22108 7.79132 6.74677 6.54284 6.74994 5.25C6.74994 4.27125 7.01394 3.36 7.47669 2.57775H7.45344C8.78769 1.96275 10.3297 1.5 11.9999 1.5ZM11.9999 3C11.403 3.0002 10.8306 3.23752 10.4086 3.65976C9.98668 4.082 9.74974 4.65456 9.74994 5.2515C9.75014 5.84844 9.98746 6.42084 10.4097 6.8428C10.8319 7.26476 11.4045 7.5017 12.0014 7.5015C12.297 7.5014 12.5897 7.44309 12.8627 7.32989C13.1357 7.21668 13.3838 7.05081 13.5927 6.84174C13.8017 6.63267 13.9674 6.38449 14.0804 6.11138C14.1934 5.83827 14.2515 5.54557 14.2514 5.25C14.2513 4.95443 14.193 4.66177 14.0798 4.38873C13.9666 4.1157 13.8008 3.86763 13.5917 3.6587C13.3826 3.44977 13.1344 3.28406 12.8613 3.17104C12.5882 3.05802 12.2955 2.9999 11.9999 3V3ZM5.43744 3.7035C5.31551 4.21004 5.25259 4.72899 5.24994 5.25C5.24994 6.5655 5.62494 7.79625 6.28119 8.83575C4.94979 8.0558 3.72808 7.10218 2.64819 6C3.49829 5.14237 4.43278 4.37272 5.43744 3.70275V3.7035ZM18.5624 3.7035C19.5671 4.37323 20.5016 5.14263 21.3517 6C20.2718 7.10218 19.0501 8.0558 17.7187 8.83575C18.3952 7.76233 18.7528 6.51881 18.7499 5.25C18.7499 4.71375 18.6794 4.2015 18.5624 3.70275V3.7035Z"/>
                                 </svg>
                             </a>
-                            <a :href="item['@urls']['edit']['url']" :target="item['@urls']['edit']['target']|| '_self'"
-                               v-if="item['@urls']['edit'] && item['@urls']['edit']['url']" title="Modifier">
+                            <a :href="item['@urls']['edit']['url']" v-bind="linkAttrs(item['@urls']['edit'])"
+                               v-if="item['@urls']['edit'] && item['@urls']['edit']['url']"
+                               :title="$t('dashboard.edit')">
                                 <svg width="17" height="16" viewBox="0 0 17 16" xmlns="http://www.w3.org/2000/svg">
                                     <path
                                         d="M16.4001 3.33998L13.6601 0.59998C13.3024 0.264076 12.8338 0.0713388 12.3434 0.058432C11.8529 0.0455252 11.3748 0.213349 11.0001 0.52998L2.00005 9.52998C1.67682 9.85594 1.47556 10.2832 1.43005 10.74L1.00005 14.91C0.986582 15.0564 1.00559 15.2041 1.05571 15.3424C1.10584 15.4806 1.18585 15.6062 1.29005 15.71C1.38349 15.8027 1.49431 15.876 1.61615 15.9258C1.73798 15.9755 1.86845 16.0007 2.00005 16H2.09005L6.26005 15.62C6.71685 15.5745 7.14409 15.3732 7.47005 15.05L16.4701 6.04998C16.8194 5.68095 17.0082 5.18849 16.995 4.68052C16.9819 4.17254 16.768 3.69049 16.4001 3.33998V3.33998ZM6.08005 13.62L3.08005 13.9L3.35005 10.9L9.00005 5.31998L11.7001 8.01998L6.08005 13.62ZM13.0001 6.67998L10.3201 3.99998L12.2701 1.99998L15.0001 4.72998L13.0001 6.67998Z"/>
                                 </svg>
                             </a>
                             <div @click="setItemToRemove(item, k)"
-                                 :title="resource.isManyRelation ?'Détacher' : 'Supprimer'"
+                                 :title="resource.isManyRelation ? $t('dashboard.detach') : $t('dashboard.delete')"
                                  v-if="item['@urls']['delete']">
                                 <svg width="19" height="20" viewBox="0 0 19 20" xmlns="http://www.w3.org/2000/svg">
                                     <path
@@ -162,6 +136,7 @@
                     </div>
                 </li>
             </ol>
+            <component :is="panel.component" :resource="resource" page="index" :panel="panel" v-for="(panel, k) in resource.panels" :key="k"></component>
             <div class="empty--states" v-if="isEmpty">
                 <div class="wrapper">
                     <svg enable-background="new 0 0 24 24" viewBox="0 0 24 24"
@@ -199,7 +174,7 @@
                                 d="m23.25 6h-22.5c-.414 0-.75-.336-.75-.75s.336-.75.75-.75h22.5c.414 0 .75.336.75.75s-.336.75-.75.75z"/>
                         </g>
                     </svg>
-                    <h4>Aucun élément ne correspondant à ces critères</h4>
+                    <h4>{{$t('dashboard.empty_message')}}</h4>
                 </div>
             </div>
             <v-pagination :page-count="lastPage" page-link-class="item" v-if="lastPage > 1"
@@ -207,86 +182,35 @@
                           @input="paginate"
                           prev-link-class="item" next-link-class="item"
                           container-class="pagination--container"
-                          prev-text="Precedent" next-text="Suivant"/>
+                          :prev-text="$t('dashboard.previous')" :next-text="$t('dashboard.next')"/>
         </section>
-        <v-modal label="Confirmation" v-if="actionModalConfirmation" @close="actionModalConfirmation = false">
+        <v-modal :label="$t('dashboard.confirmation')" v-if="actionModalConfirmation"
+                 @close="actionModalConfirmation = false">
             <template v-slot:body>
                 <p v-html="currentAction.confirm_message"></p>
             </template>
             <template v-slot:footer>
-                <button class="btn btn-text btn-normal" @click="actionModalConfirmation = false">Annuler</button>
-                <button class="btn btn-normal btn-primary" @click="runAction(true)">Confirmer</button>
+                <button class="btn btn-text btn-normal" @click="actionModalConfirmation = false">
+                    {{$t('dashboard.cancel')}}
+                </button>
+                <button class="btn btn-normal btn-primary" @click="runAction(true)">{{$t('dashboard.confirm')}}</button>
             </template>
         </v-modal>
-        <v-modal label="Confirmation" v-if="deleteItemModal" @close="deleteItemModal = false">
+        <v-modal :label="$t('dashboard.confirmation')" v-if="deleteItemModal" @close="deleteItemModal = false">
             <template v-slot:body>
-                <span v-if="resource.isManyRelation">Voulez-vous vraiment détacher cet enregistrement ?</span>
-                <span v-else> Voulez-vous vraiment supprimer cet enregistrement ?</span>
+                <span v-if="resource.isManyRelation">{{$t('dashboard.detach_record_message')}}</span>
+                <span v-else>{{$t('dashboard.delete_record_message')}} </span>
             </template>
             <template v-slot:footer>
-                <button class="btn btn-normal btn-text" @click="deleteItemModal = false">Annuler</button>
-                <button class="btn btn-normal btn-radius"
-                        :class="{'btn-primary': !resource.isManyRelation, 'btn-coral': resource.isManyRelation}"
+                <button class="btn btn-normal btn-text" @click="deleteItemModal = false">{{$t('dashboard.cancel')}}
+                </button>
+                <button class="btn btn-normal btn-radius btn-primary"
                         @click="removeItem">
                     <span v-show="!removing">
-                        <span v-if="resource.isManyRelation">Détacher</span>
-                        <span v-else>Confirmer</span>
+                        <span v-if="resource.isManyRelation">{{$t('dashboard.detach')}}</span>
+                        <span v-else>{{$t('dashboard.confirm')}}</span>
                     </span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 120 30" fill="#fff"
-                         v-show="removing">
-                        <circle cx="15" cy="15" r="12.9998">
-                            <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="60" cy="15" r="11.0002" fill-opacity="0.3">
-                            <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s"
-                                     values=".5;1;.5" calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="105" cy="15" r="12.9998">
-                            <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                    </svg>
-                </button>
-            </template>
-        </v-modal>
-        <v-modal label="Associer" v-if="attachModalState" @close="attachModalState = false" card-classes="attach-modal">
-            <template v-slot:body>
-                <component :is="resource.field.components.creating" :field="resource.field"
-                           :form-data="{}" :multiple="false" v-model="itemToAttach"
-                           v-bind="resource.field.attributes"></component>
-            </template>
-            <template v-slot:footer>
-                <button class="btn btn-normal btn-text" @click="attachModalState = false">Annuler</button>
-                <button class="btn btn-normal btn-primary btn-radius" :disabled="!itemToAttach" @click="attachItem">
-                    <span v-show="!attaching">Attacher</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24px" height="24px" viewBox="0 0 120 30" fill="#fff"
-                         v-show="attaching">
-                        <circle cx="15" cy="15" r="12.9998">
-                            <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="60" cy="15" r="11.0002" fill-opacity="0.3">
-                            <animate attributeName="r" from="9" to="9" begin="0s" dur="0.8s" values="9;15;9"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="0.5" to="0.5" begin="0s" dur="0.8s"
-                                     values=".5;1;.5" calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                        <circle cx="105" cy="15" r="12.9998">
-                            <animate attributeName="r" from="15" to="15" begin="0s" dur="0.8s" values="15;9;15"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                            <animate attributeName="fill-opacity" from="1" to="1" begin="0s" dur="0.8s" values="1;.5;1"
-                                     calcMode="linear" repeatCount="indefinite"/>
-                        </circle>
-                    </svg>
+                    <inline-loader v-show="removing"></inline-loader>
                 </button>
             </template>
         </v-modal>
@@ -297,9 +221,9 @@
     import VModal from './components/v-modal.vue'
     import VPagination from "./components/VPagination";
     import {encodeUrl} from "./utils";
-    // import CheckboxFilter from "../search/checkbox-filter";
     import AdditionalActions from "./components/additional-actions";
     import HubbleFilter from "./components/filters/hubble-filter";
+    import InlineLoader from "./components/inline-loader";
 
     export default {
         name: "hubble-index",
@@ -323,15 +247,15 @@
                 sort: {by: null, type: null},
                 search: null
             },
-            attachModalState: false,
-            itemToAttach: null,
-            attaching: false,
         }),
-        components: {HubbleFilter, AdditionalActions, VPagination, VModal},
+        components: {InlineLoader, HubbleFilter, AdditionalActions, VPagination, VModal},
         props: {
             resource: {type: Object, required: true}
         },
         computed: {
+            buttons() {
+                return this.resource.buttons;
+            },
             isEmpty() {
                 return this.items.length === 0 && this.fetching === false
             },
@@ -466,22 +390,12 @@
                     this.removing = false;
                 })
             },
-            attach() {
-                this.attachModalState = true;
-            },
-            attachItem() {
-                if (!this.itemToAttach) return;
-                let value = this.itemToAttach[this.resource.field.attributes.valueKey];
-                this.attaching = true;
-                this.$axios.post(this.itemToAttach['attach_url'], {
-                    id: value
-                }).then(res => {
-                    this.attachModalState = false
-                    this.fetchItems()
-                    this.itemToAttach = null;
-                }).finally(_ => {
-                    this.attaching = false;
-                })
+            linkAttrs(link) {
+                let target = link.target || null;
+                if (!target) return {};
+                return {
+                    target: link.target
+                }
             }
         },
         watch: {

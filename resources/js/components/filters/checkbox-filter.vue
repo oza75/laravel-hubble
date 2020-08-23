@@ -122,6 +122,12 @@
                             value = value.filter(val => !idOfItemsToRemoved.includes(val[this.valueKey]))
                         }
                     }
+                } else {
+                    if (this.returnObject && this.value && this.value[this.valueKey] === item[this.valueKey]) {
+                        value = null;
+                    } else if (!this.returnObject && this.value === item[this.valueKey]) {
+                        value = null;
+                    }
                 }
 
                 this.$emit('input', value)

@@ -18,7 +18,7 @@ class SelectField extends Field
      * @param array $options
      * @param bool $sortable
      */
-    public function __construct(string $name, string $title, $options = [], bool $sortable = false)
+    public function __construct(string $name, ?string $title = null, $options = [], bool $sortable = false)
     {
         parent::__construct($name, $title, $sortable);
 
@@ -26,7 +26,7 @@ class SelectField extends Field
 
         $this->setValueKey('value');
         $this->setTextKey('text');
-        $this->addAttribute('emptyOptionName', 'Pas de ' . $this->title);
+        $this->addProp('emptyOptionName', trans('laravel-hubble::dashboard.empty_option', ['title' => $this->title]));
     }
 
     protected function registerComponents()
@@ -54,7 +54,7 @@ class SelectField extends Field
      */
     public function setValueKey(string $key)
     {
-        $this->addAttribute('valueKey', $key);
+        $this->addProp('valueKey', $key);
 
         return $this;
     }
@@ -65,7 +65,7 @@ class SelectField extends Field
      */
     public function setTextKey(string $key)
     {
-        $this->addAttribute('textKey', $key);
+        $this->addProp('textKey', $key);
 
         return $this;
     }
@@ -73,7 +73,7 @@ class SelectField extends Field
     public function toArray(string $section = 'index')
     {
         if (in_array($section, ['creating', 'editing'])) {
-            $this->addAttribute('options', $this->formatOptions());
+            $this->addProp('options', $this->formatOptions());
         }
 
         return parent::toArray($section);
@@ -106,7 +106,7 @@ class SelectField extends Field
     public function setOptions(array $options): SelectField
     {
         $this->options = $options;
-        $this->addAttribute('options', $options);
+        $this->addProp('options', $options);
 
         return $this;
     }
@@ -121,10 +121,10 @@ class SelectField extends Field
 
         $resolver = function ($value) use ($options) {
             if (is_null($value)) return;
-            $item = collect($options)->firstWhere($this->getAttribute('valueKey'), $value);
+            $item = collect($options)->firstWhere($this->getProp('valueKey'), $value);
             if (is_null($item)) return;
 
-            return $item[$this->getAttribute('textKey')];
+            return $item[$this->getProp('textKey')];
         };
 
         $this->displayOnDetailsUsing($resolver);

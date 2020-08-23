@@ -4,6 +4,11 @@
 namespace Oza75\LaravelHubble;
 
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\LazyCollection;
 use Illuminate\Support\Str;
 
 abstract class Action
@@ -29,6 +34,11 @@ abstract class Action
         'after' => []
     ];
 
+    private $visibility = [
+        'index' => true,
+        'details' => true
+    ];
+
     /**
      * Action constructor.
      * @param string|null $name
@@ -52,10 +62,11 @@ abstract class Action
     }
 
     /**
-     * @param $ids
-     * @return void
+     * @param LazyCollection $models
+     * @param Builder $builder
+     * @return array|string|void|null
      */
-    public abstract function handle($ids);
+    public abstract function handle(LazyCollection $models, Builder $builder);
 
     /**
      * @param string $name
@@ -82,6 +93,7 @@ abstract class Action
         return [
             'name' => $this->getName(),
             'title' => $this->getTitle(),
+            'icon' => $this->icon() ?? null,
             'confirm_message' => $this->confirmationMessage,
         ];
     }
@@ -105,15 +117,21 @@ abstract class Action
     }
 
     /**
-     * @param $items
+     * @param LazyCollection $collection
+     * @param Builder $query
+     * @return array|string|void|null
      */
-    public function run($items)
+    public function run(LazyCollection $collection, Builder $query)
     {
-        $this->runHook($items, 'before');
+        $models = $this->allows($collection);
 
-        $this->handle($items);
+        $this->runHook($models, 'before');
 
-        $this->runHook($items, 'after');
+        $message = $this->handle($models, $query);
+
+        $this->runHook($models, 'after');
+
+        return $message;
     }
 
     /**
@@ -137,10 +155,10 @@ abstract class Action
     }
 
     /**
-     * @param $items
+     * @param LazyCollection $items
      * @param string $type
      */
-    protected function runHook($items, string $type)
+    protected function runHook(LazyCollection $items, string $type)
     {
         $hooks = $this->hooks[$type] ?? [];
 
@@ -155,5 +173,56 @@ abstract class Action
     public function getTitle(): string
     {
         return $this->title ?? Str::studly(class_basename($this));
+    }
+
+    /**
+     * Determines if the current user can perform this action
+     *
+     * @param User $user
+     * @param Model|null $model
+     * @return bool
+     */
+    public function can(User $user, ?Model $model = null): bool
+    {
+        return true;
+    }
+
+    /**
+     * @param LazyCollection $collection
+     * @return LazyCollection
+     */
+    private function allows(LazyCollection $collection)
+    {
+        return $collection->filter(function ($item) {
+            return $this->can(auth()->user(), $item);
+        });
+    }
+
+    /**
+     * @return string url of the icon
+     */
+    protected function icon()
+    {
+    }
+
+    public function onlyInIndex()
+    {
+        $this->visibility['index'] = true;
+        $this->visibility['details'] = false;
+    }
+
+    public function onlyOnDetails()
+    {
+        $this->visibility['index'] = false;
+        $this->visibility['details'] = true;
+    }
+
+    /**
+     * @param string $section
+     * @return bool
+     */
+    public function visiblesIn(string $section)
+    {
+        return $this->visibility[$section] ?? false;
     }
 }

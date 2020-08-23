@@ -14,7 +14,7 @@ class TextField extends Field
      */
     public function type(string $type)
     {
-        $this->addAttribute('type', $type);
+        $this->addProp('type', $type);
 
         return $this;
     }
@@ -25,7 +25,7 @@ class TextField extends Field
      */
     public function limit(int $limit)
     {
-        $this->addAttribute('limit', $limit);
+        $this->addProp('limit', $limit);
 
         return $this;
     }

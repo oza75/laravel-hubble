@@ -50,7 +50,11 @@ class Hubble implements Contract
      */
     public function sidebarLinks()
     {
-        return collect($this->booted)->map(function ($resource) {
+        return collect($this->booted)
+            ->filter(function ($resource) {
+                return $resource->isAccessible();
+            })
+            ->map(function ($resource) {
             $icon = method_exists($resource, 'icon') ? $resource->icon() : $resource->icon ?? null;
 
             return [

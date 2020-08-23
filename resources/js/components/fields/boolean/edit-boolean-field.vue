@@ -1,24 +1,25 @@
 <template>
     <div>
-        <label class="fake-radio--container" :class="{active: isActive}">
-            <input type="hidden" :name="field.name"  :value="0">
-            <input type="checkbox" :name="field.name" :value="1" :id="field.name" @input="toggle" :checked="isActive">
+        <label class="fake-radio--container" :class="{active: isActive, [classes]: true}">
+            <input type="hidden" :name="field.name" v-bind="inputAttrs"  :value="0">
+            <input type="checkbox" :name="field.name" v-bind="inputAttrs" :value="1" :id="field.name" @input="toggle" :checked="isActive">
             <span class="fake-radio--wrapper">
                 <span class="fake-radio"></span>
             </span>
         </label>
+        <input-errors :errors="errors"/>
     </div>
 </template>
 
 <script>
+    import {EditMixin} from "../mixins";
+
     export default {
         name: "edit-boolean-field",
         props: {
-            field: {type: Object, required: true},
-            formData: {type: Object, default: () => ({})},
-            value: {default: null},
             type: {type: String, default: 'text'}
         },
+        mixins: [EditMixin],
         computed: {
             isActive() {
                 return this.value;

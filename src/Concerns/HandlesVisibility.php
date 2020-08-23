@@ -3,10 +3,13 @@
 
 namespace Oza75\LaravelHubble\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Arr;
+
 trait HandlesVisibility
 {
     /**
-     * @var bool[]
+     * @var bool[]|callable[]|array[]
      */
     protected $visibility = [
         'index' => true,
@@ -16,132 +19,207 @@ trait HandlesVisibility
     ];
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function hide()
+    public function hide(?callable $when = null)
     {
-        $this->visibility['index'] = false;
-        $this->visibility['editing'] = false;
-        $this->visibility['creating'] = false;
-        $this->visibility['details'] = false;
+        $this->setVisibility(['index', 'editing', 'creating', 'details'], $when ?? false, true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function hideOnForms()
+    public function only(?callable $when = null)
     {
-        $this->visibility['editing'] = false;
-        $this->visibility['creating'] = false;
+        $this->setVisibility(['index', 'editing', 'creating', 'details'], $when ?? true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function hideOnIndex()
+    public function hideOnForms(?callable $when = null)
     {
-        $this->visibility['index'] = false;
+        $this->setVisibility(['editing', 'creating'], $when ?? false, true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function hideWhenEditing()
+    public function hideOnIndex(?callable $when = null)
     {
-        $this->visibility['editing'] = false;
+        $this->setVisibility('index', $when ?? false, true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function hideWhenCreating()
+    public function hideWhenEditing(?callable $when = null)
     {
-        $this->visibility['creating'] = false;
+        $this->setVisibility('editing', $when ?? false, true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function hideOnDetails()
+    public function hideWhenCreating(?callable $when = null)
     {
-        $this->visibility['details'] = false;
+        $this->setVisibility('creating', $when ?? false, true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function onlyOnIndex()
+    public function showOnIndex(?callable $when = null)
     {
-        $this->visibility['details'] = false;
-        $this->visibility['editing'] = false;
-        $this->visibility['creating'] = false;
-        $this->visibility['index'] = true;
+        $this->setVisibility('index', $when ?? true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function onlyOnForms()
+    public function showOnForms(?callable $when = null)
     {
-        $this->visibility['details'] = false;
-        $this->visibility['editing'] = true;
-        $this->visibility['creating'] = true;
-        $this->visibility['index'] = false;
+        $this->setVisibility(['editing', 'creating'], $when ?? true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function onlyOnDetails()
+    public function showOnDetails(?callable $when = null)
     {
-        $this->visibility['details'] = true;
-        $this->visibility['editing'] = false;
-        $this->visibility['creating'] = false;
-        $this->visibility['index'] = false;
+        $this->setVisibility('details', $when ?? true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function onlyOnEditing()
+    public function showWhenEditing(?callable $when = null)
     {
-        $this->visibility['details'] = false;
-        $this->visibility['editing'] = true;
-        $this->visibility['creating'] = false;
-        $this->visibility['index'] = false;
+        $this->setVisibility('editing', $when ?? true);
 
         return $this;
     }
 
     /**
+     * @param callable|null $when
      * @return $this
      */
-    public function onlyOnCreating()
+    public function showWhenCreating(?callable $when = null)
     {
-        $this->visibility['details'] = false;
-        $this->visibility['editing'] = false;
-        $this->visibility['creating'] = true;
-        $this->visibility['index'] = false;
+        $this->setVisibility('creating', $when ?? true);
 
         return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function hideOnDetails(?callable $when = null)
+    {
+        $this->setVisibility('details', $when ?? false, true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function onlyOnIndex(?callable $when = null)
+    {
+        $this->setVisibility(['editing', 'creating', 'details'], false);
+        $this->setVisibility('index', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function onlyOnForms(?callable $when = null)
+    {
+        $this->setVisibility(['details', 'index'], false);
+        $this->setVisibility(['creating', 'editing'], $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function onlyOnDetails(?callable $when = null)
+    {
+        $this->setVisibility(['editing', 'creating', 'index'], false);
+        $this->setVisibility('details', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function onlyWhenEditing(?callable $when = null)
+    {
+        $this->setVisibility(['details', 'creating', 'index'], false);
+        $this->setVisibility('editing', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function onlyWhenCreating(?callable $when = null)
+    {
+        $this->setVisibility(['details', 'editing', 'index'], false);
+        $this->setVisibility('creating', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param array|string $sections
+     * @param callable|boolean $visibility
+     * @param bool $negation
+     */
+    protected function setVisibility($sections, $visibility, bool $negation = false)
+    {
+        foreach (Arr::wrap($sections) as $section) {
+            $this->visibility[$section] = is_callable($visibility) ? [$visibility, $negation] : $visibility;
+        }
     }
 
     /**
@@ -150,7 +228,21 @@ trait HandlesVisibility
      */
     public function isVisibleOn(string $section)
     {
-        return $this->visibility[$section] ?? true;
+        $visibility = $this->visibility[$section];
+
+        if (is_bool($visibility)) return $visibility;
+
+        if (is_array($visibility)) {
+            list($handler, $negation) = $visibility;
+            $response = $handler(auth()->user(), $this->resource->getCurrentItem());
+            return $negation ? !$response : $response;
+        }
+
+        if (is_callable($visibility)) {
+            return $visibility(auth()->user(), $this->resource->getCurrentItem());
+        }
+
+        return true;
     }
 
 

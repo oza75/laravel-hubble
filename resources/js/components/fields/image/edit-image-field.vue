@@ -1,5 +1,5 @@
 <template>
-    <div class="edit-image-field">
+    <div class="edit-image-field" :class="{[classes]: true}">
         <ul class="current-files">
             <li v-for="file in previews" :key="file.name" class="file">
                 <div class="add-card" :style="`background-image: url(${file.url})`">
@@ -15,7 +15,7 @@
                 </div>
             </li>
         </ul>
-        <file-input :id="field.name" :name="'__fake__' + field.name"
+        <file-input :id="field.name" v-bind="inputAttrs" :accept="accept" :name="'__fake__' + field.name"
                     :multiple="multiple" @upload="upload" v-if="canAdd">
             <template v-slot:activator>
                 <div class="add-card">
@@ -26,19 +26,20 @@
                 </div>
             </template>
         </file-input>
-        <input type="file" :id="field.name" :name="multiple ? field.name+ '[]' : field.name" style="display: none"
+        <input type="file" :class="{error: hasErrors}" :id="field.name" :name="multiple ? field.name+ '[]' : field.name" style="display: none"
                :multiple="multiple" ref="fileInput"
-               v-bind="$attrs">
+               v-bind="inputAttrs">
         <input type="hidden" :name="`${field.name}__removed__[]`" :value="file.name" v-for="file in removed"
                :key="'remove-'+file.name">
         <input type="hidden" :name="`${field.name}__current__[]`" :value="file.name" v-for="file in oldFiles"
                :key="'current-'+file.name">
+        <input-errors :errors="errors"/>
     </div>
 </template>
 
 <script>
-    import FileInput from "./FileInput";
     import {arrayToFileList, mergeFiles} from "../../../utils";
+    import {EditMixin} from "../mixins";
 
     export default {
         name: "edit-image-field",
@@ -48,17 +49,17 @@
             removed: [],
             oldFiles: []
         }),
+        mixins: [EditMixin],
         props: {
-            field: {type: Object, required: true},
-            formData: {type: Object, default: () => ({})},
-            value: {default: null},
             multiple: {type: Boolean, default: false},
             max: {type: Number, default: null}
         },
-        components: {FileInput},
         computed: {
             files() {
                 return this.formData[this.field.name + '_files'] || [];
+            },
+            accept() {
+                return this.field.attributes.accept || 'image/*';
             },
             canAdd() {
                 if (!this.multiple) return this.previews.length < 1;
@@ -110,7 +111,7 @@
         watch: {
             images(images) {
                 this.$refs['fileInput'].files = arrayToFileList(images)
-                this.$emit('input', images)
+                this.input(images)
             },
             previews(previews) {
                 this.$set(this.formData, this.field.name + '_files', previews)

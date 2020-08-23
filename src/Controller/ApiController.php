@@ -4,8 +4,12 @@
 namespace Oza75\LaravelHubble\Controller;
 
 
+use Exception;
+use Illuminate\Support\Facades\Validator;
+use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
 use Oza75\LaravelHubble\HubbleResource;
+use Oza75\LaravelHubble\Resources\DetailResource;
 use Oza75\LaravelHubble\Resources\IndexResource;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -15,19 +19,43 @@ use Illuminate\Http\Response;
 
 class ApiController
 {
+    use HandlesAuthorization;
+
     /**
      * @param Hubble $hubble
      * @param Request $request
      * @param $name
      * @return JsonResponse
+     * @throws Exception
      */
     public function index(Hubble $hubble, Request $request, $name)
     {
         $resource = $hubble->getResource($name);
 
+        $this->authorizes('index', get_class($resource->getModel()));
+
         $data = $resource->findItems($request);
 
         return $this->indexResponse($resource, $data);
+    }
+
+    /**
+     * @param Hubble $hubble
+     * @param Request $request
+     * @param $name
+     * @param $key
+     * @return DetailResource
+     * @throws Exception
+     */
+    public function show(Hubble $hubble, Request $request, $name, $key)
+    {
+        $resource = $hubble->getResource($name);
+
+        $item = $resource->findItem($key);
+
+        $this->authorizes('show', $item);
+
+        return new DetailResource($item, $resource);
     }
 
     /**
@@ -64,9 +92,9 @@ class ApiController
     {
         $resource = $hubble->getResource($name);
 
-        $resource->runAction($action, $request);
+        $notification = $resource->runAction($action, $request);
 
-        return response()->json(['success' => true]);
+        return response()->json(['success' => true, 'notification' => $notification]);
     }
 
     /**
@@ -80,9 +108,17 @@ class ApiController
     {
         $resource = $hubble->getResource($name);
 
-        $resource->delete($key);
+        $item = $resource->findItem($key);
 
-        return response()->json(['success' => true]);
+        $resource->delete($item);
+
+        return response()->json([
+            'success' => true,
+            'notification' => [
+                'message' => trans('laravel-hubble::dashboard.deleted'),
+                'state' => 'success'
+            ]
+        ]);
     }
 
     /**
@@ -90,10 +126,13 @@ class ApiController
      * @param Request $request
      * @param $name
      * @return JsonResponse
+     * @throws Exception
      */
     public function create(Hubble $hubble, Request $request, $name)
     {
         $resource = $hubble->getResource($name);
+
+        $this->authorizes('create', get_class($resource->getModel()));
 
         $url = $resource->createItem($request);
 
@@ -153,7 +192,13 @@ class ApiController
 
         $data = $related->detach($id, $request);
 
-        return response(['success' => $data]);
+        return response([
+            'success' => $data,
+            'notification' => [
+                'message' => trans('laravel-hubble::dashboard.detached'),
+                'state' => 'success'
+            ]
+        ]);
     }
 
     /**
@@ -172,6 +217,27 @@ class ApiController
 
         $data = $related->attach($request);
 
-        return response()->json(['success' => $data]);
+        return response()->json(
+            [
+                'success' => $data,
+                'notification' => [
+                    'message' => trans('laravel-hubble::dashboard.attached'),
+                    'state' => 'success'
+                ]
+            ]);
+    }
+
+    /**
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function validate(Request $request)
+    {
+        $value = $request->get('value');
+        $rules = $request->get('rules');
+
+        Validator::make($value, $rules)->validate();
+
+        return response()->json(['data' => 'passed']);
     }
 }

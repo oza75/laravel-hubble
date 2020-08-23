@@ -20,7 +20,7 @@ class DateTimeField extends TextField
     /**
      * @var bool
      */
-    protected $useDiffForHumans = true;
+    protected $useDiffForHumans = false;
 
     /**
      * DateTimeField constructor.
@@ -30,15 +30,17 @@ class DateTimeField extends TextField
      * @param string|null $locale
      * @param bool $sortable
      */
-    public function __construct(string $name, string $title, ?string $format = null, ?string $locale = null, bool $sortable = false)
+    public function __construct(string $name, ?string $title = null, ?string $format = null, ?string $locale = null, bool $sortable = false)
     {
         parent::__construct($name, $title, $sortable);
 
         $this->format($format);
         $this->locale = $locale ?? config('app.locale');
 
-        $this->addAttribute('locale', $this->locale);
+        $this->addProp('locale', $this->locale);
         $this->type('datetime');
+
+        $this->registerDisplayResolvers();
     }
 
     protected function registerComponents()
@@ -56,17 +58,20 @@ class DateTimeField extends TextField
     {
         parent::prepare($resource);
 
-        $this->registerDisplayResolvers();
     }
 
 
     protected function registerDisplayResolvers()
     {
         $callable = function ($value) {
-            if (is_null($value)) return 'N/A';
             $carbon = Carbon::parse($value)->locale($this->locale);
-            if ($this->useDiffForHumans) return $carbon->diffForHumans();
-            else return $carbon->format($this->dateFormat);
+            if (!is_null($this->dateFormat)) {
+                return $carbon->format($this->dateFormat);
+            } else if ($this->useDiffForHumans) {
+                return $carbon->diffForHumans();
+            } else {
+                return $value;
+            }
         };
 
         $this->addDisplayResolver($callable, 'index');
@@ -81,7 +86,7 @@ class DateTimeField extends TextField
     {
         if ($format) {
             $this->useDiffForHumans = false;
-            $this->addAttribute('format', $format);
+            $this->addProp('format', $format);
         }
 
         $this->dateFormat = $format;
@@ -95,14 +100,14 @@ class DateTimeField extends TextField
     public function setLocale($locale)
     {
         $this->locale = $locale;
-        $this->addAttribute('locale', $locale);
+        $this->addProp('locale', $locale);
 
         return $this;
     }
 
-    public function diffForHumans()
+    public function diffForHumans(bool $useDiffForHuman = true)
     {
-        $this->useDiffForHumans = true;
+        $this->useDiffForHumans = $useDiffForHuman;
         return $this;
     }
 }

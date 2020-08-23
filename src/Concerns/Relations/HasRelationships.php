@@ -21,7 +21,7 @@ trait HasRelationships
      */
     protected function getModel(): ?Model
     {
-        return $this->resource->baseQuery()->getModel();
+        return $this->resource->getModel();
     }
 
     /**

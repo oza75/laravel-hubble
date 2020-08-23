@@ -4,8 +4,10 @@
 namespace Oza75\LaravelHubble\Concerns;
 
 
+use Exception;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Request;
+use Oza75\LaravelHubble\HubbleResource;
 
 trait InteractsWithDatabase
 {
@@ -36,17 +38,12 @@ trait InteractsWithDatabase
     }
 
     /**
-     * @param $id
+     * @param $item
      * @return mixed
      */
-    public function delete($id)
+    public function delete($item)
     {
-        $this->fireEvent('deleting', $id);
-
-        $item = $this->baseQuery()
-            ->newQuery()
-            ->where($this->key, $id)
-            ->firstOrFail();
+        $this->fireEvent('deleting', $item);
 
         $deleted = $item->delete();
 
@@ -62,7 +59,15 @@ trait InteractsWithDatabase
      */
     public function create(array $data, Request $request)
     {
-        $collection = collect($data);
+        $collection = collect($data)->filter(function ($value) {
+            return $value !== HubbleResource::NULL_VALUE;
+        });
+
+        $rules = collect($this->rules('creating'))->filter(function ($rule, $field) use ($collection) {
+            return $collection->has($field);
+        })->toArray();
+
+        $request->validate($rules);
 
         $this->fireEvent('creating', $collection, $request);
 
@@ -74,18 +79,24 @@ trait InteractsWithDatabase
     }
 
     /**
+     * @param $item
      * @param array $data
-     * @param $id
      * @param Request $request
      * @return mixed
      */
-    public function update($id, array $data, Request $request)
+    public function update($item, array $data, Request $request)
     {
-        $collection = collect($data);
+        $collection = collect($data)->filter(function ($value) {
+            return $value !== HubbleResource::NULL_VALUE;
+        });
 
-        $this->fireEvent('updating', $id, $collection, $request);
+        $rules = collect($this->rules('editing'))->filter(function ($rule, $field) use ($item, $collection) {
+            return $collection->has($field) && ($item->{$field} !== $collection[$field] || empty($collection[$field]));
+        })->toArray();
 
-        $item = $this->baseQuery()->newQuery()->where($this->key, $id)->firstOrFail();
+        $request->validate($rules);
+
+        $this->fireEvent('updating', $item, $collection, $request);
 
         $item->update($collection->toArray());
 

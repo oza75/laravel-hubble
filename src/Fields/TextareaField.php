@@ -14,7 +14,7 @@ class TextareaField extends TextField
      * @param string $title
      * @param bool $sortable
      */
-    public function __construct(string $name, string $title, bool $sortable = false)
+    public function __construct(string $name,?string $title = null, bool $sortable = false)
     {
         parent::__construct($name, $title, $sortable);
     }

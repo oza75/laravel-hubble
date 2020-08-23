@@ -1,21 +1,15 @@
 export const buildFormData = (data) => {
     let formData = new FormData
-    const appendData = (items, prefix = null) => {
-        Object.keys(items).forEach(key => {
-            let datum = items[key];
-            if (datum === null) return formData;
-            if (Array.isArray(datum)) {
-                datum.forEach((elem, k) => {
-                    if (prefix) appendData(elem, `${prefix}[${key}][${k}]`)
-                    else appendData(elem, `${key}[${k}]`)
-                })
-            } else if (typeof datum === 'object') {
-                appendData(datum, key)
-            } else {
-                if (prefix) formData.append(`${prefix}[${key}]`, datum)
-                else formData.append(`${key}`, datum);
-            }
-        })
+    function appendData(data, parentKey) {
+        if (data && typeof data === 'object' && !(data instanceof Date) && !(data instanceof File)) {
+            Object.keys(data).forEach(key => {
+                appendData(data[key], parentKey ? `${parentKey}[${key}]` : key);
+            });
+        } else {
+            const value = data == null ? '' : data;
+
+            formData.append(parentKey, value);
+        }
     }
 
     appendData(data)

@@ -1,35 +1,36 @@
 <template>
-    <div>
-        <input type="datetime-local" :value="value" :id="field.name"
-               :name="field.name" v-bind="$attrs" ref="input"
-               @input="$emit('input', $event.target.value)">
-
+    <div :class="{[classes]: true}">
+        <input type="datetime-local" :value="value" :class="{error: hasErrors, }" :id="field.name"
+               :name="field.name" v-bind="inputAttrs" ref="input"
+               @input="input($event.target.value)">
+        <input-errors :errors="errors"/>
     </div>
 </template>
 
 <script>
 
+    import {EditMixin} from "../mixins";
     const flatpickr = require('flatpickr');
     require('flatpickr/dist/flatpickr.min.css')
 
     export default {
         name: "edit-datetime-field",
         props: {
-            field: {type: Object, required: true},
-            formData: {type: Object, default: () => ({})},
-            value: {default: null},
             format: {default: 'Y-m-d H:i'},
             locale: {type: String, default: 'en'}
         },
+        mixins: [EditMixin],
         mounted() {
             this.$nextTick(() => {
                 flatpickr(this.$refs['input'], {
                     dateFormat: this.format,
+                    defaultDate: this.value,
                     enableTime: true,
-                    locale: this.locale
+                    // locale: this.locale
                     // locale: require(`flatpickr/dist/l10n/${this.locale}.components`).default[this.locale]
-                })
-            })
+                });
+
+            });
         }
     }
 </script>
