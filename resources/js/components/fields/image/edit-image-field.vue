@@ -26,7 +26,8 @@
                 </div>
             </template>
         </file-input>
-        <input type="file" :class="{error: hasErrors}" :id="field.name" :name="multiple ? field.name+ '[]' : field.name" style="display: none"
+        <input type="file" :class="{error: hasErrors}" :id="field.name" :name="multiple ? field.name+ '[]' : field.name"
+               style="display: none"
                :multiple="multiple" ref="fileInput"
                v-bind="inputAttrs">
         <input type="hidden" :name="`${field.name}__removed__[]`" :value="file.name" v-for="file in removed"
@@ -38,90 +39,97 @@
 </template>
 
 <script>
-    import {arrayToFileList, mergeFiles} from "../../../utils";
-    import {EditMixin} from "../mixins";
+import {arrayToFileList, mergeFiles} from "../../../utils";
+import {EditMixin} from "../mixins";
 
-    export default {
-        name: "edit-image-field",
-        data: () => ({
-            previews: [],
-            images: [],
-            removed: [],
-            oldFiles: []
-        }),
-        mixins: [EditMixin],
-        props: {
-            multiple: {type: Boolean, default: false},
-            max: {type: Number, default: null}
+export default {
+    name: "edit-image-field",
+    data: () => ({
+        previews: [],
+        images: [],
+        removed: [],
+        oldFiles: []
+    }),
+    mixins: [EditMixin],
+    props: {
+        multiple: {type: Boolean, default: false},
+        max: {type: Number, default: null}
+    },
+    computed: {
+        files() {
+            return this.formData[this.field.name + '_files'] || [];
         },
-        computed: {
-            files() {
-                return this.formData[this.field.name + '_files'] || [];
-            },
-            accept() {
-                return this.field.attributes.accept || 'image/*';
-            },
-            canAdd() {
-                if (!this.multiple) return this.previews.length < 1;
-                if (!this.max) return true;
-                return this.previews.length < this.max;
-            }
+        accept() {
+            return this.field.attributes.accept || 'image/*';
         },
-        methods: {
-            remove(file) {
-                let files = Object.assign([], this.files)
-                let index = files.findIndex(it => it.name === file.name);
-                if (index !== -1) {
-                    this.removed.push(file);
-                }
-
-                let pIndex = this.previews.findIndex(it => it.name === file.name);
-                if (pIndex !== -1) this.previews.splice(pIndex, 1);
-
-                let iIndex = this.images.findIndex(it => it.name === file.name)
-                if (iIndex !== -1) this.images.splice(iIndex, 1)
-            },
-            /**
-             * @param {FileList} files
-             */
-            upload(files) {
-                for (const file of files) {
-                    let index = this.previews.findIndex(it => it.name === file.name);
-                    if (index !== -1 || !this.canAdd) continue;
-                    let reader = new FileReader();
-                    reader.addEventListener('load', () => {
-                        this.previews.push({
-                            url: reader.result,
-                            name: file.name
-                        })
-                    })
-                    reader.readAsDataURL(file);
-                }
-
-                let aFiles = Array.from(files);
-                let toAdd = aFiles;
-                if (!this.canAdd) toAdd = [];
-                else if (!this.max) toAdd = aFiles;
-                else {
-                    toAdd = aFiles.slice(0, this.max - this.images.length)
-                }
-                this.images = mergeFiles(this.images, toAdd)
-            }
+        canAdd() {
+            if (!this.multiple) return this.previews.length < 1;
+            if (!this.max) return true;
+            return this.previews.length < this.max;
         },
-        watch: {
-            images(images) {
-                this.$refs['fileInput'].files = arrayToFileList(images)
-                this.input(images)
-            },
-            previews(previews) {
-                this.$set(this.formData, this.field.name + '_files', previews)
-            }
-        },
-        created() {
-            this.previews = Object.assign([], this.files)
-            this.oldFiles = Object.assign([], this.files)
+        htmlRules() {
+          const rules = {};
+          if (!this.previews.length) {
+              rules['required'] = 'required';
+          }
+          return rules;
         }
+    },
+    methods: {
+        remove(file) {
+            let files = Object.assign([], this.files)
+            let index = files.findIndex(it => it.name === file.name);
+            if (index !== -1) {
+                this.removed.push(file);
+            }
+
+            let pIndex = this.previews.findIndex(it => it.name === file.name);
+            if (pIndex !== -1) this.previews.splice(pIndex, 1);
+
+            let iIndex = this.images.findIndex(it => it.name === file.name)
+            if (iIndex !== -1) this.images.splice(iIndex, 1)
+        },
+        /**
+         * @param {FileList} files
+         */
+        upload(files) {
+            for (const file of files) {
+                let index = this.previews.findIndex(it => it.name === file.name);
+                if (index !== -1 || !this.canAdd) continue;
+                let reader = new FileReader();
+                reader.addEventListener('load', () => {
+                    this.previews.push({
+                        url: reader.result,
+                        name: file.name
+                    })
+                })
+                reader.readAsDataURL(file);
+            }
+
+            let aFiles = Array.from(files);
+            let toAdd = aFiles;
+            if (!this.canAdd) toAdd = [];
+            else if (!this.max) toAdd = aFiles;
+            else {
+                toAdd = aFiles.slice(0, this.max - this.images.length)
+            }
+            this.images = mergeFiles(this.images, toAdd)
+        }
+    },
+    watch: {
+        images(images) {
+            this.$refs['fileInput'].files = arrayToFileList(images)
+            this.input(images)
+        },
+        previews(previews) {
+            this.$set(this.formData, this.field.name + '_files', previews)
+        }
+    },
+    created() {
+        this.previews = Object.assign([], this.files)
+        this.oldFiles = Object.assign([], this.files)
     }
+}
 </script>
 
 <style scoped>

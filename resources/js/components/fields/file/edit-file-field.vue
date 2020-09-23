@@ -11,7 +11,7 @@
                 </svg>
             </li>
         </ul>
-        <input type="file" :id="field.name"  :class="{error: hasErrors}" :name="multiple ? field.name+ '[]' : field.name"
+        <input type="file" :id="field.name" :accept="accept" :class="{error: hasErrors}" :name="multiple ? field.name+ '[]' : field.name"
                :multiple="multiple" v-if="canAdd"  :maxlength="!max ? Infinity : max - files.length"
                v-bind="inputAttrs" @change="onFileChange">
         <input type="hidden" :name="`${field.name}__removed__[]`" :value="file.name" v-for="file in removed"
@@ -35,6 +35,7 @@
         props: {
             multiple: {type: Boolean, default: false},
             max: {type: Number, default: null},
+            accept: {type: String, default: '*'}
         },
         computed: {
             files() {

@@ -40,7 +40,7 @@
         },
         created() {
             this.fields.forEach(field => {
-                if (field.attributes.isFile) {
+                if (field.props.isFile) {
                     this.input(field.name + '_files', this.item[field.name])
                 } else {
                     this.input(field.name, this.item[field.name])

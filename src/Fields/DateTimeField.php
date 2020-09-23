@@ -25,8 +25,8 @@ class DateTimeField extends TextField
     /**
      * DateTimeField constructor.
      * @param string $name
-     * @param string $title
-     * @param string $format
+     * @param string|null $title
+     * @param string|null $format
      * @param string|null $locale
      * @param bool $sortable
      */
@@ -35,12 +35,11 @@ class DateTimeField extends TextField
         parent::__construct($name, $title, $sortable);
 
         $this->format($format);
+
         $this->locale = $locale ?? config('app.locale');
 
         $this->addProp('locale', $this->locale);
         $this->type('datetime');
-
-        $this->registerDisplayResolvers();
     }
 
     protected function registerComponents()
@@ -54,10 +53,11 @@ class DateTimeField extends TextField
     /**
      * @param HubbleResource $resource
      */
-    public function prepare(HubbleResource $resource)
+    public function boot(HubbleResource $resource)
     {
-        parent::prepare($resource);
+        parent::boot($resource);
 
+        $this->registerDisplayResolvers();
     }
 
 
@@ -69,6 +69,8 @@ class DateTimeField extends TextField
                 return $carbon->format($this->dateFormat);
             } else if ($this->useDiffForHumans) {
                 return $carbon->diffForHumans();
+            } else if ($value) {
+                return $carbon->toDateTimeString();
             } else {
                 return $value;
             }

@@ -87,7 +87,7 @@ class Panel implements HasVisibility
         return collect($this->fields)->filter(function (Field $field) use ($section) {
             return $field->isVisibleOn($section);
         })->mapWithKeys(function (Field $field) {
-            $field->prepare($this->resource);
+            $field->boot($this->resource);
             return $field->toArray();
         })->toArray();
     }

@@ -7,6 +7,7 @@ namespace Oza75\LaravelHubble\Concerns;
 use Exception;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Str;
 
 trait HandlesAuthorization
 {
@@ -38,6 +39,64 @@ trait HandlesAuthorization
         if (!method_exists($policy, $ability)) return true;
 
         return Gate::allows($ability, $model);
+    }
+
+    protected function canAttach($model, $related)
+    {
+        $policy = Gate::getPolicyFor($model);
+
+        $ability = Str::ucfirst(Str::lower(Str::singular(class_basename($related))));
+
+        if (is_null($policy) || is_null($ability)) return true;
+
+        return $this->callPolicyMethod($policy, 'attach' . $ability);
+    }
+
+    protected function canDetach($model, $item)
+    {
+        $policy = Gate::getPolicyFor($model);
+
+        $ability = Str::ucfirst(Str::lower(Str::singular(class_basename(get_class($item)))));
+
+        if (is_null($policy)) return true;
+
+        return $this->callPolicyMethod($policy, 'detach' . $ability, [$item]);
+    }
+
+    /**
+     * @param object $policy
+     * @param string $ability
+     * @param array $arguments
+     * @return bool|mixed
+     */
+    protected function callPolicyMethod(object $policy, $ability, $arguments = [])
+    {
+        $user = call_user_func(app('auth')->userResolver());
+
+        $result = $this->callPolicyBefore($policy, $user, $ability);
+
+        if (! is_null($result)) {
+            return $result;
+        }
+
+        if (!method_exists($policy, $ability)) return true;
+
+        return call_user_func([$policy, $ability], $user, ...$arguments);
+    }
+
+    /**
+     * @param object $policy
+     * @param $user
+     * @param $ability
+     * @return mixed|void
+     */
+    protected function callPolicyBefore(object $policy, $user, $ability)
+    {
+        if (!method_exists($policy, 'before')) {
+            return;
+        }
+
+        return call_user_func([$policy, 'before'], $user, $ability);
     }
 
     /**
