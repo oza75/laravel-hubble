@@ -32,8 +32,9 @@ Route::prefix($prefix)
 
             Route::get('/resources/{name}/{key}', "{$namespace}HubbleController@show")
                 ->name('hubble.show');
+
+            Route::get('/login', "{$namespace}HubbleController@showLoginForm")->name('hubble.login');
         });
-        Route::view('/login', 'laravel-hubble::login')->name('hubble.login');
 //        Route::middleware(['web'])->group(function () use ($namespace) {
 //            Route::get('/login', 'Auth\AdminLoginController@showLoginForm')->name('admin.login');
 //            Route::post('/logout', 'Auth\AdminLoginController@logout')->name("admin.logout");
