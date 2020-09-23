@@ -878,7 +878,7 @@ class PostPolicy
     * Determines if the current user can attach users to post 
     * when using a HasManyField
     */
-    public function attach(User $user) {
+    public function attachUser(User $user) {
         return false;
     }
 
@@ -886,7 +886,7 @@ class PostPolicy
     * Determines if the current user can detach users to post 
     * when using a HasManyField
     */
-    public function detach(User $user, Post $model) {
+    public function detachUser(User $user, Post $model) {
         return false;
     }
 
