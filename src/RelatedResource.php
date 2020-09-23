@@ -99,7 +99,7 @@ class RelatedResource extends HubbleResource
                 ])
                 ->displayWhen(function (User $user) {
                     $model = $this->related->getModel();
-                    return $this->canAccess('attach', get_class($model));
+                    return $this->canAttach($this->parentModel, get_class($model));
                 })
                 ->confirmText(trans('laravel-hubble::dashboard.attach'))
         ];
@@ -164,12 +164,17 @@ class RelatedResource extends HubbleResource
     public function resolveItemUrls($resource)
     {
         $data = $this->related->resolveItemUrls($resource);
-        $data['delete'] = route('api.hubble.related.detach', [
-            'name' => $this->parent->getName(),
-            'key' => $this->parentModel->{$this->parentModel->getKeyName()},
-            'field' => $this->field->getName(),
-            'id' => $resource->{$this->related->getKey()},
-        ]);
+
+        if ($this->canDetach($this->parentModel, $resource)) {
+            $data['delete'] = route('api.hubble.related.detach', [
+                'name' => $this->parent->getName(),
+                'key' => $this->parentModel->{$this->parentModel->getKeyName()},
+                'field' => $this->field->getName(),
+                'id' => $resource->{$this->related->getKey()},
+            ]);
+        } else {
+            unset($data['delete']);
+        }
 
         return $data;
     }

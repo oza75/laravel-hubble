@@ -26,8 +26,8 @@ class HubbleServiceProvider extends ServiceProvider
         /*
          * Optional methods to load your package assets
          */
-         $this->loadTranslationsFrom(__DIR__.'/../resources/lang', 'laravel-hubble');
-        $this->loadViewsFrom( __DIR__ . '/../resources/views', 'laravel-hubble');
+        $this->loadTranslationsFrom(__DIR__ . '/../resources/lang', 'laravel-hubble');
+        $this->loadViewsFrom(__DIR__ . '/../resources/views', 'laravel-hubble');
         // $this->loadMigrationsFrom(__DIR__.'/../database/migrations');
         $this->loadRoutesFrom(__DIR__ . '/routes.php');
 
@@ -56,7 +56,7 @@ class HubbleServiceProvider extends ServiceProvider
 
             // Publishing the translation files.
             $this->publishes([
-                __DIR__.'/../resources/lang' => resource_path('lang/vendor/laravel-hubble'),
+                __DIR__ . '/../resources/lang' => resource_path('lang/vendor/laravel-hubble'),
             ], 'lang');
 
             // Registering package commands.

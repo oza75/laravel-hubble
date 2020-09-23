@@ -174,4 +174,9 @@ class HubbleController
 
         return redirect()->route('hubble.index', ['name' => $resource->getName()]);
     }
+
+    public function showLoginForm()
+    {
+        return view('laravel-hubble::login');
+    }
 }

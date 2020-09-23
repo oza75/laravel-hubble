@@ -109,7 +109,7 @@ abstract class HubbleResource
     {
         $this->loadedFields = $this->fields();
 
-        foreach ($this->loadedFields as $field) $field->prepare($this);
+        foreach ($this->loadedFields as $field) $field->boot($this);
     }
 
     /***
@@ -374,10 +374,6 @@ abstract class HubbleResource
         $fields = collect($allFields)->filter(function (Field $field) use ($request, $section) {
             return $field->isVisibleOn($section) && !$field instanceof HandleManyRelationship;
         });
-
-//        dd($fields->mapWithKeys(function (Field $field) use ($request, $section) {
-//            return [$field->getName() => $field->retrieveFormData($request, $section)];
-//        })->toArray());
 
         return $fields->mapWithKeys(function (Field $field) use ($request, $section) {
             return [$field->getName() => $field->retrieveFormData($request, $section)];

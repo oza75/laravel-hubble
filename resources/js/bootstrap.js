@@ -2,7 +2,7 @@ import * as rules from "./rules";
 
 window.axios = require('axios');
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-window.axios.defaults.baseURL = '/api/hubble';
+window.axios.defaults.baseURL = window._api_base_url || '/api';
 // Add a response interceptor
 window.axios.interceptors.response.use(function (response) {
     // Any status code that lie within the range of 2xx cause this function to trigger

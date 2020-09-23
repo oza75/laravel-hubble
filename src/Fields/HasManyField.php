@@ -48,9 +48,9 @@ class HasManyField extends SelectField implements HandleManyRelationship
         $this->methodName = $methodName;
     }
 
-    public function prepare(HubbleResource $resource)
+    public function boot(HubbleResource $resource)
     {
-        parent::prepare($resource);
+        parent::boot($resource);
 
         [$model, $relationship] = $this->getRelationship();
 

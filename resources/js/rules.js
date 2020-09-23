@@ -1,3 +1,5 @@
+import {buildFormData} from "./utils";
+
 let timers = {};
 export const required = function (value) {
     return !(value === null || value === undefined || value === "");
@@ -63,7 +65,12 @@ export const defaultHandler = function (value, name, rule, ...params) {
     return new Promise((resolve, reject) => {
         let rules = rule;
         if (params.length > 0) rules += ":" + (params.join(','))
-        window.axios.post('/validation', {rules: {[name]: [rules]}, value: {[name]: value}}).then(res => {
+        const data = buildFormData({rules: {[name]: [rules]}, [name]: value});
+        window.axios.post('/validation', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        }).then(res => {
             resolve(true)
         }).catch(err => {
             let data = err.response.data;

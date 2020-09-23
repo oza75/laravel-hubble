@@ -19,7 +19,7 @@ trait InteractsWithDatabase
      */
     public function findItems(Request $request)
     {
-        $query = $this->baseQuery();
+        $query = $this->indexQuery();
 
         $this->applySearch($query, $request);
         $this->applyFilters($query, $request);
@@ -34,7 +34,7 @@ trait InteractsWithDatabase
      */
     public function findItem($id)
     {
-        return $this->baseQuery()->findOrFail($id);
+        return $this->detailsQuery()->findOrFail($id);
     }
 
     /**
@@ -71,7 +71,7 @@ trait InteractsWithDatabase
 
         $this->fireEvent('creating', $collection, $request);
 
-        $created = $this->baseQuery()->newQuery()->create($collection->toArray());
+        $created = $this->createQuery()->create($collection->toArray());
 
         $this->fireEvent('created', $created, $collection, $request);
 
@@ -103,5 +103,25 @@ trait InteractsWithDatabase
         $this->fireEvent('updated', $item, $collection, $request);
 
         return $item;
+    }
+
+    protected function indexQuery()
+    {
+        return $this->baseQuery();
+    }
+
+    protected function editQuery()
+    {
+        return $this->baseQuery();
+    }
+
+    protected function createQuery()
+    {
+        return $this->baseQuery()->newQuery();
+    }
+
+    protected function detailsQuery()
+    {
+        return $this->baseQuery();
     }
 }
