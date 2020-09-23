@@ -100,7 +100,7 @@ class UserResource extends Resource
     public function actions()
     {
         return [
-            DeleteAction::make(\App\User::query()),
+            DeleteAction::make(),
 
         ];
     }
@@ -206,6 +206,10 @@ This command will generate a new `ActiveUsers` class under `app/Hubble/Actions`
 
 namespace App\Hubble\Actions;
 
+use App\User;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\LazyCollection;
 use Oza75\LaravelHubble\Action;
 
 class ActiveUsers extends Action
@@ -223,12 +227,36 @@ class ActiveUsers extends Action
     /**
      * Handle your action
      *
-     * @param $ids
-     * @return void
+     * @param LazyCollection $collection
+     * @param Builder $query
+     * @return string
      */
-    public function handle($ids)
+    public function handle(LazyCollection $collection, Builder $query)
     {
-        // TODO: Implement handle() method.
+        $query = $query->newQuery();
+
+        $collection->each(function (User $user) use ($query) {
+            $query->orWhere('id', $user->id);
+        });
+
+        $query->update(['is_active' => true]);
+
+        return "Utilisateurs activé avec succès !";
+    }
+
+    /**
+     * @param \Illuminate\Foundation\Auth\User $user
+     * @param Model|null $model
+     * @return bool
+     */
+    public function can(\Illuminate\Foundation\Auth\User $user, ?Model $model = null): bool
+    {
+        return true;
+    }
+
+    protected function icon()
+    {
+        return asset('images/lock.svg');
     }
 }
 ```
@@ -257,7 +285,7 @@ When you created your action you can add it in your resource.
     public function actions()
     {
         return [
-            DeleteAction::make(\App\User::query()),
+            DeleteAction::make(),
             new ActiveUsers(),
 
         ];
@@ -692,7 +720,7 @@ class ColorField extends Field
      */
     public function prepare(HubbleResource $resource)
     {
-        parent::prepare($resource);
+        parent::boot($resource);
 
         // do action that depends on the resource within this field is added
     }

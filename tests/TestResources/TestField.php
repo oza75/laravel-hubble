@@ -27,9 +27,9 @@ class TestField extends Field
      *
      * @param HubbleResource $resource
      */
-    public function prepare(HubbleResource $resource)
+    public function boot(HubbleResource $resource)
     {
-        parent::prepare($resource);
+        parent::boot($resource);
 
         // do action that depends on the resource within this field is added
     }

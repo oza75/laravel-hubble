@@ -143,7 +143,7 @@ class Field implements HasVisibility
         return $this;
     }
 
-    public function prepare(HubbleResource $resource)
+    public function boot(HubbleResource $resource)
     {
         $this->resource = $resource;
 

@@ -85,7 +85,7 @@ export const EditMixin = {
         validate(handler, value, rule, params) {
             let passed;
             if (!handler) {
-                passed = window.hubble_rules.defaultHandler(value, this.field.name, rule, ...params);
+                passed = window.hubble_rules.defaultHandler(value, this.field.props.isFile ? this.field.name + '.*' : this.field.name, rule, ...params);
             } else {
                 passed = handler(value, this.field.name, ...params);
             }

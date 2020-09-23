@@ -119,7 +119,7 @@ class FileField extends Field
     protected function registerFileResolver(): void
     {
         $callable = function ($value) {
-            if (is_null($value)) return [];
+            if (is_null($value) || empty($value)) return [];
             $value = explode(",", $value);
             return collect($value)->map(function ($item) {
                 return [

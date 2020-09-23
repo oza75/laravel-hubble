@@ -233,10 +233,11 @@ class ApiController
      */
     public function validate(Request $request)
     {
-        $value = $request->get('value');
+//        $value = $request->get('value') ?? $request->file('value') ?? [];
         $rules = $request->get('rules');
 
-        Validator::make($value, $rules)->validate();
+//        Validator::make($value, $rules)->validate();
+        $request->validate($rules);
 
         return response()->json(['data' => 'passed']);
     }

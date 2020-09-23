@@ -57,9 +57,9 @@ class BelongsToField extends SelectField
     /**
      * @param HubbleResource $resource
      */
-    public function prepare(HubbleResource $resource)
+    public function boot(HubbleResource $resource)
     {
-        parent::prepare($resource);
+        parent::boot($resource);
 
         $model = $resource->getModel();
 

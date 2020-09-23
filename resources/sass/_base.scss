@@ -182,7 +182,9 @@ a:not(.btn) {
             }
         }
         &:hover {
-            background-color: darken($backgroundColor, 5%);
+            //background-color: darken($backgroundColor, 5%);
+            //background-color: hsla($backgroundColor, 0.05);
+            filter: brightness(0.9);
         }
     }
     @mixin btnOutline($bgColor, $color) {
@@ -939,7 +941,8 @@ img.lazy-image {
     & > *:first-child {
         flex: 1 auto;
     }
-    & > *:last-child{
+
+    & > *:last-child {
         flex: 1 100%;
     }
 
