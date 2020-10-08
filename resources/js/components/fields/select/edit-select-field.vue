@@ -157,7 +157,8 @@
                 if (keyboardEvent.keyCode === 40) {
                     if (this.realOptions.length > this.currentIndex + 1) {
                         this.currentIndex += 1;
-                        this.scrollToOption(this.currentIndex)
+                        this.$emit('next');
+                        this.scrollToOption(this.currentIndex);
                     }
                     return;
                 }
@@ -165,11 +166,12 @@
                     if (this.currentIndex - 1 > -1) {
                         this.currentIndex -= 1;
                         this.scrollToOption(this.currentIndex, 'prev');
+                        this.$emit('prev');
                     }
                     return;
                 }
                 if (keyboardEvent.keyCode === 9) {
-                    this.close()
+                    this.close();
                     return;
                 }
 
@@ -207,6 +209,7 @@
             },
             close() {
                 this.dropdownOpened = false;
+                this.$emit('close');
             },
             onSearch(event) {
                 let query = event.target.value;
@@ -231,6 +234,7 @@
             },
             search(query) {
                 query = String(query).toLowerCase()
+                this.$emit('search', query);
                 this.searchValue = query;
                 if (Array.isArray(this.options)) {
                     if (!query) this.realOptions = this.options;
@@ -284,10 +288,12 @@
             removeTag(tag) {
                 let index = this.tags.findIndex(t => t[this.valueKey] === tag[this.valueKey])
                 if (index === -1) return;
+                this.$emit('unselect', this.tags[index], index);
                 this.tags.splice(index, 1);
             },
             removeAllTags() {
                 this.tags = [];
+                this.$emit('clearAll');
             }
         },
         watch: {
@@ -295,7 +301,8 @@
                 this.input(this.returnObject ? values : values.map(value => value[this.valueKey]))
             },
             page() {
-                this.fetchOptions()
+                this.$emit('paginate', this.page);
+                this.fetchOptions();
             },
             inputValue(value) {
                 if (!value) this.$refs['textInput'].removeAttribute('value')
