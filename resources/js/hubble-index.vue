@@ -94,7 +94,7 @@
                     <div class="fake-checkbox--wrapper table--list--data">
                         <div class="fake-checkbox" :class="{active: isSelected(item)}"></div>
                     </div>
-                    <div class="table--list--data" :class="{['table--'+field.name]: true}"
+                    <div class="table--list--data" :class="{['table--'+field.name]: true, 'sortable-field': field.sortable}"
                          v-for="field in fields" :key="'table-row--'+k+'-'+field.name"
                     >
                         <div class="table--list--data--content">
