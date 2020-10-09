@@ -5,8 +5,10 @@ namespace Oza75\LaravelHubble\Controller;
 
 
 use Exception;
+use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
+use Oza75\LaravelHubble\Facades\Hubble as HubbleFacade;
 use Oza75\LaravelHubble\Resources\CreateResource;
 use Oza75\LaravelHubble\Resources\DetailResource;
 use Oza75\LaravelHubble\Resources\EditResource;
@@ -177,6 +179,10 @@ class HubbleController
 
     public function showLoginForm()
     {
+        if (! Str::contains(session('url.intended'), HubbleFacade::prefix())) {
+            session('url.intended', route('hubble.home'));
+        }
+
         return view('laravel-hubble::login');
     }
 }
