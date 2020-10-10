@@ -29,7 +29,7 @@ class %class_name%Resource extends Resource
     protected $displayColumn = 'id';
 
     /**
-     * Get the fields displayed that the %snake_name% resource
+     * Register all fields that the %snake_name% resource should display
      *
      * @return Field[] array of fields
      */

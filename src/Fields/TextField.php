@@ -30,4 +30,22 @@ class TextField extends Field
         return $this;
     }
 
+    /**
+     * @param string|callable|null $text
+     * @param string|null $target
+     * @return $this
+     */
+    public function link($text = null, $target = null)
+    {
+        $callable = function ($value, $resource) use ($text, $target) {
+            $textValue = is_callable($text) ? call_user_func($text, $value, $resource) : (is_null($text) ? $value : $text);
+
+            return "<a href='$value' target='$target'>$textValue</a>";
+        };
+
+        $this->displayOnIndexUsing($callable);
+        $this->displayOnDetailsUsing($callable);
+
+        return $this;
+    }
 }

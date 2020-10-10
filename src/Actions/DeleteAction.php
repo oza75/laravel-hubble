@@ -25,7 +25,12 @@ class DeleteAction extends Action
      */
     public function __construct(?string $name = null, ?string $title = null, ?string $confirmationMessage = null)
     {
-        parent::__construct($name, $title, $confirmationMessage);
+        parent::__construct(
+            $name,
+            $title ?? __('laravel-hubble::dashboard.delete'),
+            $confirmationMessage ?? __('laravel-hubble::dashboard.delete_items_message')
+        );
+
         $this->onlyInIndex();
     }
 

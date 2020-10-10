@@ -1,8 +1,7 @@
 @extends('laravel-hubble::layouts.hubble', ['hideSidebar' => true])
 @section('content')
     <div class="login--container">
-{{--        <form action="{{route('admin.login')}}" method="post" class="login--form-card">--}}
-        <form action="{{route('login')}}" method="post" class="login--form-card">
+        <form action="{{\Illuminate\Support\Facades\Route::has('login') ? route('login') : '/login'}}" method="post" class="login--form-card">
             @csrf
             <div class="login--form--group">
                 <label for="email" class="login--input--group">

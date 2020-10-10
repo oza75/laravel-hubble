@@ -21,6 +21,7 @@ return [
     "next" => "Suivant",
     "confirmation" => "Confirmation",
     "delete_item_message" => "Voulez-vous vraiment supprimer cet enregistrement ?",
+    "delete_items_message" => "Voulez-vous vraiment supprimer ces enregistrements ?",
     "details_title" => "Détails - :name",
     "edit_title" => "Modifier - :name",
     "create_title" => "Création - :name",
