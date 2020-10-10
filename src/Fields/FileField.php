@@ -123,7 +123,7 @@ class FileField extends Field
             $value = explode(",", $value);
             return collect($value)->map(function ($item) {
                 return [
-                    'url' => Storage::disk($this->storageDisk)->url($item),
+                    'url' => Str::startsWith($item, ['http://', 'https://']) ? $item : Storage::disk($this->storageDisk)->url($item),
                     'name' => $item
                 ];
             })->toArray();

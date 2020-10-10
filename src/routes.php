@@ -46,7 +46,7 @@ Route::prefix($prefix)
     });
 
 Route::prefix("/api{$prefix}")
-    ->middleware(['api'])
+    ->middleware(['api', 'hubble.auth'])
     ->group(function () use ($namespace) {
         Route::get('/resources/{name}', "{$namespace}ApiController@index")
             ->name('api.hubble.index');

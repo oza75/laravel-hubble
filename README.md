@@ -23,6 +23,45 @@ Then install laravel-hubble
 ```bash
 php artisan hubble:install
 ```
+In your `app/Http/kernel.php`, move `StartSession`, `AuthenticateSession` from `web` middleware group array to global `middleware` array like this:
+
+```php 
+ protected $middleware = [
+        // \App\Http\Middleware\TrustHosts::class,
+        \App\Http\Middleware\TrustProxies::class,
+        \Fruitcake\Cors\HandleCors::class,
+        \App\Http\Middleware\CheckForMaintenanceMode::class,
+        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
+        \App\Http\Middleware\TrimStrings::class,
+        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
+        \Illuminate\Session\Middleware\StartSession::class,
+        \Laravel\Jetstream\Http\Middleware\AuthenticateSession::class,
+        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+    ];
+
+    /**
+     * The application's route middleware groups.
+     *
+     * @var array
+     */
+    protected $middlewareGroups = [
+        'web' => [
+            \App\Http\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \App\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        'api' => [
+            'throttle:60,1',
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+    ];
+```
+You have to do this because `hubble` doesn't have a default authentification system for api requests, 
+so it refers to the session authentification system. **Any pull request that can solve this issue is welcoming !**
+
+
 Now go to : http://yourapp.tld/hubble (or http://localhost:8000/hubble if you use `artisan serve`)
 
 ## Authentification
