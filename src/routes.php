@@ -35,7 +35,7 @@ Route::prefix($prefix)
 
         });
 
-        Route::get('/login', "{$namespace}HubbleController@showLoginForm")->name('hubble.login');
+        Route::get('/login', "{$namespace}HubbleController@showLoginForm")->middleware('web')->name('hubble.login');
 
         //
 //        Route::middleware(['web'])->group(function () use ($namespace) {

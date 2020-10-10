@@ -5,6 +5,7 @@ namespace Oza75\LaravelHubble;
 
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Concerns\HandlesRules;
 use Oza75\LaravelHubble\Concerns\HandlesVisibility;
@@ -384,12 +385,19 @@ class Field implements HasVisibility
 
     /**
      * @param string $name
-     * @param $default
+     * @param null $default
+     * @param string $section
      * @return mixed
      */
-    public function getProp(string $name, $default = null)
+    public function getProp(string $name, $default = null, $section = 'index')
     {
-        return $this->props[$name] ?? $default;
+        $prop = $this->props[$section][$name] ?? ['value' => null, 'condition' => true];
+
+        $condition = $prop['condition'] ?? true;
+
+        if (is_callable($condition)) $condition = call_user_func($condition, Auth::user(), null);
+
+        return $condition ? $prop['value'] : $default;
     }
 
     /**
@@ -457,6 +465,9 @@ class Field implements HasVisibility
 
         $this->displayOnDetailsUsing($resolver);
         $this->displayOnIndexUsing($resolver);
+        if ($this->default !== 'N/A') {
+            $this->displayOnFormsUsing($resolver);
+        }
     }
 
     /**

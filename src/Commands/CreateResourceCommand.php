@@ -41,7 +41,7 @@ class CreateResourceCommand extends Command
     private function getData(?string $name)
     {
         $name = Str::studly(preg_replace('/[rR]esource/', '', $name));
-        $modelClass = '\\App\\' . $name;
+        $modelClass = '\\App\\'. (is_dir(app_path('Models')) ? 'Models\\' : '') . $name;
         return [
             'namespace' => Hubble::getResourcesNamespace(),
             'model_class' => $modelClass,
