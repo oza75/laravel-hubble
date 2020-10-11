@@ -67,7 +67,7 @@ class FileField extends Field
      */
     public function retrieveFormData(Request $request, string $section)
     {
-        $max = $this->getProp('max', $this->hasMultiple() ? INF : 1);
+        $max = $this->getProp('max', $this->hasMultiple() ? INF : 1, $section) ?? 1;
         $files = $request->file($this->getName());
         $removed = $request->get($this->getName() . '__removed__', []);
         $old = $request->get($this->getName() . '__current__', []);
