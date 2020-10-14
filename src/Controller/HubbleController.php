@@ -179,9 +179,9 @@ class HubbleController
 
     public function showLoginForm()
     {
-        if (! Str::contains(session('url.intended'), HubbleFacade::prefix())) {
-            session('url.intended', route('hubble.home'));
-        }
+//        if (! Str::contains(session('url.intended'), HubbleFacade::prefix())) {
+//            session('url.intended', route('hubble.home'));
+//        }
 
         return view('laravel-hubble::login');
     }
