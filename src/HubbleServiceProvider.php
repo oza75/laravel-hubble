@@ -21,7 +21,8 @@ class HubbleServiceProvider extends ServiceProvider
     public function boot()
     {
         $router = $this->app->make(Router::class);
-        $router->aliasMiddleware('hubble.auth', HubbleAuthMiddleware::class);
+        $router->aliasMiddleware('hubble.auth', config('laravel-hubble.middlewares.auth'));
+        $router->aliasMiddleware('hubble.guest', config('laravel-hubble.middlewares.guest'));
 
         /*
          * Optional methods to load your package assets
