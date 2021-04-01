@@ -62,9 +62,9 @@ class RelatedResource extends HubbleResource
     /**
      * @return Field[] array of fields
      */
-    public function fields()
+    public function fields(): array
     {
-        return $this->related->getLoadedFields();
+        return $this->related->fieldCollection->all();
     }
 
     /**

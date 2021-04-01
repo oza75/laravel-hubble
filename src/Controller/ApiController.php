@@ -6,6 +6,7 @@ namespace Oza75\LaravelHubble\Controller;
 
 use Exception;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
 use Oza75\LaravelHubble\HubbleResource;
@@ -230,14 +231,15 @@ class ApiController
     /**
      * @param Request $request
      * @return JsonResponse
+     * @throws ValidationException
      */
     public function validate(Request $request)
     {
-//        $value = $request->get('value') ?? $request->file('value') ?? [];
+        $value = $request->get('value') ?? $request->file('value') ?? [];
         $rules = $request->get('rules');
 
-//        Validator::make($value, $rules)->validate();
-        $request->validate($rules);
+        Validator::make($value, $rules)->validate();
+//        $request->validate($rules);
 
         return response()->json(['data' => 'passed']);
     }

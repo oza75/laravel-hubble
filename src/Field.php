@@ -82,6 +82,8 @@ class Field implements HasVisibility
      */
     private $usedAsDefaultSort;
 
+    protected $positionAfter;
+
     /**
      * Field constructor.
      * @param string $name
@@ -147,7 +149,6 @@ class Field implements HasVisibility
     public function boot(HubbleResource $resource)
     {
         $this->resource = $resource;
-
     }
 
     /**
@@ -521,5 +522,25 @@ class Field implements HasVisibility
         });
 
         return $attributes->toArray();
+    }
+
+    /**
+     * @param string $columnName
+     * @return $this
+     */
+    public function after(string $columnName): Field
+    {
+        $this->positionAfter = $columnName;
+
+        return $this;
+    }
+
+    /**
+     * @param string $columnName
+     * @return mixed
+     */
+    public function getAfterColumn(string $columnName)
+    {
+        return $this->positionAfter;
     }
 }
