@@ -45,8 +45,10 @@ class DeleteAction extends Action
     {
         $builder = $builder->newQuery();
 
-        $collection->chunk(500)->each(function ($items) use ($builder) {
-            $builder->orWhereIn('id', collect($items)->pluck('id'));
+        $builder->where(function (Builder  $builder) use ($collection) {
+            $collection->chunk(500)->each(function ($items) use ($builder) {
+                $builder->orWhereIn('id', collect($items)->pluck('id'));
+            });
         });
 
         $builder->delete();
