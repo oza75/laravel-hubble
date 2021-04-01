@@ -1,7 +1,7 @@
 <template>
     <div class="container dashboard--container dashboard--index">
         <header class="header">
-            <h2 class="title">{{resource.title}}</h2>
+            <h2 class="title">{{resource.config.title}}</h2>
             <div class="filters">
                 <div v-for="(filter, k) in (resource.filters || [])" :key="'filter-'+k">
                     <hubble-filter :filter="filter" :value="customFilters[filter.name]"

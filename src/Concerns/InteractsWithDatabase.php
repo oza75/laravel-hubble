@@ -63,7 +63,7 @@ trait InteractsWithDatabase
             return $value !== HubbleResource::NULL_VALUE;
         });
 
-        $rules = collect($this->rules('creating'))->filter(function ($rule, $field) use ($collection) {
+        $rules = collect($this->fieldCollection->rules('creating'))->filter(function ($rule, $field) use ($collection) {
             return $collection->has($field);
         })->toArray();
 
@@ -90,7 +90,7 @@ trait InteractsWithDatabase
             return $value !== HubbleResource::NULL_VALUE;
         });
 
-        $rules = collect($this->rules('editing'))->filter(function ($rule, $field) use ($item, $collection) {
+        $rules = collect($this->fieldCollection->rules('editing'))->filter(function ($rule, $field) use ($item, $collection) {
             return $collection->has($field) && ($item->{$field} !== $collection[$field] || empty($collection[$field]));
         })->toArray();
 

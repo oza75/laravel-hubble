@@ -34,7 +34,7 @@ trait HandlesFilters
      */
     protected function applySorts(Builder $query, Request $request)
     {
-        $fields = $this->getVisibleFields('index');
+        $fields = $this->fieldCollection->visible('index');
 
         $sort = $request->get('sort', []);
 
@@ -43,7 +43,7 @@ trait HandlesFilters
             return;
         }
 
-        $field = collect($fields)->first(function (Field $field) use ($sort) {
+        $field = $fields->first(function (Field $field) use ($sort) {
             return $field->getName() === $sort['by'] && $field->isSortable();
         });
 

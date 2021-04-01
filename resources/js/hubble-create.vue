@@ -1,7 +1,7 @@
 <template>
     <div class="container dashboard--container dashboard--edit">
         <header class="header">
-            <h2 class="title">{{$t('dashboard.create_title', {name: resource.title})}}</h2>
+            <h2 class="title">{{resource.config.title}}</h2>
         </header>
         <section class="content--list">
             <form method="post" :action="resource.urls.store.url" enctype="multipart/form-data">

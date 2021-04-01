@@ -9,8 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
+use Oza75\LaravelHubble\Concerns\HandlesConfiguration;
 use Oza75\LaravelHubble\Concerns\HandlesEvents;
 use Oza75\LaravelHubble\Concerns\InteractsWithDatabase;
+use Oza75\LaravelHubble\Configuration\Configuration;
+use Oza75\LaravelHubble\Configuration\ScreenConfiguration;
 use Oza75\LaravelHubble\Contracts\HasVisibility;
 use Oza75\LaravelHubble\Contracts\Relations\HandleManyRelationship;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +22,7 @@ use Illuminate\Support\Collection;
 
 abstract class HubbleResource
 {
-    use InteractsWithDatabase, HandlesAuthorization, HandlesEvents;
+    use InteractsWithDatabase, HandlesAuthorization, HandlesEvents, HandlesConfiguration;
 
     const NULL_VALUE = "__laravel__hubble@null#";
 
@@ -33,7 +36,8 @@ abstract class HubbleResource
 
     protected $displayColumn;
 
-    protected $loadedFields = [];
+    /** @var FieldCollection */
+    public $fieldCollection;
 
     protected $perPage = 38;
 
@@ -55,6 +59,7 @@ abstract class HubbleResource
      * @return Filter[] array of filters
      */
     public abstract function filters();
+
 
     /**
      * @return Builder
@@ -107,17 +112,7 @@ abstract class HubbleResource
 
     public function boot()
     {
-        $this->loadedFields = $this->fields();
-
-        foreach ($this->loadedFields as $field) $field->boot($this);
-    }
-
-    /***
-     * @return Field[]
-     */
-    public function getLoadedFields()
-    {
-        return $this->loadedFields;
+        $this->fieldCollection = FieldCollection::make($this, $this->fields());
     }
 
     /**
@@ -131,7 +126,8 @@ abstract class HubbleResource
             'title' => $this->getTitle(),
             'searchable' => $this->searchable(),
             'urls' => $this->getUrls(),
-            'fields' => $this->parseFields($section),
+            'config' => $this->buildConfiguration($section),
+            'fields' => $this->fieldCollection->build($section),
             'panels' => $this->getPanels($section),
             'token' => csrf_token(),
         ];
@@ -189,28 +185,6 @@ abstract class HubbleResource
         })->toArray();
 
         return ['actions' => $actions, 'filters' => $filters, 'buttons' => $buttons];
-    }
-
-    /**
-     * @param string $section
-     * @return array
-     */
-    private function parseFields(string $section = 'index')
-    {
-        return collect($this->getVisibleFields($section))->mapWithKeys(function (Field $field) use ($section) {
-            return $field->toArray($section);
-        })->toArray();
-    }
-
-    /**
-     * @param string $section
-     * @return array
-     */
-    public function getVisibleFields(string $section)
-    {
-        return collect($this->loadedFields)->filter(function (HasVisibility $field) use ($section) {
-            return $field->isVisibleOn($section) && !$field instanceof HandleManyRelationship;
-        })->toArray();
     }
 
     /**
@@ -278,7 +252,7 @@ abstract class HubbleResource
     {
         $data = $this->retrieveFormData($request, 'creating');
 
-        $request->validate($this->rules('creating'));
+        $request->validate($this->fieldCollection->rules('creating'));
 
         $item = $this->create($data, $request);
 
@@ -302,21 +276,6 @@ abstract class HubbleResource
         session()->flash('notification', ['message' => trans('laravel-hubble::dashboard.updated'), 'state' => 'success']);
 
         return $updated;
-    }
-
-    /**
-     * @param string $section
-     * @return array
-     */
-    public function rules(string $section)
-    {
-        $fields = $this->getVisibleFields($section);
-
-        return collect($fields)->mapWithKeys(function (Field $field) use ($section) {
-            return [$field->getName() => $field->rulesFor($section)];
-        })->filter(function ($rules) {
-            return !empty($rules);
-        })->toArray();
     }
 
     /**
@@ -364,7 +323,7 @@ abstract class HubbleResource
      */
     public function retrieveFormData(Request $request, string $section): array
     {
-        $allFields = array_merge($this->loadedFields, collect($this->panels())
+        $allFields = array_merge($this->fieldCollection->all(), collect($this->panels())
             ->filter(function (Panel $panel) use ($section) {
                 return $panel->isVisibleOn($section);
             })->map(function (Panel $panel) {
@@ -403,7 +362,7 @@ abstract class HubbleResource
      */
     public function getRelatedFieldOptions($field, Request $request)
     {
-        $field = collect($this->loadedFields)->first(function (Field $item) use ($field) {
+        $field = $this->fieldCollection->first(function (Field $item) use ($field) {
             return $item->getName() === $field;
         });
 
@@ -418,8 +377,7 @@ abstract class HubbleResource
      */
     protected function getRelatedResources(string $section)
     {
-        return collect($this->getLoadedFields())
-            ->filter(function (Field $field) use ($section) {
+        return $this->fieldCollection->filter(function (Field $field) use ($section) {
                 return $field instanceof HandleManyRelationship && $field->isVisibleOn($section);
             })->map(function (Field $field) {
                 return $field->getRelatedResource()->toArray();
@@ -440,8 +398,7 @@ abstract class HubbleResource
      */
     public function getRelatedFieldResource($name)
     {
-        $field = collect($this->getLoadedFields())
-            ->first(function (Field $item) use ($name) {
+        $field = $this->fieldCollection->first(function (Field $item) use ($name) {
                 return $item instanceof HandleManyRelationship && $item->getName() === $name;
             });
 

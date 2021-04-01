@@ -1,7 +1,7 @@
 <template>
     <div class="container dashboard--container dashboard--details">
         <header class="header">
-            <h2 class="title">{{$t('dashboard.details_title', {name: resource.title})}}</h2>
+            <h2 class="title">{{resource.config.title}}</h2>
             <div class="ctas">
                 <div class="ctas--wrapper">
                     <a v-if="datum['@urls']['edit']" :href="datum['@urls']['edit']['url']"

@@ -35,7 +35,7 @@ class DefaultResource extends JsonResource
 
     public function toArray($request)
     {
-        $data = collect($this->presenter->getVisibleFields($this->section))
+        $data = collect($this->presenter->fieldCollection->visible($this->section))
             ->mapWithKeys(function (Field $field) {
                 return [
                     $field->getName() => $field->resolveData($this->value($field), $this->resource, $this->section)
