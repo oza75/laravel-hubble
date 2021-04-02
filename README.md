@@ -26,6 +26,8 @@ Then install laravel-hubble
 
 ```bash
 php artisan hubble:install
+
+# Now Add App\Providers\HubbleServiceProvider into providers array in your config/app.php
 ```
 
 Now go to : http://yourapp.tld/hubble (or http://localhost:8000/hubble if you use `artisan serve`)
