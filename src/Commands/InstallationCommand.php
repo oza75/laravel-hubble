@@ -29,12 +29,12 @@ class InstallationCommand extends Command
      */
     public function handle()
     {
-//        $this->checkAuthRouteExistence();
+        $this->checkAuthRouteExistence();
 
-//        $this->publishPublicAssets();
-//        $this->createHubbleDirectory();
-//        $this->createBaseResource();
-//        $this->createHubbleWebpackMix();
+        $this->publishPublicAssets();
+        $this->createHubbleDirectory();
+        $this->createBaseResource();
+        $this->createHubbleWebpackMix();
         $this->createServiceProvider();
 
         $this->info('Laravel Hubble is successfully installed !');
