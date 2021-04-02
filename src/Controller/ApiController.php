@@ -5,10 +5,14 @@ namespace Oza75\LaravelHubble\Controller;
 
 
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
+use Oza75\LaravelHubble\Export\ExcelExport;
+use Oza75\LaravelHubble\Export\ResourceExporter;
 use Oza75\LaravelHubble\HubbleResource;
 use Oza75\LaravelHubble\Resources\DetailResource;
 use Oza75\LaravelHubble\Resources\IndexResource;
@@ -242,5 +246,31 @@ class ApiController
 //        $request->validate($rules);
 
         return response()->json(['data' => 'passed']);
+    }
+
+    /**
+     * @param Hubble $hubble
+     * @param Request $request
+     * @param $name
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function export(Hubble $hubble, Request $request, $name)
+    {
+        /** @var HubbleResource $resource */
+        $resource = $hubble->getResource($name);
+
+        $this->authorizes('index', get_class($resource->getModel()));
+
+        $filename = Str::snake($resource->getTitle()) . '_' . now()->format('Y_m_d_h_i_s') . '.xlsx';
+
+        /** @var ResourceExporter $exporter */
+        $exporter = app(ResourceExporter::class);
+        $exporter->boot($resource)->store($filename, 'public');
+
+        return response()->json([
+            'file' => Storage::disk('public')->url($filename),
+            'filename' => $filename
+        ]);
     }
 }

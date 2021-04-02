@@ -29,12 +29,13 @@ class InstallationCommand extends Command
      */
     public function handle()
     {
-        $this->checkAuthRouteExistence();
+//        $this->checkAuthRouteExistence();
 
-        $this->publishPublicAssets();
-        $this->createHubbleDirectory();
-        $this->createBaseResource();
-        $this->createHubbleWebpackMix();
+//        $this->publishPublicAssets();
+//        $this->createHubbleDirectory();
+//        $this->createBaseResource();
+//        $this->createHubbleWebpackMix();
+        $this->createServiceProvider();
 
         $this->info('Laravel Hubble is successfully installed !');
         $url = route('hubble.home');
@@ -61,7 +62,7 @@ class InstallationCommand extends Command
 
     private function installLaravelUiPackage()
     {
-        $this->warn("Please consider using laravel/ui package in order to register those route or manually register those routes");
+        $this->warn("Please consider using laravel/ui package in order to register these route or manually register these routes");
 
         if (!$this->confirm('Do you want to use laravel/ui package ? ')) {
             $this->warn("You need to add login and logout routes.");
@@ -162,5 +163,25 @@ class InstallationCommand extends Command
 
         if (!File::exists($path . DIRECTORY_SEPARATOR . "rules.js"))
             $this->createStubFile('rules.stub', [], $path . DIRECTORY_SEPARATOR . "rules.js");
+    }
+
+    private function createServiceProvider()
+    {
+        $path = app_path('Providers' . DIRECTORY_SEPARATOR . 'HubbleServiceProvider.php');
+
+        if (File::exists($path)) {
+            $this->info("app/Providers/HubbleServiceProvider.php already exists !");
+            $app = include base_path('config/app.php');
+
+            if (!collect($app['providers'] ?? [])->contains("App\Providers\HubbleServiceProvider")) {
+                $this->error("Please, add app\Providers\HubbleServiceProvider into providers array in your config/app.php.");
+            }
+
+            return;
+        }
+
+        $this->createStubFile('service-provider.stub', [], $path);
+
+        $this->warn("Add app\Providers\HubbleServiceProvider into providers array in your config/app.php.");
     }
 }

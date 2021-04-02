@@ -17,7 +17,8 @@
     ],
     "require": {
         "php": "^7.1",
-        "ext-json": "*"
+        "ext-json": "*",
+        "maatwebsite/excel": "^3.1"
     },
     "require-dev": {
         "orchestra/testbench": "^6.0",
@@ -44,7 +45,7 @@
     "extra": {
         "laravel": {
             "providers": [
-                "Oza75\\LaravelHubble\\HubbleServiceProvider",
+                "Oza75\\LaravelHubble\\ServiceProvider",
                 "Oza75\\LaravelHubble\\Utilities\\Javascript\\JavascriptServiceProvider"
             ],
             "aliases": {

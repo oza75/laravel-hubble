@@ -30,6 +30,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
         'editing' => false,
         'creating' => false,
         'details' => true,
+        'export' => true,
     ];
 
     /**

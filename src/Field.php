@@ -39,6 +39,7 @@ class Field implements HasVisibility
         'editing' => [],
         'creating' => [],
         'details' => [],
+        'export' => []
     ];
 
     protected $resource;
@@ -194,6 +195,10 @@ class Field implements HasVisibility
      */
     public function resolveData($value, $resource, string $type)
     {
+        if ($type === 'export' && empty($this->displayResolver[$type])) {
+            return $this->resolveData($value, $resource, 'details');
+        }
+
         $this->registerDefaultResolver();
 
         $resolvers = $this->displayResolver[$type] ?? [];
@@ -267,12 +272,24 @@ class Field implements HasVisibility
      * @param callable $callable
      * @return $this
      */
+    public function displayWhenExportingUsing(callable $callable): Field
+    {
+        $this->addDisplayResolver($callable, 'export');
+
+        return $this;
+    }
+
+    /**
+     * @param callable $callable
+     * @return $this
+     */
     public function displayUsing(callable $callable)
     {
         $this->addDisplayResolver($callable, 'index');
         $this->addDisplayResolver($callable, 'editing');
         $this->addDisplayResolver($callable, 'creating');
         $this->addDisplayResolver($callable, 'details');
+        $this->addDisplayResolver($callable, 'export');
 
         return $this;
     }
@@ -466,6 +483,7 @@ class Field implements HasVisibility
 
         $this->displayOnDetailsUsing($resolver);
         $this->displayOnIndexUsing($resolver);
+
         if ($this->default !== 'N/A') {
             $this->displayOnFormsUsing($resolver);
         }

@@ -19,6 +19,7 @@ use Oza75\LaravelHubble\Contracts\Relations\HandleManyRelationship;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Oza75\LaravelHubble\TableButtons\ExportButton;
 
 abstract class HubbleResource
 {
@@ -39,9 +40,16 @@ abstract class HubbleResource
     /** @var FieldCollection */
     public $fieldCollection;
 
+    /** @var int Number of records per page */
     protected $perPage = 38;
 
+    /** @var bool Determines if a resource should be shown in sidebar */
     protected $displayInSidebar = true;
+
+    /**
+     * @var bool Determines if a resource can be exported in excel format.
+     */
+    protected $exportable = true;
 
     private $currentItem = null;
 
@@ -77,8 +85,16 @@ abstract class HubbleResource
                 route('hubble.create', ['name' => $this->getName()])
             )->displayWhen(function (User $user) {
                 return $this->canAccess('create', get_class($this->getModel()));
-            })
+            }),
+            $this->exportButton(),
         ];
+    }
+
+    protected function exportButton(): ExportButton
+    {
+        return ExportButton::make($this->getName())->displayWhen(function (User $user) {
+            return $this->exportable;
+        });
     }
 
     /**
@@ -378,10 +394,10 @@ abstract class HubbleResource
     protected function getRelatedResources(string $section)
     {
         return $this->fieldCollection->filter(function (Field $field) use ($section) {
-                return $field instanceof HandleManyRelationship && $field->isVisibleOn($section);
-            })->map(function (Field $field) {
-                return $field->getRelatedResource()->toArray();
-            })->values();
+            return $field instanceof HandleManyRelationship && $field->isVisibleOn($section);
+        })->map(function (Field $field) {
+            return $field->getRelatedResource()->toArray();
+        })->values();
     }
 
     /**
@@ -399,8 +415,8 @@ abstract class HubbleResource
     public function getRelatedFieldResource($name)
     {
         $field = $this->fieldCollection->first(function (Field $item) use ($name) {
-                return $item instanceof HandleManyRelationship && $item->getName() === $name;
-            });
+            return $item instanceof HandleManyRelationship && $item->getName() === $name;
+        });
 
         if (is_null($field)) abort(404);
 
@@ -489,5 +505,12 @@ abstract class HubbleResource
             $panel->prepare($this);
             return $panel->toArray($section);
         })->toArray();
+    }
+
+    public function configure(Configuration $configuration)
+    {
+        $configuration->details(function (ScreenConfiguration $configuration, User $user) {
+            $configuration->setTitle("User #". $user->id);
+        });
     }
 }
