@@ -2,7 +2,7 @@
     <div class="custom--select--container" :class="{[classes]: true}">
         <template v-if="!multiple">
             <input type="text" @click.stop @keyup="onSearch" :placeholder="inputAttrs.placeholder" @keydown="onKeydown"
-                   ref="textInput" v-bind="inputAttrs" :class="{error: hasErrors}" :id="field.name" autocomplete="off"
+                   ref="textInput" v-bind="inputAttrs" :class="{error: hasErrors}" :id="field.name + '__'" autocomplete="off"
                    @focus="openDropdown">
             <input :name="field.name" :value="inputValue" ref="input" v-show="false">
         </template>
