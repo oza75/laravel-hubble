@@ -64,7 +64,7 @@ class RelatedResource extends HubbleResource
      */
     public function fields(): array
     {
-        return $this->related->fieldCollection->all();
+        return $this->related->fields();
     }
 
     /**
