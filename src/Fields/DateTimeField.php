@@ -64,6 +64,7 @@ class DateTimeField extends TextField
     protected function registerDisplayResolvers()
     {
         $callable = function ($value) {
+            if (is_null($value)) return $value;
             $carbon = Carbon::parse($value)->locale($this->locale);
             if (!is_null($this->dateFormat)) {
                 return $carbon->format($this->dateFormat);
