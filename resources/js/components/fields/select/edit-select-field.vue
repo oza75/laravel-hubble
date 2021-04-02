@@ -220,7 +220,7 @@
                 if (this.multiple) {
                     values = this.tags.map(tag => tag[this.textKey])
                 } else {
-                    let item = this.realOptions.find(opt => opt[this.valueKey] === this.inputValue)
+                    let item = this.realOptions.find(opt => opt[this.valueKey] == this.inputValue)
                     if (item) values = [item[this.textKey]]
                 }
 
@@ -254,7 +254,7 @@
             select(option) {
                 if (this.multiple) {
                     let values = this.tags || []
-                    let index = values.findIndex(value => value[this.valueKey] === option[this.valueKey])
+                    let index = values.findIndex(value => value[this.valueKey] == option[this.valueKey])
                     if (index === -1) values.push(option)
                     else values.splice(index, 1)
 
@@ -288,7 +288,7 @@
                 this.dropdownOpened = false;
             },
             removeTag(tag) {
-                let index = this.tags.findIndex(t => t[this.valueKey] === tag[this.valueKey])
+                let index = this.tags.findIndex(t => t[this.valueKey] == tag[this.valueKey])
                 if (index === -1) return;
                 this.$emit('unselect', this.tags[index], index);
                 this.tags.splice(index, 1);
@@ -308,7 +308,7 @@
             },
             inputValue(value) {
                 if (!value) this.$refs['textInput'].removeAttribute('value')
-                let item = this.realOptions.find(option => option[this.valueKey] === value)
+                let item = this.realOptions.find(option => option[this.valueKey] == value)
                 if (!item) {
                     this.$refs['textInput'].value = null;
                     return;
