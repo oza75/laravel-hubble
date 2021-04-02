@@ -150,6 +150,7 @@ export default {
         fetchOptionItem(value) {
             return this.$axios.get(this.options, {params: {[this.valueKey]: value}}).then(res => {
                 this.realOptions.push(res.data.data);
+                this.inputValue = value;
             });
         },
         onKeydown(keyboardEvent) {
