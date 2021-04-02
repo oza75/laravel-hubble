@@ -85,7 +85,7 @@ class InstallationCommand extends Command
     private function publishPublicAssets()
     {
         $this->call('vendor:publish', [
-            "--provider" => "Oza75\LaravelHubble\HubbleServiceProvider",
+            "--provider" => "Oza75\LaravelHubble\ServiceProvider",
 //            "--tag" => "public",
         ]);
     }
