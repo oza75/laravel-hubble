@@ -150,7 +150,13 @@ export default {
         fetchOptionItem(value) {
             return this.$axios.get(this.options, {params: {[this.valueKey]: value}}).then(res => {
                 this.realOptions.push(res.data.data);
-                this.inputValue = value;
+                let item = this.realOptions.find(option => option[this.valueKey] == value);
+                if (!item) {
+                    this.$refs['textInput'].value = null;
+                    return;
+                }
+
+                this.$refs['textInput'].value = item[this.textKey]
             });
         },
         onKeydown(keyboardEvent) {
@@ -316,7 +322,6 @@ export default {
         inputValue(value) {
             if (!value) this.$refs['textInput'].removeAttribute('value')
             let item = this.realOptions.find(option => option[this.valueKey] == value);
-            console.log(item);
             if (!item) {
                 this.$refs['textInput'].value = null;
                 return;
