@@ -8,6 +8,7 @@ use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\LazyCollection;
 use Oza75\LaravelHubble\Action;
 use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
@@ -45,10 +46,10 @@ class DeleteAction extends Action
     {
         $builder = $builder->newQuery();
 
-        $builder->where(function (Builder  $builder) use ($collection) {
-            $collection->chunk(500)->each(function ($items) use ($builder) {
-                $builder->orWhereIn('id', collect($items)->pluck('id'));
-            });
+        $builder->where(function (Builder $builder) use ($collection) {
+            $ids = $collection->pluck('id')->values()->all();
+
+            $builder->whereIn('id', $ids);
         });
 
         $builder->delete();
