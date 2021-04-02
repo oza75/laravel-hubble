@@ -47,7 +47,7 @@ export default {
                 this.filterOptions = this.originalsOptions;
                 return;
             }
-            console.log(this.filter.options, this.filter, Array.isArray(this.filter.options));
+
             if (Array.isArray(this.filter.options)) {
                 this.filterOptions = this.originalsOptions.filter(it => {
                     return String(it[this.filter.attributes.textKey]).toLowerCase().includes(String(query).toLowerCase())
