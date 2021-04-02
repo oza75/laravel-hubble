@@ -129,7 +129,9 @@
                     if (this.$refs['tagSearchInput']) {
                         this.$refs['tagSearchInput'].focus();
                     }
-                })
+                });
+
+                this.$emit('dropdown-open');
             },
             fetchOptions(clear = false) {
                 let url = `${this.options}?page=${this.page}`;
@@ -229,7 +231,7 @@
                 }
 
                 this.searchTimer = setTimeout(() => {
-                    this.search(query)
+                    this.search(query);
                 }, Array.isArray(this.options) ? 0 : 500)
             },
             search(query) {
@@ -330,6 +332,7 @@
             this.$nextTick(() => {
                 new InfiniteScroll(() => {
                     this.page = this.page + 1
+                    this.$emit('paginate', this.page);
                 }, {
                     element: this.$refs['optionsContent'],
                     threshold: 30

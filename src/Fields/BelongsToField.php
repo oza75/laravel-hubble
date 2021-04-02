@@ -121,6 +121,7 @@ class BelongsToField extends SelectField
 
         $this->displayOnDetailsUsing($callable);
         $this->displayOnIndexUsing($callable);
+//        $this->displayWhenExportingUsing($callable);
     }
 
     public function resolveData($value, $resource, string $type)

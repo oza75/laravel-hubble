@@ -16,6 +16,7 @@ trait HandlesVisibility
         'editing' => true,
         'creating' => true,
         'details' => true,
+        'export' => true,
     ];
 
     /**
@@ -24,7 +25,7 @@ trait HandlesVisibility
      */
     public function hide(?callable $when = null)
     {
-        $this->setVisibility(['index', 'editing', 'creating', 'details'], $when ?? false, true);
+        $this->setVisibility(['index', 'editing', 'creating', 'details', 'export'], $when ?? false, true);
 
         return $this;
     }
@@ -35,7 +36,7 @@ trait HandlesVisibility
      */
     public function only(?callable $when = null)
     {
-        $this->setVisibility(['index', 'editing', 'creating', 'details'], $when ?? true);
+        $this->setVisibility(['index', 'editing', 'creating', 'details', 'export'], $when ?? true);
 
         return $this;
     }
@@ -156,7 +157,7 @@ trait HandlesVisibility
      */
     public function onlyOnIndex(?callable $when = null)
     {
-        $this->setVisibility(['editing', 'creating', 'details'], false);
+        $this->setVisibility(['editing', 'creating', 'details', 'export'], false);
         $this->setVisibility('index', $when ?? true);
 
         return $this;
@@ -168,7 +169,7 @@ trait HandlesVisibility
      */
     public function onlyOnForms(?callable $when = null)
     {
-        $this->setVisibility(['details', 'index'], false);
+        $this->setVisibility(['details', 'index', 'export'], false);
         $this->setVisibility(['creating', 'editing'], $when ?? true);
 
         return $this;
@@ -180,7 +181,7 @@ trait HandlesVisibility
      */
     public function onlyOnDetails(?callable $when = null)
     {
-        $this->setVisibility(['editing', 'creating', 'index'], false);
+        $this->setVisibility(['editing', 'creating', 'index', 'export'], false);
         $this->setVisibility('details', $when ?? true);
 
         return $this;
@@ -192,7 +193,7 @@ trait HandlesVisibility
      */
     public function onlyWhenEditing(?callable $when = null)
     {
-        $this->setVisibility(['details', 'creating', 'index'], false);
+        $this->setVisibility(['details', 'creating', 'index', 'export'], false);
         $this->setVisibility('editing', $when ?? true);
 
         return $this;
@@ -204,8 +205,42 @@ trait HandlesVisibility
      */
     public function onlyWhenCreating(?callable $when = null)
     {
-        $this->setVisibility(['details', 'editing', 'index'], false);
+        $this->setVisibility(['details', 'editing', 'index', 'export'], false);
         $this->setVisibility('creating', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function onlyOnExport(?callable $when = null): HandlesVisibility
+    {
+        $this->setVisibility(['details', 'creating', 'editing', 'index'], false);
+        $this->setVisibility('export', $when ?? true);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function hideOnExport(?callable $when = null): HandlesVisibility
+    {
+        $this->setVisibility('export', false);
+
+        return $this;
+    }
+
+    /**
+     * @param callable|null $when
+     * @return $this
+     */
+    public function showOnExport(?callable $when = null): HandlesVisibility
+    {
+        $this->setVisibility('export', $when ?? true);
 
         return $this;
     }
@@ -228,7 +263,7 @@ trait HandlesVisibility
      */
     public function isVisibleOn(string $section)
     {
-        $visibility = $this->visibility[$section];
+        $visibility = $this->visibility[$section] ?? true;
 
         if (is_bool($visibility)) return $visibility;
 

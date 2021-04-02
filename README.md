@@ -10,81 +10,63 @@ Build a beautiful dashboard with laravel in no time.
 ![Details screen](./docs/images/show-screen.png)
 
 ## Requirements
+
 - php : ^7.1
 - Laravel : ^6.0
 
 ## Installation
+
 You can install the package via composer:
 
 ```bash
 composer require oza75/laravel-hubble
 ```
+
 Then install laravel-hubble
+
 ```bash
 php artisan hubble:install
 ```
-In your `app/Http/kernel.php`, move `StartSession`, `AuthenticateSession` from `web` middleware group array to global `middleware` array like this:
-
-```php 
- protected $middleware = [
-        // \App\Http\Middleware\TrustHosts::class,
-        \App\Http\Middleware\TrustProxies::class,
-        \Fruitcake\Cors\HandleCors::class,
-        \App\Http\Middleware\CheckForMaintenanceMode::class,
-        \Illuminate\Foundation\Http\Middleware\ValidatePostSize::class,
-        \App\Http\Middleware\TrimStrings::class,
-        \Illuminate\Foundation\Http\Middleware\ConvertEmptyStringsToNull::class,
-        \Illuminate\Session\Middleware\StartSession::class,
-        \Laravel\Jetstream\Http\Middleware\AuthenticateSession::class,
-        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-    ];
-
-    /**
-     * The application's route middleware groups.
-     *
-     * @var array
-     */
-    protected $middlewareGroups = [
-        'web' => [
-            \App\Http\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \App\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ],
-
-        'api' => [
-            'throttle:60,1',
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        ],
-    ];
-```
-You have to do this because `hubble` doesn't have a default authentification system for api requests, 
-so it refers to the session authentification system. **Any pull request that can solve this issue is welcoming !**
-
 
 Now go to : http://yourapp.tld/hubble (or http://localhost:8000/hubble if you use `artisan serve`)
 
 ## Authentification
-Hubble uses the default Laravel authorization gate to check if a user can access to the dashboard. 
-By default, everyone can access to hubble dashboard. You are free to modify this gate in your `App\Providers\AppServiceProvider` boot method to restrict access.
+
+Hubble uses the default Laravel authorization gate to check if a user can access to the dashboard. By default, everyone
+can access to hubble dashboard. You can restrict access by using `authorizesAccess` method
+on `App\Providers\HubbleServiceProvider`.
 
 ```php 
- Gate::define('viewHubble', function (User $user) {
-      return $user->isAdmin();
- });
+   // file: app/Providers/HubbleServiceProvider.php
+
+   /**
+    * Determines if a given user can access to hubble dashboard.
+    * By default every user can access to hubble
+    *
+    * @param User $user
+    * @return bool
+    */
+    public function authorizesAccess(User $user): bool
+    {
+        return $user->isAdmin();
+    }
 ```
 
 ## Usage
 
 ### Resources
 
-A hubble resource is a simple php class which aims to represent the resource you want to add, namely the different fields, actions, filters, etc. that it has.
+A hubble resource is a simple php class which aims to represent the resource you want to add, namely the different
+fields, actions, filters, etc. that it has.
 
-#### Create resource 
+#### Create resource
+
 You can create a new resource by running `hubble:resource` command
+
 ``` php
 php artisan hubble:resource UserResource
 ```
+
 This will automatically create a new resource under `app/Hubble` folder
 
 ```php 
@@ -173,8 +155,11 @@ class UserResource extends Resource
     }
 }
 ```
-After your resource is generated, you need to set the `eloquent builder` hubble should use to get your data. When generating this resource we will try to obtain the eloquent builder according to the name of the resource passed in `php artisan hubble:resource` command.
-You can modify this query builder to add some computed fields.
+
+After your resource is generated, you need to set the `eloquent builder` hubble should use to get your data. When
+generating this resource we will try to obtain the eloquent builder according to the name of the resource passed
+in `php artisan hubble:resource` command. You can modify this query builder to add some computed fields.
+
 ```php 
     /**
      * @return Builder
@@ -185,7 +170,9 @@ You can modify this query builder to add some computed fields.
     }
 ```
 
-`fields` method is used to return all fields your want to display. By default, hubble comes with some fields like `TextField`, `TextareaField`, `ImageField` and more. But you can also create your own custom field.  
+`fields` method is used to return all fields your want to display. By default, hubble comes with some fields
+like `TextField`, `TextareaField`, `ImageField` and more. But you can also create your own custom field.
+
 ```php
     /**
      * Get the fields displayed that the user resource
@@ -207,39 +194,120 @@ You can modify this query builder to add some computed fields.
         ];
     }
 ```
+
+#### Configure your resource
+
+You can configure your resource by setting some properties on your resource class.
+
+```php 
+    /**
+     * @var string The title will be used as your resource name in the ui
+     */
+    protected $title = "Users";
+
+    /**
+     * @var string[]
+     */
+    protected $searchColumns = ['id', 'name'];
+
+    /**
+     * @var string used to show resource value in relationship
+     */
+    protected $displayColumn = 'name';
+    
+    
+    /** @var int Number of records per page */
+    protected $perPage = 38;
+    
+    /** @var bool Determines if a resource should be shown in sidebar */
+    protected $displayInSidebar = true;
+    
+    /**
+     * @var bool Determines if a resource can be exported in excel format.
+     */
+    protected $exportable = true;
+```
+If you want to customize the title that should be shown in each different screen (index page, edit page, details page etc...)
+you may define `configure` method in your resource. For example: 
+```php
+    // use Oza75\LaravelHubble\Configuration\Configuration;
+    // use Oza75\LaravelHubble\Configuration\ScreenConfiguration;
+    
+    
+    public function configure(Configuration $configuration)
+    {
+        $configuration->details(function (ScreenConfiguration $configuration, User $user) {
+            $configuration->setTitle("User #". $user->id);
+        });
+    }
+```
 #### Registering your resource
+
 By default, hubble will automatically register all resources you have under `app/Hubble` folder.
 
 Just go to `http://yourapp.tld/hubble` and you will see the new user resource that we add.
 
-You can customize the folder within hubble must look for your resources in config file. The auto registration is very useful when developing your dashboard
-but you may disable it in production to gain a small performance.
+You can customize the folder within hubble must look for your resources in config file. The auto registration is very
+useful when developing your dashboard but you may disable it in production to gain a small performance.
 
-In your AppServiceProvider :
+In your app/Providers/HubbleServiceProvider.php :
+
 ```php
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Foundation\Auth\User;
+use Oza75\LaravelHubble\HubbleServiceProvider as BaseProvider;
+
+class HubbleServiceProvider extends BaseProvider
+{
     /**
-     * Bootstrap any application services.
+     * Determines if hubble should detects automatically
+     * resources under Hubble resource folder. This is useful when you are
+     * developing but should be disable in production
      *
-     * @return void
+     * @var bool
      */
-    public function boot()
+    protected $autoRegistration = false; // set to false to disable auto registration 
+
+    /**
+     * List of resource Hubble should register. Should be used
+     * when you set autoRegistration = false. Optionally you can
+     * define a resource method in this class to bypass this property.
+     *
+     * @var array
+     */
+    protected $resources = [
+        // add your resources manually here
+        UserResource::class,
+    ];
+
+    /**
+     * Determines if a given user can access to hubble dashboard.
+     * By default every user can access to hubble
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function authorizesAccess(User $user): bool
     {
-       \Oza75\LaravelHubble\Facades\Hubble::disableAutoDiscovering(); // will disable auto registration of your resources.
-        
-        \Oza75\LaravelHubble\Facades\Hubble::addResources([
-            UserResource::class,
-            PostResource::class,
-        ]); // to add manually your resources
+        return parent::authorizesAccess($user);
     }
+}
+
 ```  
 
 ### Actions
 
 Action is used to perform custom tasks on one or more Eloquent models. You can generate action using :
+
 ```bash
 php artisan hubble:action ActiveUsers
 ```
+
 This command will generate a new `ActiveUsers` class under `app/Hubble/Actions`
+
 ```php
 <?php
 
@@ -299,9 +367,12 @@ class ActiveUsers extends Action
     }
 }
 ```
+
 The `title` property contains the name of the action that will be shown on the User Interface
 
-In the `handle` method you can perform your action. For our example, let's assume that our users table has an active column which determine whether the user is active or not. 
+In the `handle` method you can perform your action. For our example, let's assume that our users table has an active
+column which determine whether the user is active or not.
+
 ```php
     /**
      * Handle your action
@@ -314,7 +385,9 @@ In the `handle` method you can perform your action. For our example, let's assum
         User::query()->whereIn('id', $ids)->update(['active' => true]);
     }
 ```
+
 When you created your action you can add it in your resource.
+
 ```php 
     /**
      * Register all actions that the user resource have
@@ -332,8 +405,9 @@ When you created your action you can add it in your resource.
 ```
 
 ### Filters
-As the name suggests, filters are used to filter your data and display only data that satisfy certain conditions.
-There are many ways to add filter into your resource : 
+
+As the name suggests, filters are used to filter your data and display only data that satisfy certain conditions. There
+are many ways to add filter into your resource :
 
 - the first way (the easiest way ) :
 
@@ -350,13 +424,16 @@ There are many ways to add filter into your resource :
         ];
     }
 ```
-`Filter::make` take as is first argument, the column in the database. The second argument is the title and then the third array of options.
- 
-The options' argument is an associative array where the key is the label and the value, the value of the option. You can also pass an url where the options
- should be fetched or a custom array. for those cases you may set the valueKey and the textKey
- using the `setValueKey(string $key)`, and the `setTextKey(string $key)`. 
- 
- For example:
+
+`Filter::make` take as is first argument, the column in the database. The second argument is the title and then the
+third array of options.
+
+The options' argument is an associative array where the key is the label and the value, the value of the option. You can
+also pass an url where the options should be fetched or a custom array. for those cases you may set the valueKey and the
+textKey using the `setValueKey(string $key)`, and the `setTextKey(string $key)`.
+
+For example:
+
  ```php
     /**
      * Register all filters that the user resource have
@@ -374,7 +451,9 @@ The options' argument is an associative array where the key is the label and the
         ];
     }
 ```
+
 Another example:
+
 ```php
     /**
      * Register all filters that the user resource have
@@ -391,6 +470,7 @@ Another example:
         ];
     }
 ```
+
 - the second way to define a filter (more powerful) :
 
 ```php
@@ -413,13 +493,18 @@ Another example:
         ];
     }
 ```
-With this way, you can use the `setHandler` method to pass a callable that takes the `query builder` as his first argument and the value of the filter, you can add any `where clause` you want. 
+
+With this way, you can use the `setHandler` method to pass a callable that takes the `query builder` as his first
+argument and the value of the filter, you can add any `where clause` you want.
 
 - The last way is to generate a new filter class.
+
 ```bash
 php artisan hubble:filter MyCustomFilter
 ```
+
 This command will generate a new filter class under `app/Hubble/Filters`.
+
 ```php
 <?php
 
@@ -477,27 +562,40 @@ class MyCustomFilter extends Filter
 }
 
 ```
+
 You can also generate a filter with a custom `VueJs` components.
+
 ```bash
 php artisan hubble:filter MyCustomFilter --custom
 ```
+
 This will generate a `VueJs` component under `resources/hubble/components/filters/my-custom-filter.vue`
+
 ### Fields
-Fields are used to display your data. the base `Field` class can be used to create fields. Any types of fields extend this class. 
+
+Fields are used to display your data. the base `Field` class can be used to create fields. Any types of fields extend
+this class.
+
 ```php
 \Oza75\LaravelHubble\Field::make('column', 'title');
 ```
+
 - sortable
+
 ```php
 \Oza75\LaravelHubble\Field::make('column', 'title')->sortable(); // now this field can be used to sort your data
 ```
+
 You can also tell to `Hubble` to sort your data by default using a certain field.
+
 ```php
 \Oza75\LaravelHubble\Field::make('column', 'title')->sortable(true, 'desc');
 ```
+
 #### Custom Display
 
-There are a few methods you can use to customize how you want to display the field value in the different sections of the dashboard.
+There are a few methods you can use to customize how you want to display the field value in the different sections of
+the dashboard.
 
 * displayUsing
 * displayOnIndexUsing
@@ -505,7 +603,7 @@ There are a few methods you can use to customize how you want to display the fie
 * displayOnFormsUsing
 * displayWhenEditingUsing
 * displayWhenCreatingUsing
-    
+
 The `displayUsing` method customize the display in all sections of the dashboard.
 
 All these methods as the same signature.
@@ -519,8 +617,10 @@ All these methods as the same signature.
     return "<a href='mailto:$value'>$value</a>";
 });
 ```
+
 #### Visibility
-`Field` comes with some methods that you can use to tell when to display 
+
+`Field` comes with some methods that you can use to tell when to display
 
 * hide : will hide the field in all screen
 * hideOnIndex
@@ -528,16 +628,19 @@ All these methods as the same signature.
 * hideOnDetails
 * hideWhenCreating
 * hideWhenEditing
+* hideOnExport
 * showOnIndex
 * showOnDetails
 * showOnForm
 * showWhenCreating
 * showWhenEditing
-* onlyOnIndex 
-* onlyOnDetails 
-* onlyOnForms 
-* onlyOnCreating 
-* onlyOnEditing 
+* showOnExport
+* onlyOnIndex
+* onlyOnDetails
+* onlyOnForms
+* onlyOnCreating
+* onlyOnEditing
+* onlyOnExport
 
 ```php 
 \Oza75\LaravelHubble\TextField::make('email', 'Email')->hideOnIndex();
@@ -551,7 +654,7 @@ All of these methods can pass a closure that will be used to hide or display the
 });
 ```
 
-`Hubble` ships with many types of fields, but you can also [create your own.](#create-a-custom-field) 
+`Hubble` ships with many types of fields, but you can also [create your own.](#create-a-custom-field)
 
 - TextField
 - BooleanField
@@ -566,20 +669,27 @@ All of these methods can pass a closure that will be used to hide or display the
 - HasManyField  (relation field)
 
 #### TextField
+
 Used to display a text Field.
 
 ```php
 \Oza75\LaravelHubble\Fields\TextField::make('email', 'Email');
 ```
+
 - text type
+
 ```php
 \Oza75\LaravelHubble\Fields\TextField::make('email', 'Email')->type('email');
 ```
+
 this type will be used to display correct input type in forms.
+
 - limit
+
 ```php
 \Oza75\LaravelHubble\Fields\TextField::make('bio', 'Bio')->limit(100);
 ```
+
 limit the number of character that should be displayed in tables.
 
 #### BooleanField
@@ -587,14 +697,19 @@ limit the number of character that should be displayed in tables.
 ```php
     \Oza75\LaravelHubble\Fields\BooleanField::make('active', 'Active ?')->text('Yes', 'No');
 ```
+
 the `text` method set the text to display when this field has `true` or `false` value.
+
 #### NumberField
+
 Used to display number values
 
 ```php
 \Oza75\LaravelHubble\Fields\NumberField::make('articles_count', 'Articles');
 ```
+
 #### TextareaField
+
 Used to display long text values
 
 ```php
@@ -602,11 +717,13 @@ Used to display long text values
 ```
 
 #### DateTimeField
+
 Used to display dates values
 
 ```php
 \Oza75\LaravelHubble\Fields\DateTimeField::make('created_at', 'Created at');
 ```
+
 - date format
 
 ```php
@@ -614,49 +731,63 @@ Used to display dates values
 ```
 
 - date locale
+
 ```php
 \Oza75\LaravelHubble\Fields\DateTimeField::make('created_at', 'Created at')->setLocale('fr')->format('Y-m-d at h:i');
 ```
+
 #### SelectField
 
 ```php
 \Oza75\LaravelHubble\Fields\SelectField::make('user_type', 'Type')->options(['Pro' => 'pro', 'Normal' => 'normal']);
 ```
+
 - display using label
+
 ```php
 \Oza75\LaravelHubble\Fields\SelectField::make('user_type', 'Type')
 ->options(['Pro' => 'pro', 'Normal' => 'normal'])
 ->displayUsingLabel();
 ```
+
 #### ColorField
+
 Used to display colors
 
 ```php
 \Oza75\LaravelHubble\Fields\ColorField::make('primary_color', 'Color');
 ```
+
 - display using hex value
+
 ```php
 \Oza75\LaravelHubble\Fields\ColorField::make('primary_color', 'Color')->displayUsingHex();
 ```
+
 #### FileField
+
 Used to display and upload files
+
 ```php 
 \Oza75\LaravelHubble\Fields\FileField::make('avatar', 'Avatar'),
 ```
+
 - multiple
 
 ```php 
 \Oza75\LaravelHubble\Fields\FileField::make('avatar', 'Avatar')->multiple(),
 ```
 
-- max 
+- max
 
 Limit number of files
 
 ```php 
 \Oza75\LaravelHubble\Fields\FileField::make('avatar', 'Avatar')->multiple()->max(5),
 ```
+
 #### ImageField
+
 Used to display image and upload images.
 
 `ImageField` extends to `FileField` so it has all methods that `FileField` has, such as `multiple` or `max`.
@@ -672,12 +803,18 @@ or
 ```
 
 #### BelongsToField
+
 Used to display a related resource
+
 - signature
+
 ```php
 \Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'related_class', 'Title');
 ```
-The first argument is the name relationship method. Let's assume we have in our `User` model a `belongsTo` method to `City` Model.
+
+The first argument is the name relationship method. Let's assume we have in our `User` model a `belongsTo` method
+to `City` Model.
+
 ```php 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
@@ -686,30 +823,43 @@ The first argument is the name relationship method. Let's assume we have in our 
         return $this->belongsTo(City::class);
     }
 ```
+
 Then to add this relationship in our resource
+
 ```php
 \Oza75\LaravelHubble\Fields\BelongsToField::make('city', CityResource::class);
 ```
+
 #### HasManyField
+
 Used to display related resources
 
 - signature
+
 ```php
 \Oza75\LaravelHubble\Fields\BelongsToField::make('method_name', 'related_class', 'Title');
 ```
+
 As the `BelongsToField`, the `HasManyField` takes the relationship method name as his first argument.
+
 ```php
 \Oza75\LaravelHubble\Fields\HasManyField::make('roles', RoleResource::class, 'User Roles');
 ```
+
 ### Create a custom field
-You can create a custom field by using this command: 
+
+You can create a custom field by using this command:
+
 ```bash
 php artisan hubble:field ColorField 
 ```
-You can also generate a new field with custom components by using this command: 
+
+You can also generate a new field with custom components by using this command:
+
 ```bash
 php artisan hubble:field ColorField --custom
 ```
+
 This will create new `VueJs` components for your field under `resources/hubble/components/fields/color`
 
 Use this command to build the newly components
@@ -718,12 +868,14 @@ Use this command to build the newly components
 npm run hubble:watch
 ```
 
-or 
+or
+
 ```bash
 npm run hubble:prod
 ```
 
 `php artisan hubble:field` will generate a new Field Class under `app/Hubble/Fields`
+
 ```php
 <?php
 
@@ -766,6 +918,7 @@ class ColorField extends Field
 
 }
 ```
+
 ### Rules
 
 You can automatically validate your forms data by setting rules on each field.
@@ -773,6 +926,7 @@ You can automatically validate your forms data by setting rules on each field.
 ```php
 \Oza75\LaravelHubble\Fields\TextField::make('email', 'Email')->rules('required|email|max:255');
 ```
+
 There are also `rules` methods for each `creation` and `editing` screen
 
 - `rulesWhenUpdating` will define the rules only when updating
@@ -781,8 +935,9 @@ There are also `rules` methods for each `creation` and `editing` screen
 > Warning:  the rules' method cannot yet take a validation object (such as a rule class) or a closure
 > but any `Pull Request` is welcoming.
 
-For frontend interactivity, you may set a handler that can be used to validate automatically your field value under 
-`resources/hubble/rules.js`. If you don't, an `ajax` request will be sent to the backend to check if the value is valid when user is filling the form.
+For frontend interactivity, you may set a handler that can be used to validate automatically your field value under
+`resources/hubble/rules.js`. If you don't, an `ajax` request will be sent to the backend to check if the value is valid
+when user is filling the form.
 
 ```js
 // this method must return a boolean, a string or a promise (for validations that need to make ajax requests) 
@@ -792,16 +947,18 @@ export const string = function (value, fieldName) {
         // then you can use the `window.trans` method to return a translated string
         return window.trans('validation.string', {attribute: fieldName})
     }
-    
+
     return true;
 }
 ```
 
 ### Authorization
 
-Authorization is used to restrict access of certain screen of your dashboard. Internally, it uses mostly `Laravel Authorization Gate`.
+Authorization is used to restrict access of certain screen of your dashboard. Internally, it uses
+mostly `Laravel Authorization Gate`.
 
-You just need to create a [Laravel Policy](https://laravel.com/docs/7.x/authorization#gates) for your resource that will control which user can access or not to a specific screen.
+You just need to create a [Laravel Policy](https://laravel.com/docs/7.x/authorization#gates) for your resource that will
+control which user can access or not to a specific screen.
 
 For example, let's assume I have a `Post` model :
 

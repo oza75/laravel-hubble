@@ -52,6 +52,7 @@ Vue.component('hubble-create', () => import(/* webpackChunkName: "hubble-create"
 Vue.component('hubble-checkbox-filter', () => import(/* webpackChunkName: "hubble-checkbox-filter"*/ /* webpackPrefetch: true */ "./components/filters/checkbox-filter.vue"))
 Vue.component('edit-image-field', () => import(/* webpackChunkName: "edit-image-field" */ /* webpackPrefetch: true */"./components/fields/image/edit-image-field.vue"))
 Vue.component('table-button', () => import(/* webpackChunkName: "table-button" */ /* webpackPrefetch: true */"./components/table-buttons/t-button.vue"))
+Vue.component('export-button', () => import(/* webpackChunkName: "export-button" */ /* webpackPrefetch: true */"./components/table-buttons/export-button.vue"))
 Vue.component('table-button-attach', () => import(/* webpackChunkName: "table-button-attach" */ /* webpackPrefetch: true */"./components/table-buttons/t-attach.vue"))
 Vue.component('table-modal', () => import(/* webpackChunkName: "table-modal" */ /* webpackPrefetch: true */"./components/table-buttons/table-modal.vue"))
 Vue.component('hubble-panel', () => import(/* webpackChunkName: "hubble-panel" */ /* webpackPrefetch: true */"./hubble-panel.vue"))

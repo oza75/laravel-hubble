@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Providers;
+
+use Illuminate\Foundation\Auth\User;
+use Oza75\LaravelHubble\HubbleServiceProvider as BaseProvider;
+
+class HubbleServiceProvider extends BaseProvider
+{
+    /**
+     * Determines if hubble should detects automatically
+     * resources under Hubble resource folder. This is useful when you are
+     * developing but should be disable in production
+     *
+     * @var bool
+     */
+    protected $autoRegistration = true;
+
+    /**
+     * List of resource Hubble should register. Should be used
+     * when you set autoRegistration = false. Optionally you can
+     * define a resource method in this class to bypass this property.
+     *
+     * @var array
+     */
+    protected $resources = [];
+
+    /**
+     * Determines if a given user can access to hubble dashboard.
+     * By default every user can access to hubble
+     *
+     * @param User $user
+     * @return bool
+     */
+    public function authorizesAccess(User $user): bool
+    {
+        return parent::authorizesAccess($user);
+    }
+}

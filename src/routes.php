@@ -1,6 +1,11 @@
 <?php
 
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Oza75\LaravelHubble\Facades\Hubble;
 
 $namespace = Hubble::namespace();
@@ -8,32 +13,33 @@ $prefix = Hubble::prefix();
 
 Route::prefix($prefix)
     ->group(function () use ($namespace) {
-        Route::middleware(['web', 'hubble.auth'])->group(function () use ($namespace) {
-            Route::get('/', "{$namespace}HubbleController@home")
-                ->name('hubble.home');
+        Route::middleware(['web', 'hubble.auth'])
+            ->group(function () use ($namespace) {
+                Route::get('/', "{$namespace}HubbleController@home")
+                    ->name('hubble.home');
 
-            Route::get('/resources/{name}', "{$namespace}HubbleController@index")
-                ->name('hubble.index');
+                Route::get('/resources/{name}', "{$namespace}HubbleController@index")
+                    ->name('hubble.index');
 
-            Route::put('/resources/{name}/{key}/update', "{$namespace}HubbleController@update")
-                ->name('hubble.update');
+                Route::put('/resources/{name}/{key}/update', "{$namespace}HubbleController@update")
+                    ->name('hubble.update');
 
-            Route::get('/resources/{name}/{key}/edit', "{$namespace}HubbleController@edit")
-                ->name('hubble.edit');
+                Route::get('/resources/{name}/{key}/edit', "{$namespace}HubbleController@edit")
+                    ->name('hubble.edit');
 
-            Route::get('/resources/{name}/create', "{$namespace}HubbleController@create")
-                ->name('hubble.create');
+                Route::get('/resources/{name}/create', "{$namespace}HubbleController@create")
+                    ->name('hubble.create');
 
-            Route::post('/resources/{name}/store', "{$namespace}HubbleController@store")
-                ->name('hubble.store');
+                Route::post('/resources/{name}/store', "{$namespace}HubbleController@store")
+                    ->name('hubble.store');
 
-            Route::delete('/resources/{name}/{key}', "{$namespace}HubbleController@destroy")
-                ->name('hubble.delete');
+                Route::delete('/resources/{name}/{key}', "{$namespace}HubbleController@destroy")
+                    ->name('hubble.delete');
 
-            Route::get('/resources/{name}/{key}', "{$namespace}HubbleController@show")
-                ->name('hubble.show');
+                Route::get('/resources/{name}/{key}', "{$namespace}HubbleController@show")
+                    ->name('hubble.show');
 
-        });
+            });
 
         Route::get('/login', "{$namespace}HubbleController@showLoginForm")
             ->middleware(['web', 'hubble.guest'])
@@ -48,10 +54,17 @@ Route::prefix($prefix)
     });
 
 Route::prefix("/api{$prefix}")
-    ->middleware(['api', 'hubble.auth'])
+    ->middleware([
+        EncryptCookies::class, AddQueuedCookiesToResponse::class,
+        StartSession::class, ShareErrorsFromSession::class,
+        'api', 'hubble.auth'
+    ])
     ->group(function () use ($namespace) {
         Route::get('/resources/{name}', "{$namespace}ApiController@index")
             ->name('api.hubble.index');
+
+        Route::get('/resources/{name}/export', "{$namespace}ApiController@export")
+            ->name('api.hubble.export');
 
         Route::get('/resources/{name}/{key}', "{$namespace}ApiController@show")
             ->name('api.hubble.show');

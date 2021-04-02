@@ -105,22 +105,22 @@ trait InteractsWithDatabase
         return $item;
     }
 
-    protected function indexQuery()
+    public function indexQuery()
     {
         return $this->baseQuery();
     }
 
-    protected function editQuery()
+    public function editQuery()
     {
         return $this->baseQuery();
     }
 
-    protected function createQuery()
+    public function createQuery()
     {
         return $this->baseQuery()->newQuery();
     }
 
-    protected function detailsQuery()
+    public function detailsQuery()
     {
         return $this->baseQuery();
     }
