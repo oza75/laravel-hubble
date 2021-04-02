@@ -149,7 +149,7 @@ export default {
         },
         fetchOptionItem(value) {
             return this.$axios.get(this.options, {params: {[this.valueKey]: value}}).then(res => {
-                this.options.push(res.data.data);
+                this.realOptions.push(res.data.data);
             });
         },
         onKeydown(keyboardEvent) {
