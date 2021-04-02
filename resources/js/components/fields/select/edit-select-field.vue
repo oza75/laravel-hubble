@@ -148,7 +148,7 @@ export default {
             })
         },
         fetchOptionItem(value) {
-            return this.$axios.get(this.options, {params: {item: value}}).then(res => {
+            return this.$axios.get(this.options, {params: {[this.valueKey]: value}}).then(res => {
                 this.options.push(res.data.data);
             });
         },
