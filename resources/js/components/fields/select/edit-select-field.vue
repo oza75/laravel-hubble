@@ -315,7 +315,8 @@ export default {
         },
         inputValue(value) {
             if (!value) this.$refs['textInput'].removeAttribute('value')
-            let item = this.realOptions.find(option => option[this.valueKey] == value)
+            let item = this.realOptions.find(option => option[this.valueKey] == value);
+            console.log(item);
             if (!item) {
                 this.$refs['textInput'].value = null;
                 return;
