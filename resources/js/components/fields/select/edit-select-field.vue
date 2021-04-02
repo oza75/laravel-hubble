@@ -145,6 +145,14 @@ export default {
                 } else {
                     this.realOptions = items
                 }
+
+                let item = this.realOptions.find(option => option[this.valueKey] == this.value);
+                if (!item) {
+                    this.$refs['textInput'].value = null;
+                    return;
+                }
+
+                this.$refs['textInput'].value = item[this.textKey]
             })
         },
         fetchOptionItem(value) {
