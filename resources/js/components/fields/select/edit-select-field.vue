@@ -270,10 +270,10 @@
             isSelected(option) {
                 if (!this.multiple) {
                     if (!this.value) return false;
-                    return option[this.valueKey] === (this.returnObject ? this.value[this.valueKey] : this.value);
+                    return option[this.valueKey] == (this.returnObject ? this.value[this.valueKey] : this.value);
                 }
 
-                return (this.tags || []).findIndex(tag => tag[this.valueKey] === option[this.valueKey]) !== -1
+                return (this.tags || []).findIndex(tag => tag[this.valueKey] == option[this.valueKey]) !== -1
             },
             empty() {
                 if (this.multiple) {
