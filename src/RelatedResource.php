@@ -113,7 +113,7 @@ class RelatedResource extends HubbleResource
         $relatedQuery = $this->related->baseQuery();
         $with = $relatedQuery->getEagerLoads();
 
-        $newQuery = $this->relationship->newQuery();
+        $newQuery = (clone $this->relationship)->newQuery();
         $newQuery->setEagerLoads($with);
         $query = $newQuery->getQuery();
 
