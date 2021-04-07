@@ -22,6 +22,9 @@ class HasManyField extends SelectField implements HandleManyRelationship
     use HasRelationships;
 
     protected $perPage = null;
+
+    /** @var bool  */
+    protected $exportable = true;
     /**
      * @var bool[]
      */
@@ -243,5 +246,24 @@ class HasManyField extends SelectField implements HandleManyRelationship
             'last_page' => $data->lastPage(),
             'total' => $data->total(),
         ];
+    }
+
+    /**
+     * @param bool $value
+     * @return $this
+     */
+    public function exportable($value = true): HasManyField
+    {
+        $this->exportable = $value;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isExportable(): bool
+    {
+        return $this->exportable;
     }
 }

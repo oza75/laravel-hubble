@@ -273,4 +273,34 @@ class ApiController
             'filename' => $filename
         ]);
     }
+
+
+    /**
+     * @param Hubble $hubble
+     * @param Request $request
+     * @param $name
+     * @param $key
+     * @param $field
+     * @return JsonResponse
+     * @throws Exception
+     */
+    public function relatedExport(Hubble $hubble, Request $request, $name, $key, $field): JsonResponse
+    {
+        $resource = $hubble->getResource($name);
+
+        $related = $resource->getRelatedFieldResource($field);
+
+        $this->authorizes('index', get_class($resource->getModel()));
+
+        $filename = Str::snake($related->getTitle()) . '_' . $key . '_' . now()->format('Y_m_d_h_i_s') . '.xlsx';
+
+        /** @var ResourceExporter $exporter */
+        $exporter = app(ResourceExporter::class);
+        $exporter->boot($related)->store($filename, 'public');
+
+        return response()->json([
+            'file' => Storage::disk('public')->url($filename),
+            'filename' => $filename
+        ]);
+    }
 }

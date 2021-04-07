@@ -1,5 +1,5 @@
 <template>
-    <div class="container dashboard--container dashboard--index">
+    <div class="container dashboard--container dashboard--index" ref="container">
         <header class="header">
             <h2 class="title">{{resource.config.title}}</h2>
             <div class="filters">
@@ -293,7 +293,7 @@
         methods: {
             fetchItems(params = {}) {
                 this.fetching = true;
-                this.$axios.get(this.url + `&${encodeUrl(params)}`).then(res => {
+               return this.$axios.get(this.url + `&${encodeUrl(params)}`).then(res => {
                     this.items = res.data.data
                     this.lastPage = res.data.meta.last_page
                     this.total = res.data.meta.total
@@ -337,8 +337,11 @@
             },
             paginate(page) {
                 this.page = page;
-                this.fetchItems()
-                document.querySelector('.admin-dashboard--content').scroll(0, 0)
+                this.fetchItems().then(_ => {
+                    const container = this.$refs.container;
+                    if (!container) return;
+                    container.scrollIntoView();
+                });
             },
             isSortedBy(field, type = null) {
                 if (this.filters.sort.by !== field) return false;

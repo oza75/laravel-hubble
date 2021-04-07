@@ -72,6 +72,9 @@ Route::prefix("/api{$prefix}")
         Route::get('/resources/{name}/{key}/{field}', "{$namespace}ApiController@relatedIndex")
             ->name('api.hubble.related.index');
 
+        Route::get('/resources/{name}/{key}/{field}/export', "{$namespace}ApiController@relatedExport")
+            ->name('api.hubble.related.export');
+
         Route::get('/resources/{name}/{id}/edit', "{$namespace}ApiController@edit")
             ->name('api.hubble.edit');
 

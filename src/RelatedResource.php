@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Oza75\LaravelHubble\TableButtons\ExportButton;
 
 class RelatedResource extends HubbleResource
 {
@@ -91,6 +92,12 @@ class RelatedResource extends HubbleResource
             'field' => $this->field->getName()
         ]);
 
+        $exportUrl = route('api.hubble.related.export', [
+            'name' => $this->parent->getName(),
+            'key' => \request('key'),
+            'field' => $this->field->getName()
+        ]);
+
         return [
             TableModal::make(trans('laravel-hubble::dashboard.attach'), $url)
                 ->setClasses('btn-secondary')
@@ -101,7 +108,12 @@ class RelatedResource extends HubbleResource
                     $model = $this->related->getModel();
                     return $this->canAttach($this->parentModel, get_class($model));
                 })
-                ->confirmText(trans('laravel-hubble::dashboard.attach'))
+                ->confirmText(trans('laravel-hubble::dashboard.attach')),
+
+            ExportButton::make('', 'Exporter', $exportUrl, 'btn-primary')
+                ->displayWhen(function (User $user) {
+                    return $this->field->isExportable();
+                }),
         ];
     }
 
@@ -134,7 +146,7 @@ class RelatedResource extends HubbleResource
 
         foreach (array_keys($relatedQuery->getQuery()->bindings) as $key) {
             $builder->bindings[$key] = array_values(
-                array_merge($relatedQuery->getQuery()->bindings[$key], (array) $bindings[$key])
+                array_merge($relatedQuery->getQuery()->bindings[$key], (array)$bindings[$key])
             );
         }
 
