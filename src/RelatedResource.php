@@ -113,9 +113,9 @@ class RelatedResource extends HubbleResource
         $relatedQuery = $this->related->baseQuery();
         $with = $relatedQuery->getEagerLoads();
 
-        $newQuery = (clone $this->relationship)->newQuery();
-        $newQuery->setEagerLoads($with);
-        $query = $newQuery->getQuery();
+        $relationshipQuery = (clone $this->relationship)->newQuery();
+        $relationshipQuery->setEagerLoads($with);
+        $query = $relationshipQuery->getQuery();
 
         $columns = $relatedQuery->getQuery()->columns;
 
@@ -124,9 +124,21 @@ class RelatedResource extends HubbleResource
             $query->selectRaw($columnSql);
         }
 
-        $query->mergeWheres($relatedQuery->getQuery()->wheres, $relatedQuery->getQuery()->getBindings());
+        $builder = $query->getQuery();
+        $wheres = $builder->wheres;
+        $bindings = $builder->bindings;
+        $builder->wheres = [];
+        $builder->bindings = [];
 
-        return $newQuery->getQuery();
+        $builder->wheres = array_merge($relatedQuery->getQuery()->wheres, $wheres);
+
+        foreach (array_keys($relatedQuery->getQuery()->bindings) as $key) {
+            $builder->bindings[$key] = array_values(
+                array_merge($relatedQuery->getQuery()->bindings[$key], (array) $bindings[$key])
+            );
+        }
+
+        return $relationshipQuery->getQuery();
     }
 
     protected function urls()
