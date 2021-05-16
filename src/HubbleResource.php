@@ -509,8 +509,10 @@ abstract class HubbleResource
 
     public function configure(Configuration $configuration)
     {
-        $configuration->details(function (ScreenConfiguration $configuration, User $user) {
-            $configuration->setTitle("User #". $user->id);
+        $configuration->details(function (ScreenConfiguration $configuration, $model) {
+            /** @var string $title */
+            $title = $this->getTitle();
+            $configuration->setTitle(Str::singular($title) ." #". $model->id);
         });
     }
 }

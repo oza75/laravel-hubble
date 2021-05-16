@@ -137,9 +137,9 @@ class InstallationCommand extends Command
         $content = File::get(base_path('package.json'));
         $package = json_decode($content, true);
         $scripts = [
-            'hubble:dev' => "cross-env NODE_ENV=development process.env.hubble=true node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
-            "hubble:watch" => "cross-env NODE_ENV=development process.env.hubble=true node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js --watch",
-            "hubble:prod" => "cross-env NODE_ENV=production process.env.hubble=true node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
+            'hubble:dev' => "mix --mix-config hubble-webpack.mix.js",
+            "hubble:watch" => "mix watch --mix-config hubble-webpack.mix.js -- --watch-options-poll=1000",
+            "hubble:prod" => "mix --mix-config hubble-webpack.mix.js --production"
         ];
         $packageScripts = $package['scripts'] ?? [];
         $packageScripts = array_merge($packageScripts, $scripts);
