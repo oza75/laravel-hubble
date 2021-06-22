@@ -35,6 +35,7 @@ class InstallationCommand extends Command
         $this->createHubbleDirectory();
         $this->createBaseResource();
         $this->createHubbleWebpackMix();
+        $this->createActionComponentDirectory();
         $this->createServiceProvider();
 
         $this->info('Laravel Hubble is successfully installed !');
@@ -163,6 +164,18 @@ class InstallationCommand extends Command
 
         if (!File::exists($path . DIRECTORY_SEPARATOR . "rules.js"))
             $this->createStubFile('rules.stub', [], $path . DIRECTORY_SEPARATOR . "rules.js");
+
+        if (!File::isDirectory($path . DIRECTORY_SEPARATOR . "components" . DIRECTORY_SEPARATOR . 'actions')) {
+            File::makeDirectory($path . DIRECTORY_SEPARATOR . "components" . DIRECTORY_SEPARATOR . 'actions');
+        }
+
+        $actionMixinsPath = $path . DIRECTORY_SEPARATOR . "components" . DIRECTORY_SEPARATOR . 'actions' . DIRECTORY_SEPARATOR . "ActionMixin.js";
+        if (!File::exists($actionMixinsPath)) {
+            $this->createStubFile('actions' . DIRECTORY_SEPARATOR . 'action-mixin.stub',
+                [],
+                $actionMixinsPath
+            );
+        }
     }
 
     private function createServiceProvider()
@@ -183,5 +196,10 @@ class InstallationCommand extends Command
         $this->createStubFile('service-provider.stub', [], $path);
 
         $this->warn("Add app\Providers\HubbleServiceProvider into providers array in your config/app.php.");
+    }
+
+    private function createActionComponentDirectory()
+    {
+
     }
 }

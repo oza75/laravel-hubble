@@ -80,7 +80,7 @@ class CreateActionCommand extends Command
         }
 
         $componentName = Str::slug($component);
-        $chunkName = Str::contains('action', $componentName) ? $componentName : $componentName . '-action';
+        $chunkName = Str::contains($componentName, 'action') ? $componentName : $componentName . '-action';
 
         $content = "window.Vue.component('$componentName', () => import(/* webpackChunkName: '$chunkName'*/ './components/actions/$componentName'));\n";
         File::append(resource_path('hubble' . DIRECTORY_SEPARATOR . 'components.js'), $content);
