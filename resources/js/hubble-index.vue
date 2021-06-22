@@ -189,7 +189,7 @@
         </section>
 
         <component v-if="currentAction && showActionComponent" :is="currentAction.component"
-                   :selected="selected" v-bind="currentAction.props" :action="currentAction"
+                   :selected="selectedItems" :resource="resource" v-bind="currentAction.props" :action="currentAction"
                    @close="closeAction" @ran="actionRan"
         ></component>
 
@@ -285,6 +285,11 @@ export default {
         },
         fields() {
             return Object.values(this.resource.fields)
+        },
+        selectedItems() {
+            return this.items.filter(item => {
+                return this.selected.includes(item[this.key]);
+            })
         }
     },
     methods: {

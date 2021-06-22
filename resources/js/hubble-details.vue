@@ -84,7 +84,7 @@
         </div>
 
         <component v-if="action && showActionComponent" :is="action.component"
-                   :selected="[datum]" v-bind="action.props" :action="action"
+                   :selected="[datum]" :resource="resource" v-bind="action.props" :action="action"
                    @close="closeAction" @ran="actionRan"
         ></component>
     </div>

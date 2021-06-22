@@ -4,7 +4,13 @@ export const ActionMixin = {
     }),
     props: {
         action: {type: Object, required: true},
-        selected: {required: true},
+        selected: {type: Array, required: true},
+        resource: {type: Object, required: true},
+    },
+    computed: {
+        selectedIds() {
+            return this.selected.map(it => it[this.resource.key || 'id']);
+        }
     },
     methods: {
         close() {
@@ -12,7 +18,7 @@ export const ActionMixin = {
         },
         run() {
             this.running = false;
-            return this.$axios.post(this.action.url, {items: this.selected})
+            return this.$axios.post(this.action.url, {items: this.selectedIds})
                 .then(res => {
                     this.ran();
                 }).finally(_ => {
