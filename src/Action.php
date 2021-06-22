@@ -21,6 +21,11 @@ abstract class Action
      * @var string|null
      */
     protected $confirmationMessage;
+
+    /**
+     * @var string
+     */
+    protected $component = 'confirm-action';
     /**
      * @var string
      */
@@ -29,20 +34,25 @@ abstract class Action
     /**
      * @var array[]
      */
-    private $hooks = [
+    protected $hooks = [
         'before' => [],
         'after' => []
     ];
 
-    private $visibility = [
+    protected $visibility = [
         'index' => true,
         'details' => true
     ];
 
     /**
+     * @var array
+     */
+    protected $props = [];
+
+    /**
      * Action constructor.
      * @param string|null $name
-     * @param string $title
+     * @param string|null $title
      * @param string|null $confirmationMessage
      */
     public function __construct(?string $name = null, ?string $title = null, ?string $confirmationMessage = null)
@@ -94,7 +104,10 @@ abstract class Action
             'name' => $this->getName(),
             'title' => $this->getTitle(),
             'icon' => $this->icon() ?? null,
-            'confirm_message' => $this->confirmationMessage,
+            'component' => $this->component,
+            'props' => array_merge($this->getProps(), [
+                'confirmMessage' => $this->confirmationMessage
+            ]),
         ];
     }
 
@@ -191,7 +204,7 @@ abstract class Action
      * @param LazyCollection $collection
      * @return LazyCollection
      */
-    private function allows(LazyCollection $collection)
+    protected function allows(LazyCollection $collection)
     {
         return $collection->filter(function ($item) {
             return $this->can(auth()->user(), $item);
@@ -224,5 +237,32 @@ abstract class Action
     public function visiblesIn(string $section)
     {
         return $this->visibility[$section] ?? false;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     * @return $this
+     */
+    public function addProp(string $name, $value)
+    {
+        $this->props[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $name
+     * @param mixed $default
+     * @return mixed|null
+     */
+    public function getProp(string $name, $default = null)
+    {
+        return $this->props[$name] ?? $default;
+    }
+
+    public function getProps()
+    {
+        return $this->props;
     }
 }

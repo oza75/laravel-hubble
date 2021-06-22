@@ -37,7 +37,7 @@
                                 </option>
                             </select>
                         </label>
-                        <button @click="runAction(false)" class="btn btn-coral btn-radius btn-icon">
+                        <button @click="openAction" class="btn btn-coral btn-radius btn-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px"
                                  v-show="runningAction === false"
                                  height="24px">
@@ -82,18 +82,11 @@
                 <hubble-index :resource="res"></hubble-index>
             </div>
         </div>
-        <v-modal :label="$t('dashboard.confirmation')" v-if="actionModalConfirmation"
-                 @close="actionModalConfirmation = false">
-            <template v-slot:body>
-                <p v-html="action.confirm_message"></p>
-            </template>
-            <template v-slot:footer>
-                <button class="btn btn-text btn-normal" @click="actionModalConfirmation = false">
-                    {{$t('dashboard.cancel')}}
-                </button>
-                <button class="btn btn-normal btn-primary" @click="runAction(true)">{{$t('dashboard.confirm')}}</button>
-            </template>
-        </v-modal>
+
+        <component v-if="action && showActionComponent" :is="action.component"
+                   :selected="[datum]" v-bind="action.props" :action="action"
+                   @close="closeAction" @ran="actionRan"
+        ></component>
     </div>
 </template>
 
@@ -109,7 +102,7 @@
             openDeleteModal: false,
             action: null,
             runningAction: false,
-            actionModalConfirmation: false,
+            showActionComponent: false,
         }),
         components: {InlineLoader, VModal},
         props: {
@@ -131,25 +124,9 @@
             },
         },
         methods: {
-            runAction(confirmed = false) {
-                if (!this.action) return;
-                if (this.action.confirm_message && !confirmed) {
-                    this.actionModalConfirmation = true;
-                    return false;
-                }
-                this.actionModalConfirmation = false;
-                this.runningAction = this.action.icon ? this.action.name : true;
-                return this.$axios.post(this.action.url, {items: [this.datum[this.resource.key]]})
-                    .then(res => {
-                        this.fetchItem({'after-running-action': true});
-                    }).finally(_ => {
-                        this.runningAction = false;
-                        if (this.action.icon) this.action = null;
-                    })
-            },
             runIconAction(action) {
                 this.action = action;
-                this.runAction(false);
+                this.openAction();
             },
             fetchItem(params) {
                 this.$axios.get(this.resource.urls.api.show).then(res => {
@@ -167,7 +144,18 @@
             selectAction(event) {
                 let index = event.target.value;
                 this.action = this.resource.actions[index] || null;
-            }
+            },
+            closeAction() {
+                this.showActionComponent = false;
+            },
+            actionRan() {
+                this.selected = [];
+                this.fetchItems({'after-running-action': true});
+            },
+            openAction() {
+                if (!this.action) return;
+                this.showActionComponent = true;
+            },
         },
         created() {
             this.datum = this.item;

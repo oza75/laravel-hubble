@@ -1,7 +1,7 @@
 <template>
     <div class="container dashboard--container dashboard--index" ref="container">
         <header class="header">
-            <h2 class="title">{{resource.config.title}}</h2>
+            <h2 class="title">{{ resource.config.title }}</h2>
             <div class="filters">
                 <div v-for="(filter, k) in (resource.filters || [])" :key="'filter-'+k">
                     <hubble-filter :filter="filter" :value="customFilters[filter.name]"
@@ -13,7 +13,7 @@
             <div class="total--wrapper">
                 <div class="total">
                     <span v-if="total > 0">
-                        {{$t('dashboard.results', {total: total})}}
+                        {{ $t('dashboard.results', {total: total}) }}
                     </span>
                 </div>
             </div>
@@ -24,7 +24,7 @@
                         <path
                             d="M19 17L13.846 11.846C14.7988 10.3979 15.1804 8.64774 14.917 6.93442C14.6535 5.22111 13.7637 3.66648 12.4199 2.57154C11.076 1.47659 9.37366 0.919227 7.64245 1.00735C5.91123 1.09547 4.27429 1.82281 3.04855 3.04855C1.82281 4.27429 1.09547 5.91123 1.00735 7.64245C0.919227 9.37366 1.47659 11.076 2.57154 12.4199C3.66648 13.7637 5.22111 14.6535 6.93442 14.917C8.64774 15.1804 10.3979 14.7988 11.846 13.846L17 19L19 17ZM2.99998 7.99998C2.99998 5.24298 5.24298 2.99998 7.99998 2.99998C10.757 2.99998 13 5.24298 13 7.99998C13 10.757 10.757 13 7.99998 13C5.24298 13 2.99998 10.757 2.99998 7.99998Z"/>
                     </svg>
-                    <label for="table-search" class="sr-only">{{$t('dashboard.search_placeholder')}}</label>
+                    <label for="table-search" class="sr-only">{{ $t('dashboard.search_placeholder') }}</label>
                     <input type="text" id="table-search" :placeholder="$t('dashboard.search_placeholder')"
                            @input="search">
                 </div>
@@ -33,13 +33,13 @@
                          v-if="resource.actions && resource.actions.length > 0 && selected.length > 0">
                         <label class="resources--actions--wrapper">
                             <select name="action" id="action" v-model="action">
-                                <option :value="null" selected> {{$t('dashboard.choose_an_action')}}</option>
+                                <option :value="null" selected> {{ $t('dashboard.choose_an_action') }}</option>
                                 <option :value="k" v-for="(action, k) in resource.actions" :key="'action-'+k">
-                                    {{action.title}}
+                                    {{ action.title }}
                                 </option>
                             </select>
                         </label>
-                        <button @click="runAction(false)" class="btn btn-secondary btn-radius btn-icon">
+                        <button @click="openAction" class="btn btn-secondary btn-radius btn-icon">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white" width="24px"
                                  v-show="!runningAction"
                                  height="24px">
@@ -48,7 +48,8 @@
                             <inline-loader v-show="runningAction"></inline-loader>
                         </button>
                     </div>
-                    <component v-for="(button,k) in buttons" :key="'tb-'+k" :is="button.component" @refresh="fetchItems" v-bind="button"/>
+                    <component v-for="(button,k) in buttons" :key="'tb-'+k" :is="button.component" @refresh="fetchItems"
+                               v-bind="button"/>
                 </div>
             </div>
             <ol class="table--list"
@@ -83,7 +84,7 @@
                                 </svg>
                             </template>
                             <span class="name">
-                                {{field.title}}
+                                {{ field.title }}
                             </span>
                         </div>
                     </div>
@@ -94,7 +95,8 @@
                     <div class="fake-checkbox--wrapper table--list--data">
                         <div class="fake-checkbox" :class="{active: isSelected(item)}"></div>
                     </div>
-                    <div class="table--list--data" :class="{['table--'+field.name]: true, 'sortable-field': field.sortable}"
+                    <div class="table--list--data"
+                         :class="{['table--'+field.name]: true, 'sortable-field': field.sortable}"
                          v-for="field in fields" :key="'table-row--'+k+'-'+field.name"
                     >
                         <div class="table--list--data--content">
@@ -136,7 +138,8 @@
                     </div>
                 </li>
             </ol>
-            <component :is="panel.component" :resource="resource" page="index" :panel="panel" v-for="(panel, k) in resource.panels" :key="k"></component>
+            <component :is="panel.component" :resource="resource" page="index" :panel="panel"
+                       v-for="(panel, k) in resource.panels" :key="k"></component>
             <div class="empty--states" v-if="isEmpty">
                 <div class="wrapper">
                     <svg enable-background="new 0 0 24 24" viewBox="0 0 24 24"
@@ -174,7 +177,7 @@
                                 d="m23.25 6h-22.5c-.414 0-.75-.336-.75-.75s.336-.75.75-.75h22.5c.414 0 .75.336.75.75s-.336.75-.75.75z"/>
                         </g>
                     </svg>
-                    <h4>{{$t('dashboard.empty_message')}}</h4>
+                    <h4>{{ $t('dashboard.empty_message') }}</h4>
                 </div>
             </div>
             <v-pagination :page-count="lastPage" page-link-class="item" v-if="lastPage > 1"
@@ -184,31 +187,25 @@
                           container-class="pagination--container"
                           :prev-text="$t('dashboard.previous')" :next-text="$t('dashboard.next')"/>
         </section>
-        <v-modal :label="$t('dashboard.confirmation')" v-if="actionModalConfirmation"
-                 @close="actionModalConfirmation = false">
-            <template v-slot:body>
-                <p v-html="currentAction.confirm_message"></p>
-            </template>
-            <template v-slot:footer>
-                <button class="btn btn-text btn-normal" @click="actionModalConfirmation = false">
-                    {{$t('dashboard.cancel')}}
-                </button>
-                <button class="btn btn-normal btn-primary" @click="runAction(true)">{{$t('dashboard.confirm')}}</button>
-            </template>
-        </v-modal>
+
+        <component v-if="currentAction && showActionComponent" :is="currentAction.component"
+                   :selected="selected" v-bind="currentAction.props" :action="currentAction"
+                   @close="closeAction" @ran="actionRan"
+        ></component>
+
         <v-modal :label="$t('dashboard.confirmation')" v-if="deleteItemModal" @close="deleteItemModal = false">
             <template v-slot:body>
-                <span v-if="resource.isManyRelation">{{$t('dashboard.detach_record_message')}}</span>
-                <span v-else>{{$t('dashboard.delete_record_message')}} </span>
+                <span v-if="resource.isManyRelation">{{ $t('dashboard.detach_record_message') }}</span>
+                <span v-else>{{ $t('dashboard.delete_record_message') }} </span>
             </template>
             <template v-slot:footer>
-                <button class="btn btn-normal btn-text" @click="deleteItemModal = false">{{$t('dashboard.cancel')}}
+                <button class="btn btn-normal btn-text" @click="deleteItemModal = false">{{ $t('dashboard.cancel') }}
                 </button>
                 <button class="btn btn-normal btn-radius btn-primary"
                         @click="removeItem">
                     <span v-show="!removing">
-                        <span v-if="resource.isManyRelation">{{$t('dashboard.detach')}}</span>
-                        <span v-else>{{$t('dashboard.confirm')}}</span>
+                        <span v-if="resource.isManyRelation">{{ $t('dashboard.detach') }}</span>
+                        <span v-else>{{ $t('dashboard.confirm') }}</span>
                     </span>
                     <inline-loader v-show="removing"></inline-loader>
                 </button>
@@ -218,207 +215,202 @@
 </template>
 
 <script>
-    import VModal from './components/v-modal.vue'
-    import VPagination from "./components/VPagination";
-    import {encodeUrl} from "./utils";
-    import AdditionalActions from "./components/additional-actions";
-    import HubbleFilter from "./components/filters/hubble-filter";
-    import InlineLoader from "./components/inline-loader";
+import VModal from './components/v-modal.vue'
+import VPagination from "./components/VPagination";
+import {encodeUrl} from "./utils";
+import AdditionalActions from "./components/additional-actions";
+import HubbleFilter from "./components/filters/hubble-filter";
+import InlineLoader from "./components/inline-loader";
 
-    export default {
-        name: "hubble-index",
-        data: () => ({
-            items: [],
-            filtersOptions: {},
-            fetching: true,
-            removing: false,
-            selected: [],
-            page: 1,
-            action: null,
-            itemToRemove: null,
-            deleteItemModal: false,
-            actionModalConfirmation: false,
-            runningAction: false,
-            lastPage: 0,
-            total: 0,
-            searchTimer: null,
-            customFilters: {},
-            filters: {
-                sort: {by: null, type: null},
-                search: null
-            },
-        }),
-        components: {InlineLoader, HubbleFilter, AdditionalActions, VPagination, VModal},
-        props: {
-            resource: {type: Object, required: true}
+export default {
+    name: "hubble-index",
+    data: () => ({
+        items: [],
+        filtersOptions: {},
+        fetching: true,
+        removing: false,
+        selected: [],
+        page: 1,
+        action: null,
+        itemToRemove: null,
+        deleteItemModal: false,
+        showActionComponent: false,
+        runningAction: false,
+        lastPage: 0,
+        total: 0,
+        searchTimer: null,
+        customFilters: {},
+        filters: {
+            sort: {by: null, type: null},
+            search: null
         },
-        computed: {
-            buttons() {
-                return this.resource.buttons;
-            },
-            isEmpty() {
-                return this.items.length === 0 && this.fetching === false
-            },
-            isAllSelected() {
-                return this.selected.length === this.items.length
-            },
-            key() {
-                return this.resource.key || 'id'
-            },
-            currentAction() {
-                if (this.action === null || this.action === undefined) return null;
-                return this.resource.actions[this.action]
-            },
-            url() {
-                let params = {
-                    ...this.filters,
-                    page: this.page
-                }
-
-                let filters = this.resource.filters || [];
-
-                filters.forEach(filter => {
-                    if (!this.customFilters[filter.name]) return;
-                    params[filter.name] = Array.isArray(this.customFilters[filter.name])
-                        ? this.customFilters[filter.name].map(it => it[filter.attributes.valueKey])
-                        : this.customFilters[filter.name][filter.attributes.valueKey]
-                })
-
-                return this.resource.urls.api.index + '?' + encodeUrl(params)
-            },
-            fields() {
-                return Object.values(this.resource.fields)
+    }),
+    components: {InlineLoader, HubbleFilter, AdditionalActions, VPagination, VModal},
+    props: {
+        resource: {type: Object, required: true}
+    },
+    computed: {
+        buttons() {
+            return this.resource.buttons;
+        },
+        isEmpty() {
+            return this.items.length === 0 && this.fetching === false
+        },
+        isAllSelected() {
+            return this.selected.length === this.items.length
+        },
+        key() {
+            return this.resource.key || 'id'
+        },
+        currentAction() {
+            if (this.action === null || this.action === undefined) return null;
+            return this.resource.actions[this.action]
+        },
+        url() {
+            let params = {
+                ...this.filters,
+                page: this.page
             }
+
+            let filters = this.resource.filters || [];
+
+            filters.forEach(filter => {
+                if (!this.customFilters[filter.name]) return;
+                params[filter.name] = Array.isArray(this.customFilters[filter.name])
+                    ? this.customFilters[filter.name].map(it => it[filter.attributes.valueKey])
+                    : this.customFilters[filter.name][filter.attributes.valueKey]
+            })
+
+            return this.resource.urls.api.index + '?' + encodeUrl(params)
         },
-        methods: {
-            fetchItems(params = {}) {
-                this.fetching = true;
-               return this.$axios.get(this.url + `&${encodeUrl(params)}`).then(res => {
-                    this.items = res.data.data
-                    this.lastPage = res.data.meta.last_page
-                    this.total = res.data.meta.total
-                }).finally(_ => {
-                    this.fetching = false;
-                })
-            },
-            select(item) {
-                let index = this.selected.findIndex(it => it === item[this.key])
-                if (index === -1) this.selected.push(item[this.key])
-                else this.selected.splice(index, 1)
-            },
-            isSelected(item) {
-                let index = this.selected.findIndex(it => it === item[this.key])
-
-                return index !== -1
-            },
-            selectAll() {
-                if (this.isAllSelected) {
-                    this.selected = []
-                    return;
-                }
-
-                this.selected = this.items.map(it => it[this.key])
-            },
-            runAction(confirmed = false) {
-                if (!this.currentAction) return;
-                if (this.currentAction.confirm_message && !confirmed) {
-                    this.actionModalConfirmation = true;
-                    return false;
-                }
-                this.actionModalConfirmation = false;
-                this.runningAction = true;
-                return this.$axios.post(this.currentAction.url, {items: this.selected})
-                    .then(res => {
-                        this.selected = [];
-                        this.fetchItems({'after-running-action': true});
-                    }).finally(_ => {
-                        this.runningAction = false;
-                    })
-            },
-            paginate(page) {
-                this.page = page;
-                this.fetchItems().then(_ => {
-                    const container = this.$refs.container;
-                    if (!container) return;
-                    container.scrollIntoView();
-                });
-            },
-            isSortedBy(field, type = null) {
-                if (this.filters.sort.by !== field) return false;
-
-                if (!type) return true;
-
-                return this.filters.sort.type === type;
-            },
-            sortBy(field) {
-                if (!this.isSortedBy(field)) {
-                    this.filters.sort = {by: field, type: 'asc'}
-                    return;
-                }
-
-                if (this.isSortedBy(field, 'asc')) {
-                    this.filters.sort = {by: field, type: 'desc'}
-                    return;
-                }
-
-                if (this.isSortedBy(field, 'desc')) {
-                    this.filters.sort = {by: null, type: null}
-                    return;
-                }
-            },
-            search(event) {
-                let query = event.target.value;
-                clearTimeout(this.searchTimer)
-                this.searchTimer = setTimeout(() => {
-                    this.filters.search = query;
-                    // this.fetchItems();
-                }, 350)
-            },
-            selectFilter(filter, value) {
-                this.$set(this.customFilters, filter.name, value)
-            },
-
-            setItemToRemove(item, index) {
-                this.itemToRemove = {value: item, index: index}
-                this.deleteItemModal = true;
-            },
-            removeItem() {
-                if (!this.itemToRemove) return;
-                this.removing = true;
-                this.$axios.delete(this.itemToRemove.value['@urls']['delete']['url']).then(res => {
-                    this.items.splice(this.itemToRemove.index, 1);
-                    this.itemToRemove = null;
-                    this.deleteItemModal = false;
-                }).finally(_ => {
-                    this.removing = false;
-                })
-            },
-            linkAttrs(link) {
-                let target = link.target || null;
-                if (!target) return {};
-                return {
-                    target: link.target
-                }
-            }
-        },
-        watch: {
-            filters: {
-                handler() {
-                    this.page = 1
-                    this.fetchItems()
-                },
-                deep: true
-            },
-            customFilters: {
-                handler() {
-                    this.page = 1
-                    this.fetchItems()
-                },
-                deep: true
-            }
-        },
-        created() {
-            this.fetchItems()
+        fields() {
+            return Object.values(this.resource.fields)
         }
+    },
+    methods: {
+        fetchItems(params = {}) {
+            this.fetching = true;
+            return this.$axios.get(this.url + `&${encodeUrl(params)}`).then(res => {
+                this.items = res.data.data
+                this.lastPage = res.data.meta.last_page
+                this.total = res.data.meta.total
+            }).finally(_ => {
+                this.fetching = false;
+            })
+        },
+        select(item) {
+            let index = this.selected.findIndex(it => it === item[this.key])
+            if (index === -1) this.selected.push(item[this.key])
+            else this.selected.splice(index, 1)
+        },
+        isSelected(item) {
+            let index = this.selected.findIndex(it => it === item[this.key])
+
+            return index !== -1
+        },
+        selectAll() {
+            if (this.isAllSelected) {
+                this.selected = []
+                return;
+            }
+
+            this.selected = this.items.map(it => it[this.key])
+        },
+        closeAction() {
+            this.showActionComponent = false;
+        },
+        actionRan() {
+            this.selected = [];
+            this.fetchItems({'after-running-action': true});
+        },
+        openAction() {
+            if (!this.currentAction) return;
+            this.showActionComponent = true;
+        },
+        paginate(page) {
+            this.page = page;
+            this.fetchItems().then(_ => {
+                const container = this.$refs.container;
+                if (!container) return;
+                container.scrollIntoView();
+            });
+        },
+        isSortedBy(field, type = null) {
+            if (this.filters.sort.by !== field) return false;
+
+            if (!type) return true;
+
+            return this.filters.sort.type === type;
+        },
+        sortBy(field) {
+            if (!this.isSortedBy(field)) {
+                this.filters.sort = {by: field, type: 'asc'}
+                return;
+            }
+
+            if (this.isSortedBy(field, 'asc')) {
+                this.filters.sort = {by: field, type: 'desc'}
+                return;
+            }
+
+            if (this.isSortedBy(field, 'desc')) {
+                this.filters.sort = {by: null, type: null}
+                return;
+            }
+        },
+        search(event) {
+            let query = event.target.value;
+            clearTimeout(this.searchTimer)
+            this.searchTimer = setTimeout(() => {
+                this.filters.search = query;
+                // this.fetchItems();
+            }, 350)
+        },
+        selectFilter(filter, value) {
+            this.$set(this.customFilters, filter.name, value)
+        },
+
+        setItemToRemove(item, index) {
+            this.itemToRemove = {value: item, index: index}
+            this.deleteItemModal = true;
+        },
+        removeItem() {
+            if (!this.itemToRemove) return;
+            this.removing = true;
+            this.$axios.delete(this.itemToRemove.value['@urls']['delete']['url']).then(res => {
+                this.items.splice(this.itemToRemove.index, 1);
+                this.itemToRemove = null;
+                this.deleteItemModal = false;
+            }).finally(_ => {
+                this.removing = false;
+            })
+        },
+        linkAttrs(link) {
+            let target = link.target || null;
+            if (!target) return {};
+            return {
+                target: link.target
+            }
+        }
+    },
+    watch: {
+        filters: {
+            handler() {
+                this.page = 1
+                this.fetchItems()
+            },
+            deep: true
+        },
+        customFilters: {
+            handler() {
+                this.page = 1
+                this.fetchItems()
+            },
+            deep: true
+        }
+    },
+    created() {
+        this.fetchItems()
     }
+}
 </script>

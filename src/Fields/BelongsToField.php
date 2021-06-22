@@ -44,7 +44,7 @@ class BelongsToField extends SelectField
      * @param Model $model
      * @param BelongsTo $relationship
      */
-    private function getOptionsFromRelated(Model $model, BelongsTo $relationship)
+    protected function getOptionsFromRelated(Model $model, BelongsTo $relationship)
     {
         $related = $this->newRelatedInstance();
 
@@ -87,7 +87,7 @@ class BelongsToField extends SelectField
      * @param Model $model
      * @param BelongsTo $relationship
      */
-    private function guessColumnName(Model $model, BelongsTo $relationship)
+    protected function guessColumnName(Model $model, BelongsTo $relationship)
     {
         $this->setName($relationship->getForeignKeyName());
     }
@@ -95,7 +95,7 @@ class BelongsToField extends SelectField
     /**
      * @return Resource
      */
-    private function newRelatedInstance()
+    protected function newRelatedInstance()
     {
         return new $this->related;
     }
@@ -131,7 +131,7 @@ class BelongsToField extends SelectField
         return parent::resolveData($value, $resource, $type);
     }
 
-    private function addValueResolver()
+    protected function addValueResolver()
     {
         $callable = function ($value, $data) {
             $model = $data->{$this->methodName};

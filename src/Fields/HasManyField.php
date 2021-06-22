@@ -105,7 +105,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
     /**
      * @return array
      */
-    private function getRelationship()
+    protected function getRelationship()
     {
         $model = $this->getModel();
 
@@ -136,7 +136,7 @@ class HasManyField extends SelectField implements HandleManyRelationship
      * @param Request $request
      * @param HasMany $relationship
      */
-    private function persists(string $eventName, Request $request, HasMany $relationship)
+    protected function persists(string $eventName, Request $request, HasMany $relationship)
     {
         $ids = $request->get($this->name);
 

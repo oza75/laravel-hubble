@@ -1,0 +1,28 @@
+<template>
+    <v-modal :label="action.title" @close="close">
+        <template v-slot:body>
+            <!-- Your action body-->
+        </template>
+        <template v-slot:footer>
+            <button class="btn btn-text btn-normal" @click="close">
+                {{ $t('dashboard.cancel') }}
+            </button>
+            <button class="btn btn-normal btn-primary" @click="run();">{{ $t('dashboard.confirm') }}</button>
+        </template>
+    </v-modal>
+</template>
+
+<script>
+import {ActionMixin} from "./ActionMixin";
+
+export default {
+    name: "%name%",
+    props: {},
+
+    mixins: [ActionMixin],
+}
+</script>
+
+<style scoped>
+
+</style>

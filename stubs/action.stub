@@ -18,6 +18,11 @@ class %class_name% extends Action
      */
     protected $confirmationMessage = 'Do you really want to perform this action ?';
 
+      /**
+      * @var string
+      */
+    protected $component = '%componentName%';
+
     /**
      * Handle your action
      *
@@ -29,7 +34,5 @@ class %class_name% extends Action
         // We use LazyCollection for performance purpose but you can turn out to default Laravel Collection
         // by calling `$models->all()`;
         // It is recommended to use a Job to Handle your action. See an example here :
-
-
     }
 }

@@ -20,21 +20,21 @@ class RelatedResource extends HubbleResource
     /**
      * @var HubbleResource
      */
-    private $related;
+    protected $related;
 
-    private $relationship;
+    protected $relationship;
     /**
      * @var Field
      */
-    private $field;
+    protected $field;
     /**
      * @var Resource|Resource
      */
-    private $parent;
+    protected $parent;
     /**
      * @var Model
      */
-    private $parentModel;
+    protected $parentModel;
 
     /**
      * RelatedResource constructor.
