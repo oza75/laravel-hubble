@@ -20,7 +20,7 @@ class TableButton
     protected $classes;
 
     /**
-     * @var null
+     * @var string
      */
     protected $component = 'table-button';
     /**
