@@ -330,7 +330,20 @@ export default {
         },
         openAction() {
             if (!this.currentAction) return;
-            this.showActionComponent = true;
+            if (this.currentAction.component === 'confirm-action' && !this.currentAction.confirmMessage) {
+                this.runAction();
+            } else {
+                this.showActionComponent = true;
+            }
+        },
+        runAction() {
+            this.running = false;
+            return this.$axios.post(this.currentAction.url, {items: this.selected})
+                .then(res => {
+                    this.fetchItems();
+                }).finally(_ => {
+                    this.running = false;
+                })
         },
         paginate(page) {
             this.page = page;
