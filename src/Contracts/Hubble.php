@@ -57,4 +57,11 @@ interface Hubble
      * @return mixed
      */
     public function autoRegisterResources();
+
+    /**
+     * @param string $key
+     * @param mixed|null $default
+     * @return mixed
+     */
+    public function config(string $key, $default = null);
 }

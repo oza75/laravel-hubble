@@ -1,97 +1,75 @@
 <?php
 
-use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
-use Illuminate\View\Middleware\ShareErrorsFromSession;
 use Oza75\LaravelHubble\Facades\Hubble;
 
 $namespace = Hubble::namespace();
 $prefix = Hubble::prefix();
+$webController = Hubble::config('controllers.web');
+$apiController = Hubble::config('controllers.api');
 
 Route::prefix($prefix)
-    ->group(function () use ($namespace) {
-        Route::middleware(['web', 'hubble.auth'])
-            ->group(function () use ($namespace) {
-                Route::get('/', "{$namespace}HubbleController@home")
-                    ->name('hubble.home');
+    ->group(function () use ($namespace, $webController) {
+        Route::middleware(Hubble::config("routeMiddlewares.web"))
+            ->group(function () use ($namespace, $webController) {
+                Route::get('/', [$webController, 'home'])->name('hubble.home');
 
-                Route::get('/resources/{name}', "{$namespace}HubbleController@index")
-                    ->name('hubble.index');
+                Route::get('/resources/{name}', [$webController, 'index'])->name('hubble.index');
 
-                Route::put('/resources/{name}/{key}/update', "{$namespace}HubbleController@update")
-                    ->name('hubble.update');
+                Route::put('/resources/{name}/{key}/update', [$webController, 'update'])->name('hubble.update');
 
-                Route::get('/resources/{name}/{key}/edit', "{$namespace}HubbleController@edit")
-                    ->name('hubble.edit');
+                Route::get('/resources/{name}/{key}/edit', [$webController, 'edit'])->name('hubble.edit');
 
-                Route::get('/resources/{name}/create', "{$namespace}HubbleController@create")
-                    ->name('hubble.create');
+                Route::get('/resources/{name}/create', [$webController, 'create'])->name('hubble.create');
 
-                Route::post('/resources/{name}/store', "{$namespace}HubbleController@store")
-                    ->name('hubble.store');
+                Route::post('/resources/{name}/store', [$webController, 'store'])->name('hubble.store');
 
-                Route::delete('/resources/{name}/{key}', "{$namespace}HubbleController@destroy")
-                    ->name('hubble.delete');
+                Route::delete('/resources/{name}/{key}', [$webController, 'destroy'])->name('hubble.delete');
 
-                Route::get('/resources/{name}/{key}', "{$namespace}HubbleController@show")
-                    ->name('hubble.show');
+                Route::get('/resources/{name}/{key}', [$webController, 'show'])->name('hubble.show');
 
             });
 
-        Route::get('/login', "{$namespace}HubbleController@showLoginForm")
+        Route::get('/login', [$webController, 'showLoginForm'])
             ->middleware(['web', 'hubble.guest'])
             ->name('hubble.login');
-
-        //
-//        Route::middleware(['web'])->group(function () use ($namespace) {
-//            Route::get('/login', 'Auth\AdminLoginController@showLoginForm')->name('admin.login');
-//            Route::post('/logout', 'Auth\AdminLoginController@logout')->name("admin.logout");
-//            Route::post('/login', 'Auth\AdminLoginController@login')->name('admin.login.attempt');
-//        });
     });
 
 Route::prefix("/api{$prefix}")
-    ->middleware([
-        EncryptCookies::class, AddQueuedCookiesToResponse::class,
-        StartSession::class, ShareErrorsFromSession::class,
-        'api', 'hubble.auth'
-    ])
-    ->group(function () use ($namespace) {
-        Route::get('/resources/{name}', "{$namespace}ApiController@index")
+    ->middleware(Hubble::config("routeMiddlewares.api"))
+    ->group(function () use ($namespace, $apiController) {
+        Route::get('/resources/{name}', [$apiController, 'index'])
             ->name('api.hubble.index');
 
-        Route::get('/resources/{name}/export', "{$namespace}ApiController@export")
+        Route::get('/resources/{name}/export', [$apiController, 'export'])
             ->name('api.hubble.export');
 
-        Route::get('/resources/{name}/{key}', "{$namespace}ApiController@show")
+        Route::get('/resources/{name}/{key}', [$apiController, 'show'])
             ->name('api.hubble.show');
 
-        Route::get('/resources/{name}/{key}/{field}', "{$namespace}ApiController@relatedIndex")
+        Route::get('/resources/{name}/{key}/{field}', [$apiController, 'relatedIndex'])
             ->name('api.hubble.related.index');
 
-        Route::get('/resources/{name}/{key}/{field}/export', "{$namespace}ApiController@relatedExport")
+        Route::get('/resources/{name}/{key}/{field}/export', [$apiController, 'relatedExport'])
             ->name('api.hubble.related.export');
 
-        Route::get('/resources/{name}/{id}/edit', "{$namespace}ApiController@edit")
+        Route::get('/resources/{name}/{id}/edit', [$apiController, 'edit'])
             ->name('api.hubble.edit');
 
-        Route::post('/resources/{name}/actions/{action}', "{$namespace}ApiController@action")
+        Route::post('/resources/{name}/actions/{action}', [$apiController, 'action'])
             ->name('api.hubble.action');
 
-        Route::delete('/resources/{name}/{key}', "{$namespace}ApiController@destroy")
+        Route::delete('/resources/{name}/{key}', [$apiController, 'destroy'])
             ->name('api.hubble.delete');
 
-        Route::delete('/resources/{name}/{key}/{field}/detach/{id}', "{$namespace}ApiController@detachItem")
+        Route::delete('/resources/{name}/{key}/{field}/detach/{id}', [$apiController, 'detachItem'])
             ->name('api.hubble.related.detach');
 
-        Route::post('/resources/{name}/{key}/{field}/attach', "{$namespace}ApiController@attachItem")
+        Route::post('/resources/{name}/{key}/{field}/attach', [$apiController, 'attachItem'])
             ->name('api.hubble.related.attach');
 
-        Route::get('/resources/{name}/{key}/fields/{field}/related', "{$namespace}ApiController@fieldRelatedOptions")
+        Route::get('/resources/{name}/{key}/fields/{field}/related', [$apiController, 'fieldRelatedOptions'])
             ->name('api.hubble.fields.related');
 
-        Route::post('/validation', "{$namespace}ApiController@validate")->name('api.hubble.validation');
+        Route::post('/validation', [$apiController, 'validate'])->name('api.hubble.validation');
     });

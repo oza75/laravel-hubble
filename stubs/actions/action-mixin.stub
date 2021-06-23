@@ -6,6 +6,7 @@ export const ActionMixin = {
         action: {type: Object, required: true},
         selected: {type: Array, required: true},
         resource: {type: Object, required: true},
+        confirmMessage: {type: String},
     },
      computed: {
           selectedIds() {

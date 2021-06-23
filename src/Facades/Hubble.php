@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \Oza75\LaravelHubble\Contracts\Hubble setResources(array $resources);
  * @method static \Oza75\LaravelHubble\Contracts\Hubble addResources(array $resources);
  * @method static array getBooted();
+ * @method static mixed config(string $key, $default = null);
  * @method static \Oza75\LaravelHubble\Contracts\Hubble disableAutoDiscovering();
  * @method static bool autoRegisterResources();
  */

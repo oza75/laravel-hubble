@@ -3,8 +3,12 @@
 namespace Oza75\LaravelHubble;
 
 use Exception;
+use Illuminate\Config\Repository;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\Str;
+use LogicException;
 use Oza75\LaravelHubble\Contracts\Hubble as Contract;
+use ReflectionClass;
 
 class Hubble implements Contract
 {
@@ -55,14 +59,14 @@ class Hubble implements Contract
                 return $resource->isAccessible();
             })
             ->map(function ($resource) {
-            $icon = method_exists($resource, 'icon') ? $resource->icon() : $resource->icon ?? null;
+                $icon = method_exists($resource, 'icon') ? $resource->icon() : $resource->icon ?? null;
 
-            return [
-                'title' => $resource->getTitle(),
-                'icon' => $icon,
-                'url' => route('hubble.index', ['name' => $resource->getName()])
-            ];
-        });
+                return [
+                    'title' => $resource->getTitle(),
+                    'icon' => $icon,
+                    'url' => route('hubble.index', ['name' => $resource->getName()])
+                ];
+            });
     }
 
     /**
@@ -118,7 +122,7 @@ class Hubble implements Contract
     public function setResourcesFolder(string $path, string $namespace)
     {
         if (!$this->autoDiscovering) {
-            throw new \LogicException('You have already disable resource auto registration. You can only set resources namespace only if resource auto discovering is activated');
+            throw new LogicException('You have already disable resource auto registration. You can only set resources namespace only if resource auto discovering is activated');
         }
 
         $this->resourcesFolder = Str::finish(realpath($path), '/');
@@ -154,7 +158,7 @@ class Hubble implements Contract
             return $this->resourcesNamespace . '\\' . basename($file, '.php');
         })->filter(function ($class) {
             if (!class_exists($class)) return false;
-            $reflection = new \ReflectionClass($class);
+            $reflection = new ReflectionClass($class);
             return $reflection->isSubclassOf(HubbleResource::class) && $reflection->isInstantiable();
         })->toArray();
 
@@ -253,5 +257,15 @@ class Hubble implements Contract
     public function getResourcesNamespace()
     {
         return $this->resourcesNamespace;
+    }
+
+    /**
+     * @param string $key
+     * @param null $default
+     * @return Repository|Application|mixed
+     */
+    public function config(string $key, $default = null)
+    {
+        return config("laravel-hubble.{$key}", $default);
     }
 }

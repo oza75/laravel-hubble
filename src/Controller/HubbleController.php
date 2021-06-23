@@ -62,7 +62,8 @@ class HubbleController
 
         $match->setCurrentItem($founded);
 
-        $item = new EditResource($founded, $match);
+        $mapper = $dashboard->config('mappers.edit', EditResource::class);
+        $item = new $mapper($founded, $match);
 
         $resource = $match->toArray('editing', $founded);
 
@@ -86,7 +87,8 @@ class HubbleController
 
         $match->setCurrentItem($founded);
 
-        $item = new DetailResource($founded, $match);
+        $mapper = $dashboard->config('mappers.detail', DetailResource::class);
+        $item = new $mapper($founded, $match);
 
         $resource = $match->toArray('details', $founded);
 
@@ -105,7 +107,8 @@ class HubbleController
 
         $this->authorizes('create', $resource->getModel());
 
-        $item = new CreateResource($resource->getModel(), $resource);
+        $mapper = $dashboard->config('mappers.create', CreateResource::class);
+        $item = new $mapper($resource->getModel(), $resource);
 
         $resource = $resource->toArray('creating');
 

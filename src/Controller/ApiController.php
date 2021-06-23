@@ -41,7 +41,7 @@ class ApiController
 
         $data = $resource->findItems($request);
 
-        return $this->indexResponse($resource, $data);
+        return $this->indexResponse($hubble, $resource, $data);
     }
 
     /**
@@ -64,16 +64,19 @@ class ApiController
     }
 
     /**
+     * @param Hubble $hubble
      * @param $resource
      * @param $data
      * @return JsonResponse
      */
-    private function indexResponse($resource, $data)
+    private function indexResponse(Hubble $hubble, $resource, $data)
     {
         $items = $data->items();
 
-        $collection = collect($items)->map(function ($item) use ($resource) {
-            return new IndexResource($item, $resource);
+        $mapper = $hubble->config('mappers.index', IndexResource::class);
+
+        $collection = collect($items)->map(function ($item) use ($mapper, $resource) {
+            return new $mapper($item, $resource);
         });
 
         return response()->json([
@@ -177,7 +180,7 @@ class ApiController
 
         $data = $related->findItems($request);
 
-        return $this->indexResponse($related, $data);
+        return $this->indexResponse($hubble, $related, $data);
     }
 
     /**
