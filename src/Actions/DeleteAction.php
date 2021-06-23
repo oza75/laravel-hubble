@@ -63,7 +63,11 @@ class DeleteAction extends Action
      */
     public function can(User $user, ?Model $model = null): bool
     {
-        if (is_null($model)) return true;
+        if (is_null($model) && is_null($this->resource)) {
+            return true;
+        }
+
+        $model = $model ?? $this->resource->getModel();
 
         return $this->canAccess('delete', $model);
     }
