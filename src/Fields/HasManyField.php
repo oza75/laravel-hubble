@@ -5,9 +5,9 @@ namespace Oza75\LaravelHubble\Fields;
 
 use Oza75\LaravelHubble\Concerns\Relations\HasRelationships;
 use Oza75\LaravelHubble\Contracts\Relations\HandleManyRelationship;
+use Oza75\LaravelHubble\Facades\Hubble;
 use Oza75\LaravelHubble\HubbleResource;
 use Oza75\LaravelHubble\RelatedResource;
-use Oza75\LaravelHubble\Resource;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -176,7 +176,9 @@ class HasManyField extends SelectField implements HandleManyRelationship
         $model = $this->resource->baseQuery()->where($this->resource->getKey(), $key)->firstOrFail();
         $relationship = $model->{$this->methodName}();
 
-        $newResource = new RelatedResource($resource, $this->resource, $model, $this, $relationship);
+        $relatedResource = Hubble::config("relatedResource", RelatedResource::class);
+
+        $newResource = new $relatedResource($resource, $this->resource, $model, $this, $relationship);
         $newResource->boot();
 
         return $newResource;

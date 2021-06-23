@@ -46,5 +46,9 @@ return [
         'detail' => \Oza75\LaravelHubble\Resources\DetailResource::class,
         'edit' => \Oza75\LaravelHubble\Resources\EditResource::class,
         'create' => \Oza75\LaravelHubble\Resources\CreateResource::class,
-    ]
+    ],
+
+    "relatedResource" => \Oza75\LaravelHubble\RelatedResource::class,
+
+    "exporter" => \Oza75\LaravelHubble\Export\ExcelExport::class,
 ];

@@ -4,9 +4,7 @@
 namespace Oza75\LaravelHubble;
 
 
-use Illuminate\Foundation\Auth\User;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Gate;
 use Oza75\LaravelHubble\Commands\CreateActionCommand;
 use Oza75\LaravelHubble\Commands\CreateFieldCommand;
 use Oza75\LaravelHubble\Commands\CreateFilterCommand;
@@ -77,6 +75,11 @@ class ServiceProvider extends \Illuminate\Support\ServiceProvider
             return new Hubble;
         });
 
-        $this->app->bind(ResourceExporter::class, ExcelExport::class);
+        $this->app->bind(ResourceExporter::class, function ($app) {
+            /** @var \Oza75\LaravelHubble\Contracts\Hubble $hubble */
+            $hubble = $app->make(\Oza75\LaravelHubble\Contracts\Hubble::class);
+
+            return app($hubble->config("exporter", ExcelExport::class));
+        });
     }
 }
