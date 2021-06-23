@@ -463,6 +463,7 @@ abstract class HubbleResource
     {
         return collect($this->actions())
             ->filter(function (Action $action) use ($section) {
+                $action->boot($this);
                 /** @var User */
                 $user = auth()->user();
                 return $action->can($user, $this->currentItem) && $action->visiblesIn($section);
