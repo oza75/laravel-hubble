@@ -213,6 +213,8 @@ abstract class HubbleResource
         $action = $this->getActionByName($name);
         if (is_null($action)) abort(404);
 
+        $action->boot($this);
+
         $request->validate(['items' => 'required']);
         $ids = $request->get('items');
 

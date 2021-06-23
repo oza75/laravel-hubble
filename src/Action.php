@@ -50,6 +50,11 @@ abstract class Action
     protected $props = [];
 
     /**
+     * @var mixed|null
+     */
+    protected $resource;
+
+    /**
      * Action constructor.
      * @param string|null $name
      * @param string|null $title
@@ -264,5 +269,10 @@ abstract class Action
     public function getProps()
     {
         return $this->props;
+    }
+
+    public function boot($resource)
+    {
+        $this->resource = $resource;
     }
 }
