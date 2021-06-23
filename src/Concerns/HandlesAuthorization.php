@@ -49,7 +49,11 @@ trait HandlesAuthorization
 
         if (is_null($policy) || is_null($ability)) return true;
 
-        return $this->callPolicyMethod($policy, 'attach' . $ability);
+        if (method_exists($policy, $ability)) {
+            return $this->callPolicyMethod($policy, 'attach' . $ability);
+        }
+
+        return $this->callPolicyMethod($policy, 'attach', [$related]);
     }
 
     protected function canDetach($model, $item)
@@ -75,7 +79,7 @@ trait HandlesAuthorization
 
         $result = $this->callPolicyBefore($policy, $user, $ability);
 
-        if (! is_null($result)) {
+        if (!is_null($result)) {
             return $result;
         }
 
