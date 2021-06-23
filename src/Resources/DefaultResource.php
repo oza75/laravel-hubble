@@ -16,7 +16,7 @@ class DefaultResource extends JsonResource
 {
     use HandlesAuthorization;
 
-    private $presenter;
+    protected $presenter;
     /**
      * @var string
      */
@@ -56,7 +56,7 @@ class DefaultResource extends JsonResource
      * @param Field $field
      * @return mixed
      */
-    private function value(Field $field)
+    protected function value(Field $field)
     {
         try {
             return $this->resource->{$field->getName()};
