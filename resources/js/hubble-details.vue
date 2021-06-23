@@ -162,7 +162,7 @@
             },
             runAction() {
                 this.runningAction = true;
-                return this.$axios.post(this.action.url, {items: this.datum[this.resource.key]})
+                return this.$axios.post(this.action.url, {items: [this.datum[this.resource.key]]})
                     .then(res => {
                         this.fetchItems({'after-running-action': true});
                     }).finally(_ => {
