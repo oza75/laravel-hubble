@@ -390,11 +390,14 @@ abstract class HubbleResource
     /**
      * @param string $section
      * @return Collection
+     * @throws Exception
      */
     protected function getRelatedResources(string $section)
     {
         return $this->fieldCollection->filter(function (Field $field) use ($section) {
-            return $field instanceof HandleManyRelationship && $field->isVisibleOn($section);
+            return $field instanceof HandleManyRelationship
+                && $field->isVisibleOn($section)
+                && $this->canAccess('index', $field->getRelatedResource()->getModel());
         })->map(function (Field $field) {
             return $field->getRelatedResource()->toArray();
         })->values();
