@@ -154,7 +154,20 @@
             },
             openAction() {
                 if (!this.action) return;
-                this.showActionComponent = true;
+                if (this.action.component === 'confirm-action' && !this.action.props.confirmMessage) {
+                    this.runAction();
+                } else {
+                    this.showActionComponent = true;
+                }
+            },
+            runAction() {
+                this.runningAction = true;
+                return this.$axios.post(this.action.url, {items: this.datum[this.resource.key]})
+                    .then(res => {
+                        this.fetchItems({'after-running-action': true});
+                    }).finally(_ => {
+                        this.runningAction = false;
+                    })
             },
         },
         created() {
