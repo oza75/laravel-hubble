@@ -330,19 +330,19 @@ export default {
         },
         openAction() {
             if (!this.currentAction) return;
-            if (this.currentAction.component === 'confirm-action' && !this.currentAction.confirmMessage) {
+            if (this.currentAction.component === 'confirm-action' && !this.currentAction.props.confirmMessage) {
                 this.runAction();
             } else {
                 this.showActionComponent = true;
             }
         },
         runAction() {
-            this.running = false;
+            this.runningAction = false;
             return this.$axios.post(this.currentAction.url, {items: this.selected})
                 .then(res => {
                     this.fetchItems();
                 }).finally(_ => {
-                    this.running = false;
+                    this.runningAction = false;
                 })
         },
         paginate(page) {
