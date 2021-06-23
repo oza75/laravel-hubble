@@ -337,7 +337,7 @@ export default {
             }
         },
         runAction() {
-            this.runningAction = false;
+            this.runningAction = true;
             return this.$axios.post(this.currentAction.url, {items: this.selected})
                 .then(res => {
                     this.fetchItems();
