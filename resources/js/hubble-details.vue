@@ -150,7 +150,7 @@
             },
             actionRan() {
                 this.selected = [];
-                this.fetchItems({'after-running-action': true});
+                this.fetchItem({'after-running-action': true});
             },
             openAction() {
                 if (!this.action) return;
@@ -164,7 +164,7 @@
                 this.runningAction = true;
                 return this.$axios.post(this.action.url, {items: [this.datum[this.resource.key]]})
                     .then(res => {
-                        this.fetchItems({'after-running-action': true});
+                        this.fetchItem({'after-running-action': true});
                     }).finally(_ => {
                         this.runningAction = false;
                     })
