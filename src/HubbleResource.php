@@ -7,6 +7,7 @@ namespace Oza75\LaravelHubble;
 use Exception;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Auth\User;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Str;
 use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Concerns\HandlesConfiguration;
@@ -264,7 +265,7 @@ abstract class HubbleResource
 
     /**
      * @param Request $request
-     * @return string
+     * @return RedirectResponse
      */
     public function createItem(Request $request)
     {
@@ -276,7 +277,7 @@ abstract class HubbleResource
 
         session()->flash('notification', ['message' => trans('laravel-hubble::dashboard.created'), 'state' => 'success']);
 
-        return route('hubble.show', ['name' => $this->getName(), 'key' => $item->{$this->key}]);
+        return redirect()->route('hubble.show', ['name' => $this->getName(), 'key' => $item->{$this->key}]);
     }
 
     /**

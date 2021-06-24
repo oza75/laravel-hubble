@@ -5,10 +5,9 @@ namespace Oza75\LaravelHubble\Controller;
 
 
 use Exception;
-use Illuminate\Support\Str;
+use Illuminate\Contracts\Support\Responsable;
 use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
-use Oza75\LaravelHubble\Facades\Hubble as HubbleFacade;
 use Oza75\LaravelHubble\Resources\CreateResource;
 use Oza75\LaravelHubble\Resources\DetailResource;
 use Oza75\LaravelHubble\Resources\EditResource;
@@ -18,6 +17,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\Response;
 
 class HubbleController
 {
@@ -128,9 +128,9 @@ class HubbleController
 
         $this->authorizes('create', $resource->getModel());
 
-        $url = $resource->createItem($request);
+        $response = $resource->createItem($request);
 
-        return redirect($url);
+        return $this->isAResponse($response) ? $response : redirect(route('hubble.index', ['name' => $response->getName()]));
     }
 
     /**
@@ -150,8 +150,11 @@ class HubbleController
         $resource->setCurrentItem($item);
 
         $this->authorizes('update', $item);
+        $response = $resource->updateItem($item, $request);
 
-        $resource->updateItem($item, $request);
+        if ($this->isAResponse($response)) {
+            return $response;
+        }
 
         return redirect()->route('hubble.show', ['name' => $resource->getName(), 'key' => $key]);
     }
@@ -173,11 +176,20 @@ class HubbleController
 
         $resource->setCurrentItem($item);
 
-        $resource->delete($item);
+        $response = $resource->delete($item);
 
         session()->flash('notification', ['message' => trans('laravel-hubble::dashboard.deleted'), 'state' => 'success']);
 
-        return redirect()->route('hubble.index', ['name' => $resource->getName()]);
+        return $this->isAResponse($response) ? $response : redirect()->route('hubble.index', ['name' => $resource->getName()]);
+    }
+
+    protected function isAResponse($value): bool
+    {
+        if (is_null($value)) return false;
+
+        return $value instanceof Response ||
+            $value instanceof \Illuminate\Http\Response ||
+            $value instanceof Responsable;
     }
 
     public function showLoginForm()
