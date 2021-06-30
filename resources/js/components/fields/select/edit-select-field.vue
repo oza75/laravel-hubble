@@ -161,12 +161,14 @@ export default {
             return this.$axios.get(this.options, {params: {[this.valueKey]: value}}).then(res => {
                 this.realOptions.push(res.data.data);
                 let item = this.realOptions.find(option => option[this.valueKey] == value);
-                if (!item) {
+                if (!item && this.$refs['textInput']) {
                     this.$refs['textInput'].value = null;
                     return;
                 }
 
-                this.$refs['textInput'].value = item[this.textKey]
+                if (this.$refs['textInput']) {
+                    this.$refs['textInput'].value = item[this.textKey]
+                }
             });
         },
         onKeydown(keyboardEvent) {
