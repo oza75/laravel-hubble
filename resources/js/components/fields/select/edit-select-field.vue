@@ -334,12 +334,14 @@ export default {
         inputValue(value) {
             if (!value) this.$refs['textInput'].removeAttribute('value')
             let item = this.realOptions.find(option => option[this.valueKey] == value);
-            if (!item) {
+            if (!item && this.$refs['textInput']) {
                 this.$refs['textInput'].value = null;
                 return;
             }
 
-            this.$refs['textInput'].value = item[this.textKey]
+            if (this.$refs['textInput']) {
+                this.$refs['textInput'].value = item[this.textKey]
+            }
         }
     },
     created() {
