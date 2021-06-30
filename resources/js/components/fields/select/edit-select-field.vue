@@ -147,12 +147,14 @@ export default {
                 }
 
                 let item = this.realOptions.find(option => option[this.valueKey] == this.value);
-                if (!item) {
+                if (!item && this.$refs['textInput']) {
                     this.$refs['textInput'].value = null;
                     return;
                 }
 
-                this.$refs['textInput'].value = item[this.textKey]
+                if (this.$refs['textInput']) {
+                    this.$refs['textInput'].value = item[this.textKey]
+                }
             })
         },
         fetchOptionItem(value) {
