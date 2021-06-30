@@ -58,6 +58,11 @@ class Hubble implements Contract
             ->filter(function ($resource) {
                 return $resource->isAccessible();
             })
+            ->sort(function ($a, $b) {
+                if ($a->getTitle() === $b->getTitle()) return 0;
+
+                return $a->getTitle() < $b->getTitle() ? -1 : 1;
+            })
             ->map(function ($resource) {
                 $icon = method_exists($resource, 'icon') ? $resource->icon() : $resource->icon ?? null;
 
