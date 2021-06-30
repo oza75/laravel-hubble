@@ -141,7 +141,7 @@ export default {
             return this.$axios.get(this.options, {params: {page: this.page, search: this.searchValue}}).then(res => {
                 console.log(JSON.parse(JSON.stringify(this.realOptions)));
                 const values = this.realOptions.map(o => o[this.valueKey]);
-                const items = res.data.data.filter(o => !values.includes(o[this.valueKey]))
+                const items = JSON.parse(JSON.stringify(res.data.data.filter(o => !values.includes(o[this.valueKey]))))
                 console.log(items,res,res.data.data, res.data.data.filter(o => !values.includes(o[this.valueKey])), values, this);
                 if (this.page <= 1) {
                     this.realOptions = items
@@ -162,7 +162,11 @@ export default {
         },
         fetchOptionItem(value) {
             return this.$axios.get(this.options, {params: {[this.valueKey]: value}}).then(res => {
-                this.realOptions.push(res.data.data);
+                const data = Array.isArray(res.data.data) ? res.data.data : [res.data.data];
+                const values = this.realOptions.map(o => o[this.valueKey]);
+                const items = JSON.parse(JSON.stringify(data.filter(o => !values.includes(o[this.valueKey]))))
+                this.realOptions = this.realOptions.concat(items);
+
                 let item = this.realOptions.find(option => option[this.valueKey] == value);
                 if (!item && this.$refs['textInput']) {
                     this.$refs['textInput'].value = null;
@@ -352,6 +356,7 @@ export default {
             this.realOptions = this.options;
         } else {
             this.fetchOptions().then(_ => {
+                if (!this.value) return;
                 const option = this.realOptions.find(o => o[this.valueKey] == this.value);
                 if (!option) this.fetchOptionItem(this.value);
             })
