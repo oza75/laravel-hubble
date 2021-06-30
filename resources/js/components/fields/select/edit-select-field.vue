@@ -137,13 +137,15 @@ export default {
             this.$emit('dropdown-open');
         },
         fetchOptions(clear = false) {
+            window.hubble_vm = this;
             return this.$axios.get(this.options, {params: {page: this.page, search: this.searchValue}}).then(res => {
                 const values = this.realOptions.map(o => o[this.valueKey]);
                 const items = res.data.data.filter(o => !values.includes(o[this.valueKey]))
-                if (this.page !== 1) {
-                    this.realOptions = this.realOptions.concat(items);
-                } else {
+                console.log(items, this);
+                if (this.page <= 1) {
                     this.realOptions = items
+                } else {
+                    this.realOptions = this.realOptions.concat(items);
                 }
 
                 let item = this.realOptions.find(option => option[this.valueKey] == this.value);
