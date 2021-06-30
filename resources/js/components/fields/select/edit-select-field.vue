@@ -139,9 +139,10 @@ export default {
         fetchOptions(clear = false) {
             window.hubble_vm = this;
             return this.$axios.get(this.options, {params: {page: this.page, search: this.searchValue}}).then(res => {
+                console.log(JSON.parse(JSON.stringify(this.realOptions)));
                 const values = this.realOptions.map(o => o[this.valueKey]);
                 const items = res.data.data.filter(o => !values.includes(o[this.valueKey]))
-                console.log(items,res, this);
+                console.log(items,res,res.data.data, res.data.data.filter(o => !values.includes(o[this.valueKey])), values, this);
                 if (this.page <= 1) {
                     this.realOptions = items
                 } else {
