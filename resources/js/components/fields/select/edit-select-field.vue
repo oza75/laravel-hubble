@@ -141,7 +141,7 @@ export default {
             return this.$axios.get(this.options, {params: {page: this.page, search: this.searchValue}}).then(res => {
                 const values = this.realOptions.map(o => o[this.valueKey]);
                 const items = res.data.data.filter(o => !values.includes(o[this.valueKey]))
-                console.log(items, this);
+                console.log(items,res, this);
                 if (this.page <= 1) {
                     this.realOptions = items
                 } else {
