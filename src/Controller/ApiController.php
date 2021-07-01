@@ -13,6 +13,7 @@ use Oza75\LaravelHubble\Concerns\HandlesAuthorization;
 use Oza75\LaravelHubble\Contracts\Hubble;
 use Oza75\LaravelHubble\Export\ExcelExport;
 use Oza75\LaravelHubble\Export\ResourceExporter;
+use Oza75\LaravelHubble\Field;
 use Oza75\LaravelHubble\HubbleResource;
 use Oza75\LaravelHubble\Resources\DetailResource;
 use Oza75\LaravelHubble\Resources\IndexResource;
@@ -233,6 +234,26 @@ class ApiController
                     'state' => 'success'
                 ]
             ]);
+    }
+
+    /**
+     * @param Hubble $hubble
+     * @param Request $request
+     * @param string $name
+     * @param string|int $key
+     * @param Field $field
+     * @param string $action
+     * @return JsonResponse
+     */
+    public function relatedAction(Hubble $hubble, Request $request, $name, $key, $field, $action)
+    {
+        $resource = $hubble->getResource($name);
+
+        $related = $resource->getRelatedFieldResource($field);
+
+        $notification = $related->runAction($action, $request);
+
+        return response()->json(['success' => true, 'notification' => $notification]);
     }
 
     /**

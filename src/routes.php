@@ -68,6 +68,9 @@ Route::prefix("/api{$prefix}")
         Route::post('/resources/{name}/{key}/{field}/attach', [$apiController, 'attachItem'])
             ->name('api.hubble.related.attach');
 
+        Route::post('/resources/{name}/{key}/{field}/actions/{action}', [$apiController, 'relatedAction'])
+            ->name('api.hubble.related.action');
+
         Route::get('/resources/{name}/{key}/fields/{field}/related', [$apiController, 'fieldRelatedOptions'])
             ->name('api.hubble.fields.related');
 

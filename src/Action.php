@@ -55,6 +55,10 @@ abstract class Action
     protected $resource;
 
     /**
+     * @var string
+     */
+    protected $url;
+    /**
      * Action constructor.
      * @param string|null $name
      * @param string|null $title
@@ -274,5 +278,25 @@ abstract class Action
     public function boot($resource)
     {
         $this->resource = $resource;
+    }
+
+
+    /**
+     * @return string the url that will be called when run this action
+     */
+    public function url()
+    {
+        return $this->url ?? route('api.hubble.action', ['name' => $this->resource->getName(), 'action' => $this->getName()]);
+    }
+
+    /**
+     * @param string $url
+     * @return $this
+     */
+    public function setUrl(string $url)
+    {
+        $this->url = $url;
+
+        return $this;
     }
 }

@@ -219,7 +219,7 @@ abstract class HubbleResource
         $request->validate(['items' => 'required']);
         $ids = $request->get('items');
 
-        $models = $this->baseQuery()->whereIn($this->getKey(), $ids)->cursor();
+        $models = $this->baseQuery()->whereIn($this->getModel()->getTable().".". $this->getModel()->getKeyName(), $ids)->cursor();
 
         $message = $action->run($models, $this->baseQuery());
 
@@ -471,7 +471,7 @@ abstract class HubbleResource
             })
             ->map(function (Action $action) {
                 return array_merge($action->toArray(), [
-                    'url' => route('api.hubble.action', ['name' => $this->getName(), 'action' => $action->getName()])
+                    'url' => $action->url()
                 ]);
             })
             ->values()

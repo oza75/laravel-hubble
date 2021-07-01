@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Oza75\LaravelHubble\Actions\DetachAction;
 use Oza75\LaravelHubble\TableButtons\ExportButton;
 
 class RelatedResource extends HubbleResource
@@ -73,7 +74,7 @@ class RelatedResource extends HubbleResource
      */
     public function actions()
     {
-        return $this->related->actions();
+        return array_merge($this->related->actions(), [DetachAction::make()]);
     }
 
     /**
@@ -247,5 +248,37 @@ class RelatedResource extends HubbleResource
         }
 
         return true;
+    }
+
+    /**
+     * @return Field
+     */
+    public function getField()
+    {
+        return $this->field;
+    }
+
+    /**
+     * @return HubbleResource|Resource
+     */
+    public function getParent()
+    {
+        return $this->parent;
+    }
+
+    /**
+     * @return Model
+     */
+    public function getParentModel()
+    {
+        return $this->parentModel;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getRelationship()
+    {
+        return $this->relationship;
     }
 }

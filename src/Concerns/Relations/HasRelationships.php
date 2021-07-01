@@ -28,7 +28,7 @@ trait HasRelationships
      * @param Model $model
      * @param $relationship
      */
-    private function guessColumnName(Model $model, $relationship)
+    protected function guessColumnName(Model $model, $relationship)
     {
         $this->setName($relationship->getForeignKeyName());
     }
@@ -36,7 +36,7 @@ trait HasRelationships
     /**
      * @return HubbleResource
      */
-    private function newRelatedInstance()
+    protected function newRelatedInstance()
     {
         return new $this->related;
     }

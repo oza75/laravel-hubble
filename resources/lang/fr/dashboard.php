@@ -22,6 +22,7 @@ return [
     "confirmation" => "Confirmation",
     "delete_item_message" => "Voulez-vous vraiment supprimer cet enregistrement ?",
     "delete_items_message" => "Voulez-vous vraiment supprimer ces enregistrements ?",
+    "detach_items_message" => "Voulez-vous vraiment détacher ces enregistrements ?",
     "details_title" => "Détails - :name",
     "edit_title" => "Modifier - :name",
     "create_title" => "Création - :name",
@@ -38,5 +39,6 @@ return [
     "created" => "Création réussie !",
     "deleted" => "Enregistrement supprimé avec succès !",
     "detached" => "Enregistrement détaché avec succès !",
+    "detach-error" => "Une erreur s'est produite lors du détachement de l'enregistrement !",
     "attached" => "Enregistrement attaché avec succès !",
 ];
