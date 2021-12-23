@@ -85,6 +85,8 @@ class Field implements HasVisibility
 
     protected $positionAfter;
 
+    protected static $globalBaseResolver = [];
+
     /**
      * Field constructor.
      * @param string $name
@@ -99,10 +101,25 @@ class Field implements HasVisibility
 
         $this->registerComponents();
         $this->setIsNumeric();
+        $this->registerBaseResolvers();
     }
 
     protected function registerComponents()
     {
+    }
+
+    protected function registerBaseResolvers()
+    {
+        $func = static::$globalBaseResolver[get_class($this)] ?? null;
+        if (!$func) return;
+
+        $sections = ['index', 'details', 'editing', 'updating', 'export'];
+
+        foreach ($sections as $section) {
+            $callable = $func($section);
+            if (!$callable) continue;
+            $this->addDisplayResolver($callable, $section);
+        }
     }
 
     /**
@@ -560,5 +577,13 @@ class Field implements HasVisibility
     public function getAfterColumn(string $columnName)
     {
         return $this->positionAfter;
+    }
+
+    /**
+     * @param callable $callable
+     */
+    public static function baseDisplayResolver(callable $callable)
+    {
+        static::$globalBaseResolver[get_called_class()] = $callable;
     }
 }
