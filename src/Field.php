@@ -86,6 +86,10 @@ class Field implements HasVisibility
     protected $positionAfter;
 
     protected static $globalBaseResolver = [];
+    /**
+     * @var string
+     */
+    protected $sort_column = null;
 
     /**
      * Field constructor.
@@ -345,6 +349,22 @@ class Field implements HasVisibility
     public function isUsedAsDefaultSort(): bool
     {
         return !!$this->usedAsDefaultSort;
+    }
+
+    /**
+     * @param string $name
+     * @return $this
+     */
+    public function sortUsingColumn(string $name)
+    {
+        $this->sort_column = $name;
+
+        return $this;
+    }
+
+    public function getSortName()
+    {
+        return $this->sort_column ?? $this->getName();
     }
 
     /**

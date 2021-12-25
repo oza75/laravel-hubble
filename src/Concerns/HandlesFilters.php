@@ -49,7 +49,7 @@ trait HandlesFilters
 
         if (!$field) return;
 
-        $query->orderBy($field->getName(), $this->sortType($sort));
+        $query->orderBy($field->getSortName(), $this->sortType($sort));
     }
 
     /**
@@ -76,7 +76,7 @@ trait HandlesFilters
 
         if (is_null($field)) return;
 
-        $query->orderBy($field->getName(), $field->getDefaultSortType());
+        $query->orderBy($field->getSortName(), $field->getDefaultSortType());
 
         return;
     }
